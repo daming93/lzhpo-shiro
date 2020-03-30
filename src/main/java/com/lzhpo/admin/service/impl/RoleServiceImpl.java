@@ -68,7 +68,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper,Role> implements Rol
     @Override
     @Cacheable("roles")
     public List<Role> selectAll() {
-        QueryWrapper wrapper = new QueryWrapper();
+        QueryWrapper<Role> wrapper = new QueryWrapper<>();
         wrapper.eq("del_flag",false);
         return baseMapper.selectList(wrapper);
     }

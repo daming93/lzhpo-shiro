@@ -14,10 +14,11 @@ spring:
     aop:
       proxy-target-class: true
 
+
 #mybatisPlu
 mybatis-plus:
   mapper-locations: classpath:/mapper/**/*Mapper.xml
-  typeAliasesPackage: com.xiaoshu.admin.entity
+  typeAliasesPackage: com.lzhpo.client.mapper
   global-config:
     db-config:
       #主键类型  AUTO:"数据库ID自增", INPUT:"用户输入ID",ID_WORKER:"全局唯一ID (数字类型唯一ID)", UUID:"全局唯一ID UUID";
@@ -39,3 +40,5 @@ mybatis-plus:
 logging:
   config: classpath:logback.xml
   path: D:\logs\comadmin
+  
+  

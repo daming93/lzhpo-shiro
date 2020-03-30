@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lzhpo.client.mapper.ContractMainMapper">
+
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.lzhpo.client.entity.ContractMain">
+    <result column="id" property="id" />
+        <result column="create_date" property="createDate" />
+        <result column="create_by" property="createBy" />
+        <result column="update_date" property="updateDate" />
+        <result column="update_by" property="updateBy" />
+        <result column="remarks" property="remarks" />
+        <result column="del_flag" property="delFlag" />
+        <result column="handing_storage_money" property="handingStorageMoney" />
+        <result column="handing_takeout_money" property="handingTakeoutMoney" />
+        <result column="handing_terminal_money" property="handingTerminalMoney" />
+        <result column="handing_type" property="handingType" />
+        <result column="file_id" property="fileId" />
+        <result column="is_audit" property="isAudit" />
+        <result column="start_time" property="startTime" />
+        <result column="over_time" property="overTime" />
+        <result column="client_id" property="clientId" />
+        <result column="contract_code" property="contractCode" />
+    </resultMap>
+
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,
+        create_date, create_by, update_date, update_by, remarks, del_flag, handing_storage_money, handing_takeout_money, handing_terminal_money, handing_type, file_id, is_audit, start_time, over_time, client_id, contract_code
+    </sql>
+
+<!-- 
+	提供一些代码供拷贝
+-->
+</mapper>

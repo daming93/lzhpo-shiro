@@ -45,7 +45,7 @@ public class MenuController {
         map.put("del_flag",false);
         List<Menu> menus = menuService.selectAllMenuList(map);
         menus.forEach( menu -> {
-            if(StringUtils.isBlank(menu.getParentId())) {
+        	if(StringUtils.isBlank(menu.getParentId())) {
                 menu.setParentId("-1");
             }
         });

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lzhpo.client.mapper.BasicdataMapper">
+
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.lzhpo.client.entity.Basicdata">
+    <result column="id" property="id" />
+        <result column="corporation_id" property="corporationId" />
+        <result column="system_client_code" property="systemClientCode" />
+        <result column="client_code" property="clientCode" />
+        <result column="client_name" property="clientName" />
+        <result column="client_short_name" property="clientShortName" />
+        <result column="relation_name" property="relationName" />
+        <result column="phone" property="phone" />
+        <result column="telephone" property="telephone" />
+        <result column="faxnumber" property="faxnumber" />
+        <result column="email" property="email" />
+        <result column="province_id" property="provinceId" />
+        <result column="city_id" property="cityId" />
+        <result column="counties_id" property="countiesId" />
+        <result column="address" property="address" />
+        <result column="client_level" property="clientLevel" />
+        <result column="tear_open_status" property="tearOpenStatus" />
+        <result column="client_type_select" property="clientTypeSelect" />
+        <result column="client_type" property="clientType" />
+        <result column="count_type" property="countType" />
+        <result column="client_status" property="clientStatus" />
+        <result column="use_type" property="useType" />
+        <result column="contract_start_time" property="contractStartTime" />
+        <result column="contract_over_time" property="contractOverTime" />
+        <result column="cost_coefficient" property="costCoefficient" />
+        <result column="default_province" property="defaultProvince" />
+        <result column="interface_num" property="interfaceNum" />
+        <result column="contacts_position" property="contactsPosition" />
+        <result column="introduction" property="introduction" />
+        <result column="create_date" property="createDate" />
+        <result column="update_date" property="updateDate" />
+        <result column="remarks" property="remarks" />
+        <result column="create_by" property="createBy" />
+        <result column="update_by" property="updateBy" />
+        <result column="del_flag" property="delFlag" />
+    </resultMap>
+
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,
+        corporation_id, system_client_code, client_code, client_name, client_short_name, relation_name, phone, telephone, faxnumber, email, province_id, city_id, counties_id, address, client_level, tear_open_status, client_type_select, client_type, count_type, client_status, use_type, contract_start_time, contract_over_time, cost_coefficient, defaultProvince, interfaceNum, contactsPosition, introduction, create_date, update_date, remarks, create_by, update_by, del_flag
+    </sql>
+
+<!-- 
+	提供一些代码供拷贝
+-->
+</mapper>

@@ -13,4 +13,7 @@ import java.security.NoSuchAlgorithmException;
 public interface UploadService {
 
     public String upload(MultipartFile file) throws IOException, NoSuchAlgorithmException;
+    
+    
+    public String upload(MultipartFile file,String from) throws IOException, NoSuchAlgorithmException;
 }

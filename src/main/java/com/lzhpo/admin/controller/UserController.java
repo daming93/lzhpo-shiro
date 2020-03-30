@@ -327,5 +327,23 @@ public class UserController {
         }
         return ResponseEntity.success("操作成功").setAny("data",map);
     }
-
+    @SysLog("上传文件")
+    @PostMapping("uploadPDF")
+    @ResponseBody
+    public ResponseEntity uploadFilePDF(@RequestParam("file") MultipartFile file, HttpServletRequest httpServletRequest) {
+        if(file == null){
+            return ResponseEntity.failure("上传文件为空 ");
+        }
+        String url = null;
+        Map map = new HashMap();
+        try {
+            url = uploadService.upload(file,"contract");
+            map.put("url", url);
+            map.put("name", file.getOriginalFilename());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.failure(e.getMessage());
+        }
+        return ResponseEntity.success("操作成功").setAny("data",map);
+    }
 }
