@@ -74,4 +74,12 @@ public class ContractMainDetailServiceImpl extends ServiceImpl<ContractMainDetai
         wrapper.eq("del_flag",false);
         return baseMapper.selectList(wrapper);
     }
+    
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteContractMainDetailOb(String mainId) {
+    	 QueryWrapper<ContractMainDetail> wrapper = new QueryWrapper<>();
+         wrapper.eq("contract_id",mainId);
+         baseMapper.delete(wrapper);
+    }
 }

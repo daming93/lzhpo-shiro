@@ -3,6 +3,7 @@ package com.lzhpo.admin.controller;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.lzhpo.admin.entity.Rescource;
 import com.lzhpo.admin.entity.Role;
 import com.lzhpo.admin.entity.User;
 import com.lzhpo.admin.service.RoleService;
@@ -17,6 +18,7 @@ import com.lzhpo.common.util.ResponseEntity;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
@@ -25,6 +27,11 @@ import org.springframework.web.util.WebUtils;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -334,16 +341,35 @@ public class UserController {
         if(file == null){
             return ResponseEntity.failure("上传文件为空 ");
         }
-        String url = null;
+        String fileId = null;
         Map map = new HashMap();
         try {
-            url = uploadService.upload(file,"contract");
-            map.put("url", url);
+        	fileId = uploadService.upload(file,"contract");
+            map.put("fileId", fileId);
             map.put("name", file.getOriginalFilename());
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.failure(e.getMessage());
         }
         return ResponseEntity.success("操作成功").setAny("data",map);
+    }
+    
+    @SysLog("预览文件")
+    @RequestMapping("loadFilePDF/{fileUrl}")
+    @ResponseBody
+    public void loadFilePDF(@PathVariable("fileUrl")String fileUrl, HttpServletRequest httpServletRequest,HttpServletResponse response) {
+    	Rescource res = uploadService.getRescource(fileUrl);
+    	File file = new File(res.getWebUrl());
+    	byte[] data = null;
+		if(file.exists()){
+			try {
+			FileInputStream input = new FileInputStream(file);
+	        data = new byte[input.available()];
+	        input.read(data);
+	        response.getOutputStream().write(data);
+	        input.close();
+			} catch (Exception e) {
+			}
+		}
     }
 }
