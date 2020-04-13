@@ -61,10 +61,11 @@ layui.use(['layer','form','table'], function() {
         cols: [[
             {type:'checkbox'},
            /* {field:'id',        title: 'ID'   },*/
+            {field:'clientId',        title: '客户名称'   },
             {field:'name',        title: '合同名称'   },
             {field:'contractCode',        title: '合同编号'   },
-            {field:'createUser',  title: '创建人',templet:'<div>{{  d.createUser.nickName }}</div>'},
-            {field:'updateUser',  title: '修改人',templet:'<div>{{  d.updateUser.nickName }}</div>'},
+            {field:'startTime',  title: '开始时间',    width:'14%'}, 
+            {field:'overTime',  title: '结束时间',    width:'14%'}, 
             {field:'createDate',  title: '创建时间',    width:'14%',templet:'<div>{{ layui.laytpl.toDateString(d.createDate) }}</div>',unresize: true}, //单元格内容水平居中
             {field:'updateDate',  title: '修改时间',    width:'14%',templet:'<div>{{ layui.laytpl.toDateString(d.updateDate) }}</div>',unresize: true}, //单元格内容水平居中
             {title: '操作',fixed: 'right',  width:'15%',    align: 'center',toolbar: '#contractMainBar'}

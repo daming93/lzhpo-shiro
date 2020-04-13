@@ -1,7 +1,6 @@
 package com.lzhpo.client.controller;
 
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -30,7 +29,6 @@ import com.lzhpo.client.service.IBasicdataService;
 import com.lzhpo.common.annotation.SysLog;
 import com.lzhpo.common.base.PageData;
 import com.lzhpo.common.util.ResponseEntity;
-import com.lzhpo.common.util.AutoCodeUtils;
 
 
 /**

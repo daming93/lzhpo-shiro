@@ -191,6 +191,13 @@
 			<optional>true</optional>
 			
 		</dependency>
+		
+		<!-- 工具类的包 -->
+	      <dependency>
+	        <groupId>cn.hutool</groupId>
+    		<artifactId>hutool-all</artifactId>
+    		<version>5.2.3</version>
+	    </dependency>
     </dependencies>
 
     <build>

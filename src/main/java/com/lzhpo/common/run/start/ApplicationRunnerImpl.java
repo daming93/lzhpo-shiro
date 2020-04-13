@@ -6,6 +6,8 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 
+import cn.hutool.cron.CronUtil;
+
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -32,9 +34,11 @@ public class ApplicationRunnerImpl implements ApplicationRunner {
         }
         assert localHost != null;
         String ip = localHost.getHostAddress();
+        //启动定时器
+        CronUtil.start();
+        System.out.println("定时器启动成功");
         System.out.println("----------------------------------------");
         System.out.println("启动成功：http://" +ip +":" +serverPort);
         System.out.println("----------------------------------------");
-        //这里预设个字典表
     }
 }

@@ -39,6 +39,14 @@
 <div class="layui-form users_list">
     <table class="layui-table" id="contractMain-table" lay-filter="contractMainList"></table>
     <script type="text/html" id="contractMainBar">
+    {{# if (d.isUse){}}
+        <a class="layui-btn layui-btn-normal layui-btn-xs">使用中</a>
+       {{#  } else { }}
+       <a class="layui-btn layui-btn-warm layui-btn-xs">未使用</a>
+    {{# } }}
+    {{# if (d.isAudit != 1){}}
+        <a class="layui-btn layui-btn-normal layui-btn-xs">审核</a>
+    {{# } }}      
     <shiro:hasPermission name="client:contractMain:edit">
         <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
     </shiro:hasPermission>

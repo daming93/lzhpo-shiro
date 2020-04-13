@@ -1,7 +1,11 @@
 package com.lzhpo.admin.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.lzhpo.admin.entity.Rescource;
+import com.lzhpo.admin.entity.User;
+import com.lzhpo.admin.mapper.RescourceMapper;
+import com.lzhpo.admin.mapper.UserMapper;
 import com.lzhpo.admin.service.UploadService;
 import com.lzhpo.common.util.FileUtil;
 import org.springframework.stereotype.Service;
@@ -22,7 +26,7 @@ import java.util.UUID;
  * <p> Description：</p>
  */
 @Service
-public class UploadServiceImpl implements UploadService {
+public class UploadServiceImpl extends ServiceImpl<RescourceMapper, Rescource> implements  UploadService {
 
     @Override
     public String upload(MultipartFile file) throws IOException, NoSuchAlgorithmException {
@@ -101,6 +105,12 @@ public class UploadServiceImpl implements UploadService {
         rescource.setWebUrl(webUrl);
         rescource.setSource("local");
         rescource.insert();
-        return webUrl;
+        return rescource.getId();
     }
+
+	@Override
+	public Rescource getRescource(String rescourseId) {
+		// TODO Auto-generated method stub
+		return baseMapper.selectById(rescourseId);
+	}
 }

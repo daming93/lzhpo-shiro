@@ -30,7 +30,17 @@
         id,
         create_date, create_by, update_date, update_by, remarks, del_flag, handing_storage_money, handing_takeout_money, handing_terminal_money, handing_type, file_id, is_audit, start_time, over_time, client_id, contract_code
     </sql>
-
+	  <select id="getUsingContractId" parameterType="java.lang.String" resultType="String">
+      SELECT id from 
+		client_contract_main
+		WHERE
+		start_time   &lt;= NOW()
+		and over_time  &gt;= NOW()
+		and is_audit = 1
+		and client_id = #{clientId}
+		ORDER BY create_date DESC
+		 limit 1
+    </select>
 <!-- 
 	提供一些代码供拷贝
 -->

@@ -9,7 +9,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <link rel="stylesheet" th:href="@{/static/layui/css/layui.css}" media="all" />
     <style type="text/css">
-        .layui-form-item .layui-inline{ min-width:15%; float:left; margin-right:0; }
+        .layui-form-item .layui-inline{` min-width:15%; float:left; margin-right:0; }
         .layui-form-item .contractMain-box {
             position: relative;
         }
@@ -113,6 +113,7 @@
             <label class="layui-form-label">合同文件</label>
             <div class="layui-input-block">
                  <input type="hidden" name="fileId" >
+                 <input type="hidden" name="fileName" >
                  <input type="hidden" name="clientId" th:value="${clientId}" >
                 <button class="layui-btn" id="uploadPDF" type="button" lay-data="{ accept: 'file',exts:'pdf'}">上传文件</button><span id="uploadText"></span>
 

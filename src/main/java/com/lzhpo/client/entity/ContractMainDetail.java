@@ -1,13 +1,15 @@
 package com.lzhpo.client.entity;
 
-import com.baomidou.mybatisplus.annotation.TableName;
-import java.time.LocalDateTime;
-import com.baomidou.mybatisplus.annotation.TableField;
 import java.io.Serializable;
+import java.math.BigDecimal;
+
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableName;
+import com.lzhpo.common.base.DataEntity;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
-import com.lzhpo.common.base.DataEntity;
 /**
  * <p>
  * 合同收费项
@@ -26,7 +28,7 @@ public class ContractMainDetail  extends DataEntity<ContractMainDetail> implemen
 
     private static final long serialVersionUID = 1L;
 
-    private Long money;
+    private BigDecimal money;
 
     private Integer type;
 
@@ -42,11 +44,12 @@ public class ContractMainDetail  extends DataEntity<ContractMainDetail> implemen
     @TableField("contract_id")
     private String contractId;
     
-	public Long getMoney() {
+
+	public BigDecimal getMoney() {
 		return money;
 	}
 
-	public void setMoney(Long money) {
+	public void setMoney(BigDecimal money) {
 		this.money = money;
 	}
 

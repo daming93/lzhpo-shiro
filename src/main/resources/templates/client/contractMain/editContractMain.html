@@ -16,22 +16,113 @@
         .layui-form-item .contractMain-box {
             position: relative;
         }
+          /*您可以将下列样式写入自己的样式表中*/
+        .childBody{padding: 15px;}
+        
+        /*layui 元素样式改写*/
+        .layui-btn-sm{line-height: normal; font-size: 12.5px;}      
+        .layui-table-view .layui-table-body{min-height: 256px;}
+        .layui-table-cell .layui-input.layui-unselect{height: 30px; line-height: 30px;}
+        
+        /*设置 layui 表格中单元格内容溢出可见样式*/
+        .table-overlay .layui-table-view,
+        .table-overlay .layui-table-box,
+        .table-overlay .layui-table-body{overflow: visible;}
+        .table-overlay .layui-table-cell{height: auto; overflow: visible;}
+        
+        /*文本对齐方式*/
+        .text-center{text-align: center;}
     </style>
 </head>
 <body class="childrenBody">
 <form class="layui-form">
-   <input name="id" type="hidden" th:value="${contractMain.id}">
+   <input name="id" id="contractId" type="hidden" th:value="${contractMain.id}">
      <div class="layui-form-item">
-        <fieldset class="layui-elem-field layui-field-title" style="margin-top: 30px;margin-left: 10px;">
-            <legend>选项名称(<span style="color:red">*</span>)</legend>
-        </fieldset>
-    </div>
-    <div class="layui-form-item">
-        <div class="layui-input-block" style="width: 80%">
-            <input type="text" class="layui-input" name="name" th:value="${contractMain.name}" style="margin-top: 30px;" lay-verify="required" placeholder="请输入选项名称">
+        <div class="layui-inline">
+            <label class="layui-form-label">客户名称</label>
+            <div class="layui-input-block">
+                <input type="text" class="layui-input" disabled   name="clientName" th:value="${contractMain.clientId}"  lay-verify="required" placeholder="请输入客户名称">
+            </div>
+        </div>
+        <div class="layui-inline">
+            <label class="layui-form-label">合同名称</label>
+            <div class="layui-input-block">
+                <input type="text" class="layui-input" name="name" th:value="${contractMain.name}"  lay-verify="required" placeholder="请输入合同名称">
+            </div>
+        </div>
+        <div  class="layui-inline">
+            <label class="layui-form-label">开始日期</label>
+            <div class="layui-input-block">
+                <input type="text" class="layui-input layTime" th:value="${contractMain.startTime}"  id="startTime" name="startTime" lay-verify="required" placeholder="请输入合同开始日期">
+            </div>
+        </div>
+           <div class="layui-inline">
+            <label class="layui-form-label">截止日期</label>
+            <div class="layui-input-block">
+                <input type="text" class="layui-input layTime"  th:value="${contractMain.overTime}"  id="overTime" name="overTime" lay-verify="required" placeholder="请输入合同截止日期">
+            </div>
         </div>
     </div>
-        
+    <div class="layui-form-item">
+         <div class="layui-inline">
+            <label class="layui-form-label">装卸类型</label>
+            <div class="layui-input-block">
+                <select name="handingType"  class="form-control1" lay-verify="" lay-search>
+                    <option value="">装卸类型</option>
+                    <option th:each="dict:${handingType}" th:selected="${contractMain.handingType eq dict.value}" th:value="${dict.value}" lay-verify="required" th:text="${dict.name}"></option>
+                </select>
+             </div>    
+         </div>
+        <div class="layui-inline">
+            <label class="layui-form-label">入库装卸费</label>
+            <div class="layui-input-block">
+                <input type="text" class="layui-input" th:value="${contractMain.handingStorageMoney}"   value="0" name="handingStorageMoney" lay-verify="required|number" placeholder="请输入入库装卸费用">
+            </div>
+        </div>
+        <div class="layui-inline">
+            <label class="layui-form-label">出库装卸费</label>
+            <div class="layui-input-block">
+                <input type="text" class="layui-input" th:value="${contractMain.handingTerminalMoney}"  value="0" name="handingTakeoutMoney" lay-verify="required|number" placeholder="请输入出库装卸费用">
+            </div>
+        </div>
+        <div class="layui-inline">
+            <label class="layui-form-label">终端装卸费</label>
+            <div class="layui-input-block">
+                <input type="text" class="layui-input"value="0" th:value="${contractMain.handingTerminalMoney}"  name="handingTerminalMoney" lay-verify="required|number" placeholder="请入终端装卸费">
+            </div>
+        </div> 
+    </div>
+ <div class="layui-form-item">
+    <section class="layui-col-md10" style="margin: 0 auto; float: none;">
+    <div class="layui-card">
+        <div class="layui-card-header">合同自定义费用项</div>
+        <div class="layui-card-body layui-text">
+            <div id="toolbar">
+                <div>
+                    <button type="button" class="layui-btn layui-btn-sm" data-type="addRow" title="添加一行">
+                        <i class="layui-icon layui-icon-add-1"></i> 添加一行
+                    </button>                   
+                </div>
+            </div>
+            <div id="tableRes" class="table-overlay">
+                <table id="dataTable" lay-filter="dataTable" class="layui-hide"></table>
+            </div>
+        </div>
+    </div>
+    </section>
+ </div>
+ <div class="layui-form-item">
+        <div class="layui-inline">
+            <label class="layui-form-label">合同文件</label>
+            <div class="layui-input-block">
+                 <input type="hidden" name="fileId" th:value="${contractMain.fileId}">
+                 <input type="hidden" name="fileName" th:value="${contractMain.fileName}" >
+                 <input type="hidden" name="clientId" th:value="${clientId}" >
+                <button class="layui-btn" id="uploadPDF" type="button" lay-data="{ accept: 'file',exts:'pdf'}">上传文件</button><span id="uploadText"></span>
+                 <span ><a href="#" th:text="${contractMain.fileName}" onclick="onLineReadPDF()" ></a></span>
+            </div>
+        </div>
+    </div>    
     <div class="layui-form-item">
         <fieldset class="layui-elem-field layui-field-title"  style="margin-top: 30px;margin-left: 10px;">
             <legend>备注</legend>
@@ -52,7 +143,18 @@
     </div>
     </shiro:hasPermission>
 </form>
+<input type="hidden" id="periodStatus" th:value='${periodStatus}'>
+<input type="hidden" id="options" th:value='${options}'>
+<script type="text/javascript" th:inline="javascript">
+    function onLineReadPDF() {
+        window.open("/static/pdfjs/web/viewer.html?file=/admin/system/user/loadFilePDF/"+[[${contractMain.fileId}]]);
+    }
+</script>
+
 <script type="text/javascript" th:src="@{/static/layui/layui.js}"></script>
 <script type="text/javascript" th:src="@{/static/client/js/contractMain/contractMainEdit.js}"></script>
+<script src="@{/static/pdfjs/bulid/pdf.js}"></script>
+<script src="@{/static/pdfjs/bulid/pdf.worker.js"></script>
+
 </body>
 </html>

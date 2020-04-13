@@ -13,4 +13,10 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  */
 public interface ContractMainMapper extends BaseMapper<ContractMain> {
 
+	/**
+	 * 获取客户正在使用得合同id
+	 * @param clientId
+	 * @return
+	 */
+	String getUsingContractId(String clientId);
 }

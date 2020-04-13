@@ -1,6 +1,7 @@
 package com.lzhpo.client.entity;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Set;
 
@@ -34,19 +35,19 @@ public class ContractMain  extends DataEntity<ContractMain> implements Serializa
      * 入库装卸费用
      */
     @TableField("handing_storage_money")
-    private Long handingStorageMoney;
+    private BigDecimal handingStorageMoney;
 
     /**
      * 出库装卸费用
      */
     @TableField("handing_takeout_money")
-    private Long handingTakeoutMoney;
+    private BigDecimal handingTakeoutMoney;
 
     /**
      * 终端装卸费
      */
     @TableField("handing_terminal_money")
-    private Long handingTerminalMoney;
+    private BigDecimal handingTerminalMoney;
 
     /**
      * 装卸类型
@@ -90,27 +91,50 @@ public class ContractMain  extends DataEntity<ContractMain> implements Serializa
     @TableField("contract_code")
     private String contractCode;
 
-	public Long getHandingStorageMoney() {
+
+    /**
+     * 保存文件名
+     */
+    @TableField("file_name")    
+    private String fileName;
+	/**
+	 * 是否在使用
+	 */
+	@TableField(exist = false)
+    private boolean isUse;
+	
+	
+	public boolean getIsUse() {
+		return isUse;
+	}
+
+	public void setUse(boolean isUse) {
+		this.isUse = isUse;
+	}
+
+	
+
+	public BigDecimal getHandingStorageMoney() {
 		return handingStorageMoney;
 	}
 
-	public void setHandingStorageMoney(Long handingStorageMoney) {
+	public void setHandingStorageMoney(BigDecimal handingStorageMoney) {
 		this.handingStorageMoney = handingStorageMoney;
 	}
 
-	public Long getHandingTakeoutMoney() {
+	public BigDecimal getHandingTakeoutMoney() {
 		return handingTakeoutMoney;
 	}
 
-	public void setHandingTakeoutMoney(Long handingTakeoutMoney) {
+	public void setHandingTakeoutMoney(BigDecimal handingTakeoutMoney) {
 		this.handingTakeoutMoney = handingTakeoutMoney;
 	}
 
-	public Long getHandingTerminalMoney() {
+	public BigDecimal getHandingTerminalMoney() {
 		return handingTerminalMoney;
 	}
 
-	public void setHandingTerminalMoney(Long handingTerminalMoney) {
+	public void setHandingTerminalMoney(BigDecimal handingTerminalMoney) {
 		this.handingTerminalMoney = handingTerminalMoney;
 	}
 
@@ -178,6 +202,16 @@ public class ContractMain  extends DataEntity<ContractMain> implements Serializa
 		this.name = name;
 	}
 	
+	
+	public String getFileName() {
+		return fileName;
+	}
+
+	public void setFileName(String fileName) {
+		this.fileName = fileName;
+	}
+
+
 	@TableField(exist = false)
     private Set<ContractMainDetail> detailSet;
 

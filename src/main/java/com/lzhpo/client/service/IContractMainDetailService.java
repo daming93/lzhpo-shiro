@@ -31,6 +31,6 @@ public interface IContractMainDetailService extends IService<ContractMainDetail>
 	//选取所有记录
 	List<ContractMainDetail> selectAll();
 
-	//分页查询数据在父类
-	
+	//硬删 根据主表id
+	void deleteContractMainDetailOb(String mainId);
 }	

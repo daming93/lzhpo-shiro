@@ -32,5 +32,8 @@ public interface IContractMainService extends IService<ContractMain> {
 	List<ContractMain> selectAll();
 
 	//分页查询数据在父类
+	String getUsingContractId(String clientId);
 	
+	//审核 改变审核状态
+	void ChangeAduitStatus(Integer aduitStatus,String id);
 }	

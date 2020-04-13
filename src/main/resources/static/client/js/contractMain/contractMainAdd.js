@@ -72,7 +72,8 @@ window.viewObj = {
                     return layer.msg('上传失败');
                 }else{
                     layer.msg("上传成功",{time:1000},function () {
-                        $("input[name='fileId']").val(res.data.url);
+                        $("input[name='fileId']").val(res.data.fileId);
+                        $("input[name='fileName']").val(res.data.fileName);
                         $("#uploadText").html(res.data.name+"上传成功");
                     })
                 }
