@@ -21,7 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @author xdm
  * @since 2020-03-27
  */
-@Service
+@Service("contractMainDetailService")
 @Transactional(rollbackFor = Exception.class)
 public class ContractMainDetailServiceImpl extends ServiceImpl<ContractMainDetailMapper, ContractMainDetail> implements IContractMainDetailService {
 	@Override
@@ -82,4 +82,13 @@ public class ContractMainDetailServiceImpl extends ServiceImpl<ContractMainDetai
          wrapper.eq("contract_id",mainId);
          baseMapper.delete(wrapper);
     }
+
+	@Override
+	public List<ContractMainDetail> selectDetail(String mainId) {
+		 QueryWrapper<ContractMainDetail> wrapper = new QueryWrapper<>();
+	     wrapper.eq("contract_id", mainId);
+	     return baseMapper.selectList(wrapper);
+	}
+    
+    
 }

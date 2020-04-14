@@ -24,7 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @author xdm
  * @since 2020-03-26
  */
-@Service
+@Service("generateNoService")
 @Transactional(rollbackFor = Exception.class)
 public class GenerateNoServiceImpl extends ServiceImpl<GenerateNoMapper, GenerateNo> implements IGenerateNoService {
 	@Override
@@ -66,7 +66,7 @@ public class GenerateNoServiceImpl extends ServiceImpl<GenerateNoMapper, Generat
     @Transactional(rollbackFor = Exception.class)
     @CacheEvict(value = "generateNos", allEntries = true)
     public void deleteGenerateNo(GenerateNo generateNo) {
-        generateNo.setDelFlag(true);
+        //generateNo.setDelFlag(true);
         baseMapper.updateById(generateNo);
     }
 

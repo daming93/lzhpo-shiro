@@ -12,7 +12,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 </#if>
-
+import com.lzhpo.common.base.DataEntity;
 /**
  * <p>
  * ${table.comment!}
@@ -41,7 +41,7 @@ public class ${entity} extends ${superEntityClass}<#if activeRecord><${entity}><
 <#elseif activeRecord>
 public class ${entity} extends Model<${entity}> {
 <#else>
-public class ${entity} implements Serializable {
+public class ${entity} extends DataEntity<${entity}> implements Serializable {
 </#if>
 
     private static final long serialVersionUID = 1L;

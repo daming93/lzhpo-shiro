@@ -33,4 +33,7 @@ public interface IContractMainDetailService extends IService<ContractMainDetail>
 
 	//硬删 根据主表id
 	void deleteContractMainDetailOb(String mainId);
+	
+	//根据主表ID找细则
+	List<ContractMainDetail> selectDetail(String mainId);
 }	

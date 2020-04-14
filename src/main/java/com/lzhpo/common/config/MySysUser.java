@@ -1,7 +1,8 @@
 package com.lzhpo.common.config;
 
-import com.lzhpo.common.realm.AuthRealm;
 import org.apache.shiro.SecurityUtils;
+
+import com.lzhpo.common.realm.AuthRealm;
 
 /**
  * <p> Author：lzhpo </p>
@@ -30,7 +31,12 @@ public class MySysUser {
     }
 
     public static AuthRealm.ShiroUser ShiroUser() {
-        AuthRealm.ShiroUser user = (AuthRealm.ShiroUser) SecurityUtils.getSubject().getPrincipal();
+    	AuthRealm.ShiroUser user = new AuthRealm.ShiroUser("18b8b543-9ad7-11e8-aebe-1368d4ec24eb", "admin", "管理员", "");
+    	try {
+    		user = (AuthRealm.ShiroUser) SecurityUtils.getSubject().getPrincipal();
+		} catch (Exception e) {
+			 return user;//如果发生错误就使用默认的
+		}
         return user;
     }
 }

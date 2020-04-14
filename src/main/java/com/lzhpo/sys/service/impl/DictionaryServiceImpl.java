@@ -21,7 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @author xdm
  * @since 2020-03-26
  */
-@Service
+@Service("dictionaryService")
 @Transactional(rollbackFor = Exception.class)
 public class DictionaryServiceImpl extends ServiceImpl<DictionaryMapper, Dictionary> implements IDictionaryService {
 	@Override

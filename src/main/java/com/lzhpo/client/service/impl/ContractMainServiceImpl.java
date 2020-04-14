@@ -24,7 +24,7 @@ import com.lzhpo.client.service.IContractMainService;
  * @author xdm
  * @since 2020-03-26
  */
-@Service
+@Service("contractMainService")
 @Transactional(rollbackFor = Exception.class)
 public class ContractMainServiceImpl extends ServiceImpl<ContractMainMapper, ContractMain> implements IContractMainService {
 	

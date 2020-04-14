@@ -9,7 +9,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  * </p>
  *
  * @author xdm
- * @since 2020-04-13
+ * @since 2020-04-14
  */
 public interface IncomeMapper extends BaseMapper<Income> {
 
