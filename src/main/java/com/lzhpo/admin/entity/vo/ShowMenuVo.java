@@ -21,9 +21,15 @@ public class ShowMenuVo {
     private String href;
 
     private Boolean spread = Boolean.FALSE;
+    
+    private String myuserId;
+    
+    
 
     private List<ShowMenuVo> children =  new ArrayList();
 
+    
+    
     public String getId() {
         return id;
     }
@@ -79,4 +85,14 @@ public class ShowMenuVo {
     public void setChildren(List<ShowMenuVo> children) {
         this.children = children;
     }
+
+	public String getMyuserId() {
+		return myuserId;
+	}
+
+	public void setMyuserId(String myuserId) {
+		this.myuserId = myuserId;
+	}
+    
+    
 }

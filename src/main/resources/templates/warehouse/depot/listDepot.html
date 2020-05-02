@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <meta charset="UTF-8">
+    <title>储位管理</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <link rel="stylesheet" th:href="@{/static/layui/css/layui.css}" media="all" />
+    <link rel="stylesheet" th:href="@{/static/admin/css/list.css}" media="all" />
+</head>
+<body class="childrenBody">
+<fieldset class="layui-elem-field">
+    <legend>储位检索</legend>
+    <div class="layui-field-box">
+        <form class="layui-form">
+            <div class="layui-inline">
+                <input type="text" value="" name="s_like_name" placeholder="可以输入储位名" class="layui-input search_input">
+            </div>
+            <div class="layui-input-inline">
+                <a class="layui-btn" lay-submit="" lay-filter="searchForm">查询</a>
+            </div>
+
+            <shiro:hasPermission name="warehouse:depot:add">
+            <div class="layui-inline">
+                <a class="layui-btn layui-btn-normal" data-type="addUser">添加储位</a>
+                <button class="layui-btn" id="upload" type="button" lay-data="{ accept: 'file',exts:'xls'}">批量上传(模板使用导出得excel)</button><span id="uploadText"></span>
+            </div>
+            </shiro:hasPermission>
+            <shiro:hasPermission name="warehouse:depot:delete">
+            <div class="layui-inline">
+                <a class="layui-btn layui-btn-danger" data-type="deleteSome">批量删除</a>
+            </div>
+            </shiro:hasPermission>
+            <div class="layui-input-inline">
+              <div class="layui-form-mid layui-word-aux">添加或导入的时候只会导入从A段开始的连续编号</div>
+            </div>
+        </form>
+    </div>
+</fieldset>
+
+<script type="text/html" id="toolbarDemo">
+            <div class="layui-input-block">
+               
+            </div>
+</script>
+    <table class="layui-table" id="depot-table" lay-filter="depotList"></table>
+    <script type="text/html" id="depotBar">
+    <shiro:hasPermission name="warehouse:depot:edit">
+        <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+    </shiro:hasPermission>
+    <shiro:hasPermission name="warehouse:depot:delete">
+        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+    </shiro:hasPermission>
+    </script>
+</div>
+<div id="page"></div>
+
+<script type="text/javascript" th:src="@{/static/layui/layui.js}"></script>
+<script type="text/javascript" th:src="@{/static/admin/js/tools.js}"></script>
+<script type="text/javascript" th:src="@{/static/warehouse/js/depot/depotList.js}"></script>
+</body>
+</html>

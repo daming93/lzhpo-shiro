@@ -82,7 +82,7 @@
         <div class="layui-inline">
             <label class="layui-form-label">出库装卸费</label>
             <div class="layui-input-block">
-                <input type="text" class="layui-input" th:value="${contractMain.handingTerminalMoney}"  value="0" name="handingTakeoutMoney" lay-verify="required|number" placeholder="请输入出库装卸费用">
+                <input type="text" class="layui-input" th:value="${contractMain.handingTakeoutMoney}"  value="0" name="handingTakeoutMoney" lay-verify="required|number" placeholder="请输入出库装卸费用">
             </div>
         </div>
         <div class="layui-inline">
@@ -117,7 +117,6 @@
             <div class="layui-input-block">
                  <input type="hidden" name="fileId" th:value="${contractMain.fileId}">
                  <input type="hidden" name="fileName" th:value="${contractMain.fileName}" >
-                 <input type="hidden" name="clientId" th:value="${clientId}" >
                 <button class="layui-btn" id="uploadPDF" type="button" lay-data="{ accept: 'file',exts:'pdf'}">上传文件</button><span id="uploadText"></span>
                  <span ><a href="#" th:text="${contractMain.fileName}" onclick="onLineReadPDF()" ></a></span>
             </div>
@@ -130,13 +129,12 @@
     </div>
     <div class="layui-form-item layui-form-text">
         <div class="layui-input-block" style="width: 80%">
-            <textarea placeholder="备注(不超过200字)" name="remarks" th:value="${contractMain.remarks}" class="layui-textarea"></textarea>
+            <textarea placeholder="备注(不超过200字)" name="remarks" th:text="${contractMain.remarks}" class="layui-textarea"></textarea>
         </div>
     </div>
-
     <shiro:hasPermission name="client:contractMain:edit">
     <div class="layui-form-item" style="padding-left: 30%;">
-        <div class="layui-input-block">
+        <div th:if="${contractMain.isAudit!=1}" class="layui-input-block">
             <button class="layui-btn" lay-submit="" lay-filter="editcontractMain">确认修改</button>
             <button class="layui-btn layui-btn-primary">放弃修改</button>
         </div>

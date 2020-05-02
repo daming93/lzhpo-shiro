@@ -125,9 +125,12 @@ public class BasicdataController {
         if(StringUtils.isBlank(basicdata.getClientName())){
             return ResponseEntity.failure("修改提示信息（不能为空)");
         }
-        if(basicdataService.getBasicdataCount(basicdata.getClientName())>0){
-             return ResponseEntity.failure("修改提示信息（不能重复)");
+        if(basicdataService.getBasicdataCount("client_name",basicdata.getClientName())>0){
+             return ResponseEntity.failure("客户名称不能重复");
         }
+        if(basicdataService.getBasicdataCount("client_short_name",basicdata.getClientShortName())>0){
+            return ResponseEntity.failure("客户简称不能重复");
+       }
         basicdataService.saveBasicdata(basicdata);
         return ResponseEntity.success("操作成功");
     }
@@ -183,9 +186,12 @@ public class BasicdataController {
         }
         Basicdata oldBasicdata =  basicdataService.getBasicdataById(basicdata.getId());
         if(!oldBasicdata.getClientName().equals(basicdata.getClientName())){
-             if( basicdataService.getBasicdataCount(basicdata.getClientName())>0){
-                return ResponseEntity.failure("修改提示信息（不能重复)");
-            }
+        	if(basicdataService.getBasicdataCount("client_name",basicdata.getClientName())>0){
+                return ResponseEntity.failure("客户名称不能重复");
+           }
+           if(basicdataService.getBasicdataCount("client_short_name",basicdata.getClientShortName())>0){
+               return ResponseEntity.failure("客户简称不能重复");
+          }
         }
          basicdataService.updateBasicdata(basicdata);
         return ResponseEntity.success("操作成功");

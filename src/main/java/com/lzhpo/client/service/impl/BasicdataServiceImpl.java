@@ -1,18 +1,20 @@
 package com.lzhpo.client.service.impl;
 
-import com.lzhpo.client.entity.Basicdata;
-import com.lzhpo.client.mapper.BasicdataMapper;
-import com.lzhpo.client.service.IBasicdataService;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import org.springframework.stereotype.Service;
-
 import java.util.List;
 
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import org.springframework.transaction.annotation.Transactional;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.lzhpo.client.entity.Basicdata;
+import com.lzhpo.client.mapper.BasicdataMapper;
+import com.lzhpo.client.service.IBasicdataService;
+
+import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.date.TimeInterval;
 /**
  * <p>
  * 客户表 服务实现类
@@ -25,11 +27,11 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(rollbackFor = Exception.class)
 public class BasicdataServiceImpl extends ServiceImpl<BasicdataMapper, Basicdata> implements IBasicdataService {
 	@Override
-    public long getBasicdataCount(String name) {
+    public long getBasicdataCount(String fieldName,String value) {
         QueryWrapper<Basicdata> wrapper = new QueryWrapper<>();
 	// 下行编辑条件
         wrapper.eq("del_flag",false); 
-       // wrapper.eq("clientName", name);
+        wrapper.eq(fieldName, value);
         return baseMapper.selectCount(wrapper);
     }
 
@@ -70,8 +72,11 @@ public class BasicdataServiceImpl extends ServiceImpl<BasicdataMapper, Basicdata
     @Override
     @Cacheable("basicdatas")
     public List<Basicdata> selectAll() {
+    	TimeInterval timer = DateUtil.timer();
         QueryWrapper<Basicdata> wrapper = new QueryWrapper<>();
         wrapper.eq("del_flag",false);
-        return baseMapper.selectList(wrapper);
+        List<Basicdata> list = baseMapper.selectList(wrapper);
+        System.out.println(timer.interval()+"service");
+        return list;
     }
 }

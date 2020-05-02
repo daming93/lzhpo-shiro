@@ -13,8 +13,8 @@ import java.util.List;
  * @since 2020-03-24
  */
 public interface IBasicdataService extends IService<Basicdata> {
-	//获取满足某个条件的记录 以便不插入重复记录
-	long getBasicdataCount(String name);
+	//获取满足某个条件的记录 以便不插入重复记录 单一条件查询
+	long getBasicdataCount(String fieldName,String value);
 	
 	//保存实例 返回该实例
 	Basicdata saveBasicdata(Basicdata basicdata);

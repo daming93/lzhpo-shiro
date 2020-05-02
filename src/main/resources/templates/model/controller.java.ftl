@@ -76,7 +76,7 @@ public class ${table.controllerName} {
     /**
      * 查询分页数据
      */
-    @RequiresPermissions("needChange:${entity}:list")
+    @RequiresPermissions("needChange:${entity?uncap_first}:list")
     @PostMapping("list")
     @ResponseBody
     public PageData<${entity}> list(@RequestParam(value = "page",defaultValue = "1")Integer page,
@@ -134,10 +134,10 @@ public class ${table.controllerName} {
         /**
 	*自定义传入add页面的数据
 	*/
-        return "needChange/${entity}/add${entity}";
+        return "needChange/${entity?uncap_first}/add${entity}";
     }
 
-    @RequiresPermissions("needChange:${entity}:add")
+    @RequiresPermissions("needChange:${entity?uncap_first}:add")
     @PostMapping("add")
     @ResponseBody
     @SysLog("保存新增数据")
@@ -145,14 +145,14 @@ public class ${table.controllerName} {
         if(StringUtils.isBlank(${entity?uncap_first}.getName())){
             return ResponseEntity.failure("修改提示信息（不能为空)");
         }
-        if(${entity?uncap_first}Service.get${entity}Count(${entity}.getName())>0){
+        if(${entity?uncap_first}Service.get${entity}Count(${entity?uncap_first}.getName())>0){
              return ResponseEntity.failure("修改提示信息（不能重复)");
         }
         ${entity?uncap_first}Service.save${entity}(${entity?uncap_first});
         return ResponseEntity.success("操作成功");
     }
  
-    @RequiresPermissions("needChange:${entity}:delete")
+    @RequiresPermissions("needChange:${entity?uncap_first}:delete")
     @PostMapping("delete")
     @ResponseBody
     @SysLog("删除数据")
@@ -165,7 +165,7 @@ public class ${table.controllerName} {
         return ResponseEntity.success("操作成功");
     }
  
-  @RequiresPermissions("needChange:${entity}:delete")
+  @RequiresPermissions("needChange:${entity?uncap_first}:delete")
     @PostMapping("deleteSome")
     @ResponseBody
     @SysLog("多选删除数据")
@@ -187,10 +187,10 @@ public class ${table.controllerName} {
         Map<String,Object> map = new HashMap();
         modelMap.put("${entity?uncap_first}", ${entity?uncap_first});
       
-        return "needChange/${entity}/edit${entity}";
+        return "needChange/${entity?uncap_first}/edit${entity}";
    }
 
-    @RequiresPermissions("needChange:${entity}:edit")
+    @RequiresPermissions("needChange:${entity?uncap_first}:edit")
     @PostMapping("edit")
     @ResponseBody
     @SysLog("保存编辑数据")

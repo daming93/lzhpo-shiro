@@ -61,6 +61,18 @@ window.viewObj = {
        
         var $ = layui.$, table = layui.table, form = layui.form, layer = layui.layer,upload = layui.upload;
 
+        var contractId =     document.getElementById("contractId").value;   
+
+        var tableData=new Array(); // 用于存放表格数据
+        $.ajax({
+          url: "/client/contractMain/selectDetail?contractId="+contractId
+          ,type:"get"
+          ,async:false
+          ,dataType:"json"
+          , success: function(result){
+              tableData=result.data;
+            }
+        });
         //上传控件
         upload.render({
             elem: '#uploadPDF',
@@ -79,16 +91,14 @@ window.viewObj = {
                 }
             }
         });   
-        var contractId =     document.getElementById("contractId").value;     
+         
         //数据表格实例化           
         var tbWidth = $("#tableRes").width();
         var layTableId = "layTable";
         var tableIns = table.render({
             elem: '#dataTable',
             id: layTableId,
-            url:'/client/contractMain/selectDetail',
-            method:'post',
-            where: {"contractId":contractId},
+            data:tableData,
             width: tbWidth,
             page: false,
             loading: true,
@@ -249,7 +259,7 @@ window.viewObj = {
             }
         });
 //提交数据代码
-        form.on('submit(addcontractMain)',function(data){
+        form.on('submit(editcontractMain)',function(data){
         activeByType('save');    //更新行记录对象
       
         data.field.detailSet = table.cache[layTableId];  

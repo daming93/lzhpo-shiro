@@ -86,7 +86,6 @@ public class ContractMainServiceImpl extends ServiceImpl<ContractMainMapper, Con
         		detailService.save(detail);
         	}  
         }
-        
     }
 
     @Override

@@ -42,6 +42,41 @@ layui.use(['layer','form','table'], function() {
                 }
             )
         }
+        if(obj.event === "audit"){
+            layer.confirm("你确定要审核该合同么(请仔细阅读合同条款)？",{btn:['是的,我确定','我再想想']},
+                function(){
+                    $.post("/client/contractMain/audit",{"id":data.id,"status":1},function (res){
+                        if(res.success){
+                            layer.msg("审核成功",{time: 1000},function(){
+                                table.reload('contractMain-table', t);
+                            });
+                        }else{
+                            layer.msg(res.message);
+                        }
+                    });
+                }
+            )
+        }
+    });
+    table.on('rowDouble(contractMainList)', function(obj){
+        var data = obj.data;
+        var editIndex = layer.open({
+            title : "合同详情",
+            type : 2,
+            content : "/client/contractMain/edit?id="+data.id,
+            success : function(layero, index){
+                setTimeout(function(){
+                    layer.tips('点击此处返回合同列表', '.layui-layer-setwin .layui-layer-close', {
+                        tips: 3
+                    });
+                },500);
+            }
+        });
+        //改变窗口大小时，重置弹窗的高度，防止超出可视区域（如F12调出debug的操作）
+        $(window).resize(function(){
+            layer.full(editIndex);
+        });
+        layer.full(editIndex);
     });
     t = {
         elem: '#contractMain-table',

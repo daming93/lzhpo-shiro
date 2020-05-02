@@ -257,19 +257,10 @@ public class ContractMainController {
 	@ResponseBody
 	@SysLog("保存编辑数据")
 	public ResponseEntity edit(@RequestBody ContractMain contractMain) {
-		if (StringUtils.isBlank(contractMain.getId())) {
-			return ResponseEntity.failure("修改提示信息（不能为空)");
-		}
-		// if(StringUtils.isBlank(contractMain.getName())){
-		// return ResponseEntity.failure("角色名称不能为空");
-		// }
+		System.out.println("进入编辑方法");
+		if (StringUtils.isBlank(contractMain.getId())) 
+			return ResponseEntity.failure("不能为空");
 		ContractMain oldContractMain = contractMainService.getContractMainById(contractMain.getId());
-		// if(!oldContractMain.getName().equals(contractMain.getName())){
-		// if(
-		// contractMainService.getContractMainCount(contractMain.getName())>0){
-		// return ResponseEntity.failure("修改提示信息（不能重复)");
-		// }
-		// }
 		contractMainService.updateContractMain(contractMain);
 		return ResponseEntity.success("操作成功");
 	}

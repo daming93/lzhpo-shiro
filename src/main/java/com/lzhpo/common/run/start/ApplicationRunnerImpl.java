@@ -35,8 +35,8 @@ public class ApplicationRunnerImpl implements ApplicationRunner {
         assert localHost != null;
         String ip = localHost.getHostAddress();
         //启动定时器
-        CronUtil.start();
-        System.out.println("定时器启动成功");
+       // CronUtil.start();
+       // System.out.println("定时器启动成功");
         System.out.println("----------------------------------------");
         System.out.println("启动成功：http://" +ip +":" +serverPort);
         System.out.println("----------------------------------------");
