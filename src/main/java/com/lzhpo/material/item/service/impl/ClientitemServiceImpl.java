@@ -136,4 +136,24 @@ public class ClientitemServiceImpl extends ServiceImpl<ClientitemMapper, Clienti
 		return buffer.toString();
 	}
 
+	@Override
+	public List<Clientitem> selectByClientId(String clientId) {
+		QueryWrapper<Clientitem> wrapper = new QueryWrapper<>();
+		// 下行编辑条件
+		wrapper.eq("del_flag", false);
+		wrapper.eq("client_id", clientId);
+		List<Clientitem> list = baseMapper.selectList(wrapper);
+		return list;
+	}
+
+	@Override
+	public List<Clientitem> selectByItemCode(String itemCode) {
+		QueryWrapper<Clientitem> wrapper = new QueryWrapper<>();
+		// 下行编辑条件
+		wrapper.eq("del_flag", false);
+		wrapper.like("code", itemCode);
+		List<Clientitem> list = baseMapper.selectList(wrapper);
+		return list;
+	}
+
 }

@@ -35,4 +35,6 @@ public interface ITrayService extends IService<Tray> {
 
 	//验证code是否符合标准
 	String judCode(Tray tray);
+	
+	List<Tray> selectByClientId(String clientId);
 }

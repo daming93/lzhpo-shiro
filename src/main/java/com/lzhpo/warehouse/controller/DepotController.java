@@ -29,6 +29,7 @@ import com.lzhpo.client.service.IBasicdataService;
 import com.lzhpo.common.annotation.SysLog;
 import com.lzhpo.common.base.PageData;
 import com.lzhpo.common.util.ResponseEntity;
+import com.lzhpo.material.item.entity.Clientitem;
 import com.lzhpo.warehouse.entity.Depot;
 import com.lzhpo.warehouse.service.IDepotService;
 
@@ -105,12 +106,13 @@ public class DepotController {
 	}
 
 	/**
-	 * 根据id查询
+	 * 根据客户id查询
 	 */
-	// @RequestMapping(value = "/getById")
-	// public ResponseWeb<Depot> getById(@RequestParam("pkid") String pkid){
-	// return null;
-	// }
+	@ResponseBody
+	@RequestMapping(value = "/getByClientId")
+	public List<Depot> getByClientId(@RequestParam("clientId") String clientId) {
+		return depotService.selectByClientId(clientId);
+	}
 
 	@GetMapping("add")
 	public String add(ModelMap modelMap) {

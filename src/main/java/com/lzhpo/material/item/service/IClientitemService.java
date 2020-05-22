@@ -35,7 +35,10 @@ public interface IClientitemService extends IService<Clientitem> {
 
 	//分页查询数据在父类
 
-
+	List<Clientitem> selectByClientId(String clientId);
 	//上传xls文件 
 	String upload(MultipartFile file,List<Basicdata> basicDatas);
+	
+	List<Clientitem> selectByItemCode(String itemCode);
+	
 }

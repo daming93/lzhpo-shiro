@@ -13,12 +13,14 @@ layui.use('laydate', function(){
   //执行一个laydate实例
   laydate.render({
     elem: '#startTime' //指定元素
+     ,value: new Date()
   });
   var laydate2 = layui.laydate;
   
   //执行一个laydate实例
   laydate2.render({
     elem: '#overTime' //指定元素
+    ,value: new Date()
   });
 });
  

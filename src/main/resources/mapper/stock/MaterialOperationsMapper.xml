@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lzhpo.stock.mapper.MaterialOperationsMapper">
+<select id="selectOperations" resultType="com.lzhpo.stock.entity.MaterialOperations" parameterType="map">
+		SELECT
+			id,
+			material_id,
+			item_id,
+			from_code,
+			sum(number) number,
+		CASE from_type
+		when 0 then 0
+		when 1 then 0
+		when 2 then 2
+		when 3 then 2
+		else 5 end from_type,
+		create_date
+		FROM
+			(
+				SELECT
+					o.id,
+					o.material_id,
+		
+				IF (
+					o.type = 1,
+					o.number ,- o.number
+				) number,
+				i.id item_id,
+				o.from_code,
+			o.from_type,
+			o.create_date
+			FROM
+				stock_material_operations o
+			LEFT JOIN stock_material m ON o.material_id = m.id
+			LEFT JOIN material_item_clientitem i ON m.item_id = i.id
+			where 1=1
+			<if test="startTime != null" >
+			AND o.create_date >=  #{startTime,jdbcType=TIMESTAMP}
+			</if>
+			<if test="overTime != null" >
+			<![CDATA[ AND o.create_date <=  #{overTime,jdbcType=TIMESTAMP} ]]>
+			</if>
+			<if test="itemName != null" >
+				AND i.code like CONCAT('%',#{itemName,jdbcType=VARCHAR},'%') 
+			</if>
+			ORDER BY
+				o.create_date DESC
+			) temp
+		GROUP BY
+		<if test="flag == 1" >
+			id
+		</if>
+		<if test="flag == 2" >
+			from_code,material_id
+		</if>
+		<if test="flag == 3" >
+			from_code,item_id
+		</if>	
+		
+		<if test="start != null" >
+			<if test="limit != null" >
+				LIMIT #{start,jdbcType=INTEGER},#{limit,jdbcType=INTEGER}
+			</if>
+        </if>
+	</select>
+	
+	<select id="selectOperationsCount" resultType="java.lang.Long" parameterType="map">
+		select count(1) from (
+		SELECT
+			id,
+			material_id,
+			item_id,
+			from_code,
+			sum(number) number,
+		CASE from_type
+		when 0 then 0
+		when 1 then 0
+		when 2 then 2
+		when 3 then 2
+		else 5 end from_type
+		FROM
+			(
+				SELECT
+					o.id,
+					o.material_id,
+		
+				IF (
+					o.type = 1,
+					o.number ,- o.number
+				) number,
+				i.id item_id,
+				o.from_code,
+			o.from_type,
+			o.create_date
+			FROM
+				stock_material_operations o
+			LEFT JOIN stock_material m ON o.material_id = m.id
+			LEFT JOIN material_item_clientitem i ON m.item_id = i.id
+			where 1=1
+			<if test="startTime != null" >
+			AND o.create_date >=  #{startTime,jdbcType=TIMESTAMP}
+			</if>
+			<if test="overTime != null" >
+			<![CDATA[ AND o.create_date <=  #{overTime,jdbcType=TIMESTAMP} ]]>
+			</if>
+			<if test="itemName != null" >
+				AND i.code like CONCAT('%',#{itemName,jdbcType=VARCHAR},'%') 
+			</if>
+			ORDER BY
+				o.create_date DESC
+			) temp
+		GROUP BY
+			<if test="flag == 1" >
+				id
+			</if>
+			<if test="flag == 2" >
+				from_code,material_id
+			</if>
+			<if test="flag == 3" >
+				from_code,item_id
+			</if>
+		) c
+	</select>
+</mapper>

@@ -1,19 +1,18 @@
 package com.lzhpo.warehouse.service.impl;
 
-import com.lzhpo.warehouse.entity.Depot;
-import com.lzhpo.warehouse.mapper.DepotMapper;
-import com.lzhpo.warehouse.service.IDepotService;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import org.springframework.stereotype.Service;
-
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import org.springframework.transaction.annotation.Transactional;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.lzhpo.warehouse.entity.Depot;
+import com.lzhpo.warehouse.mapper.DepotMapper;
+import com.lzhpo.warehouse.service.IDepotService;
 /**
  * <p>
  * 储位表 服务实现类
@@ -117,6 +116,13 @@ public class DepotServiceImpl extends ServiceImpl<DepotMapper, Depot> implements
 		}
 		return buf.toString();
 	}
-
+	@Override
+	public List<Depot> selectByClientId(String clientId) {
+		QueryWrapper<Depot> wrapper = new QueryWrapper<>();
+		// 下行编辑条件
+		wrapper.eq("del_flag", false).and(depotwrapper -> depotwrapper.like("client_ids", clientId).or().eq("client_ids", ""));
+		
+		return baseMapper.selectList(wrapper);
+	}
 
 }

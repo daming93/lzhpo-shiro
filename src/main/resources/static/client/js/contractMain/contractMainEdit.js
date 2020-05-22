@@ -193,7 +193,8 @@ window.viewObj = {
                 active[type] ? active[type].call(this) : '';
             }
         }
-        
+
+
         //注册按钮事件
         $('.layui-btn[data-type]').on('click', function () {
             var type = $(this).data('type');

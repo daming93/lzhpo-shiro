@@ -10,7 +10,6 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.cache.RedisCache;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -112,7 +111,7 @@ public class ClientitemController {
 				}
 				r.setUpdateUser(u);
 			}
-			if(StringUtils.isNotBlank(r.getClientId())){
+			if (StringUtils.isNotBlank(r.getClientId())) {
 				r.setClientId(basicdateService.getById(r.getClientId()).getClientShortName());
 			}
 		});
@@ -121,14 +120,24 @@ public class ClientitemController {
 	}
 
 	/**
+	 * 根据客户id查询
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/getByClientId")
+	public List<Clientitem> getByClientId(@RequestParam("clientId") String clientId) {
+		return clientitemService.selectByClientId(clientId);
+	}
+
+	/**
 	 * 根据id查询
 	 */
-	// @RequestMapping(value = "/getById")
-	// public ResponseWeb<Clientitem> getById(@RequestParam("pkid") String
-	// pkid){
-	// return null;
-	// }
+	@ResponseBody
+	@RequestMapping(value = "/getById")
+	public Clientitem getById(@RequestParam("itemId") String itemId) {
+		return clientitemService.getById(itemId);
+	}
 
+	
 	@GetMapping("add")
 	public String add(ModelMap modelMap) {
 		List<Basicdata> basicDatas = basicdateService.selectAll();
@@ -222,16 +231,17 @@ public class ClientitemController {
 		clientitemService.updateClientitem(clientitem);
 		return ResponseEntity.success("操作成功");
 	}
+
 	@SysLog("上传文件")
-    @PostMapping("upload")
-    @ResponseBody
-    public ResponseEntity uploadFile(@RequestParam("file") MultipartFile file, HttpServletRequest httpServletRequest) {
-        if(file == null){
-            return ResponseEntity.failure("上传文件为空 ");
-        }
-        Map map = new HashMap();
-        List<Basicdata> basicDatas = basicdateService.selectAll();
-        String message = clientitemService.upload(file, basicDatas);
-        return ResponseEntity.success(message).setAny("data",map);
-    }
+	@PostMapping("upload")
+	@ResponseBody
+	public ResponseEntity uploadFile(@RequestParam("file") MultipartFile file, HttpServletRequest httpServletRequest) {
+		if (file == null) {
+			return ResponseEntity.failure("上传文件为空 ");
+		}
+		Map map = new HashMap();
+		List<Basicdata> basicDatas = basicdateService.selectAll();
+		String message = clientitemService.upload(file, basicDatas);
+		return ResponseEntity.success(message).setAny("data", map);
+	}
 }

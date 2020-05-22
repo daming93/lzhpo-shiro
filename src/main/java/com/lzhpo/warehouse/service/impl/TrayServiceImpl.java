@@ -117,4 +117,13 @@ public class TrayServiceImpl extends ServiceImpl<TrayMapper, Tray> implements IT
 		return buf.toString();
 	}
 
+	@Override
+	public List<Tray> selectByClientId(String clientId) {
+		QueryWrapper<Tray> wrapper = new QueryWrapper<>();
+		// 下行编辑条件
+		wrapper.eq("del_flag", false);
+	//	wrapper.like("client_ids", clientId);
+		return baseMapper.selectList(wrapper);
+	}
+
 }

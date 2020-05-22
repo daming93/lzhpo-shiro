@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lzhpo.stock.mapper.TakeoutMapper">
+	<select id="selectMathTakeoutNumberByTakeoutId" resultType="com.lzhpo.stock.entity.MathStockNumber" parameterType="java.lang.String">
+		SELECT
+			o.takeoutId,
+			o. NAME name,
+			sum(o.sum) numZ,
+			sum(o.number) number,
+			sum(o.weight) weightSum,
+			sum(o.volume) volumeSum,
+			CEILING(sum(o.tray)) tray
+		FROM
+			(
+				SELECT
+					d.takeout_id takeoutId,
+					s. CODE,
+					d.item_id item_id,
+					i. NAME,
+					CEILING(sum(d.number) / i.unit_rate) sum,
+					sum(d.number) number,
+					CEILING(sum(d.number) / i.unit_rate) * i.item_weight weight,
+					CEILING(sum(d.number) / i.unit_rate) * i.item_volume volume,
+					CEILING(sum(d.number) / i.unit_rate) / i.tray tray
+				FROM
+					stock_takeout_detail d
+				LEFT JOIN material_item_clientitem i ON d.item_id = i.id
+				LEFT JOIN stock_takeout s ON d.takeout_id = s.id
+				GROUP BY
+					d.takeout_id,
+					d.item_id
+			) o where o.takeoutId = #{takeoutId}
+		GROUP BY
+			o.takeoutId
+	</select>
+</mapper>

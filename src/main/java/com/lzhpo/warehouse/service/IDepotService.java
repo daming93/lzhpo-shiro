@@ -1,8 +1,9 @@
 package com.lzhpo.warehouse.service;
 
-import com.lzhpo.warehouse.entity.Depot;
-import com.baomidou.mybatisplus.extension.service.IService;
 import java.util.List;
+
+import com.baomidou.mybatisplus.extension.service.IService;
+import com.lzhpo.warehouse.entity.Depot;
 /**
  * <p>
  * 储位表 服务类
@@ -35,4 +36,6 @@ public interface IDepotService extends IService<Depot> {
 
 	//验证code是否符合标准
 	String judCode(Depot depot);
+	
+	List<Depot> selectByClientId(String clientId);
 }
