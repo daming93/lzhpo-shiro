@@ -34,5 +34,5 @@ public interface ITakeoutService extends IService<Takeout> {
 
 	//分页查询数据在父类
 
-
+	void ensurePick(String id);
 }

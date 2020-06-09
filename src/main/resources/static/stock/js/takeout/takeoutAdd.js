@@ -262,7 +262,7 @@ window.viewObj = {
                 var tbWidth = $("#tableRes").width();
                 tableIns = table.render({
                     url:'/stock/material/listByClientIdAndBatch',
-                    where:{itemId:itemId,batch:batch},
+                    where:{itemId:itemId,batch:batch,materialType:1},//选择良品出库
                     elem: '#dataTable',
                     id: layTableId,
                     method: 'post',
@@ -270,7 +270,7 @@ window.viewObj = {
                     page: false,
                     loading: true,
                     even: false, //不开启隔行背景
-                    limit: 100, // 数据表格默认全部显示
+                    limit: 1000, // 数据表格默认全部显示
                     cols: [[
                             {title: '序号', type: 'numbers'},
                             { field:'systemCode',title:'系统物料编号',align:'center',width:160},
@@ -327,8 +327,16 @@ window.viewObj = {
                 layer.close(loadIndex);
                 if(res.success){
                     parent.layer.msg("单据添加成功！",{time:1000},function(){
-                        //刷新父页面
-                        parent.location.reload();
+                        var continuity = $("#continuity").val();
+                        // 是否开启连续 录单 
+                        if(continuity=="true"){//开启
+                            var node = parent.document.getElementById("addtakeout");
+                         //调用该元素的Click事件
+                            node.click();//连续录单
+                        }else{
+                          // 刷新父页面
+                           parent.location.reload(); 
+                        }
                     });
                 }else{
                     layer.msg(res.message);

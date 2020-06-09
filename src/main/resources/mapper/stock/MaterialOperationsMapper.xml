@@ -8,12 +8,7 @@
 			item_id,
 			from_code,
 			sum(number) number,
-		CASE from_type
-		when 0 then 0
-		when 1 then 0
-		when 2 then 2
-		when 3 then 2
-		else 5 end from_type,
+		from_type,
 		create_date
 		FROM
 			(

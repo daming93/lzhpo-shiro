@@ -3,14 +3,13 @@ package com.lzhpo.common.timer;
 import java.util.Date;
 import java.util.List;
 
-import javax.annotation.Resource;
-
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+
 import com.lzhpo.client.entity.Basicdata;
 import com.lzhpo.client.entity.ContractMain;
 import com.lzhpo.client.entity.ContractMainDetail;

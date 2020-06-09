@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <meta charset="utf-8">
+    <title>新增--单据主体</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" th:href="@{/static/layui/css/layui.css}" media="all" />
+    <style type="text/css">
+        .layui-form-item .layui-inline{` min-width:15%; float:left; margin-right:0; }
+        .layui-form-item .materialManage-box {
+            position: relative;
+        }
+    /*您可以将下列样式写入自己的样式表中*/
+        .childBody{padding: 15px;}
+        
+        /*layui 元素样式改写*/
+        .layui-btn-sm{line-height: normal; font-size: 12.5px;}      
+        .layui-table-view .layui-table-body{min-height: 256px;}
+        .layui-table-cell .layui-input.layui-unselect{height: 30px; line-height: 30px;}
+        
+        /*设置 layui 表格中单元格内容溢出可见样式*/
+        .table-overlay .layui-table-view,
+        .table-overlay .layui-table-box,
+        .table-overlay .layui-table-body{overflow: visible;}
+        .table-overlay .layui-table-cell{height: auto; overflow: visible;}
+        
+        /*文本对齐方式*/
+        .text-center{text-align: center;}
+    </style>
+</head>
+<body class="childrenBody">
+
+<form class="layui-form" id="form">
+     <div class="layui-form-item">
+        <div class="layui-inline">
+            <label class="layui-form-label">客户</label>
+            <div class="layui-input-block">
+                <select name="clientId" id="clientId" class="form-control1" lay-verify="" lay-filter="clientId" lay-search>
+                    <option value="">请选择客户</option>
+                    <option th:each="basic:${basicDatas}" th:value="${basic.id}" lay-verify="required" th:text="${basic.clientShortName}"></option>
+                </select>
+            </div>  
+        </div>
+        <div class="layui-inline">
+             <label class="layui-form-label">转品时间</label>
+            <div class="layui-input-block">
+                <input type="text" class="layui-input layTime" id="materialManageTime" name="time" lay-verify="required" placeholder="请输入转品时间">
+            </div>
+        </div>
+        <div  class="layui-inline">
+            <label class="layui-form-label">客户单号</label>
+            <div class="layui-input-block">
+                <input type="text" class="layui-input" id="clientCode" name="clientCode" lay-verify="required" placeholder="请输入客户单号"  >
+            </div>
+        </div>
+        <div class="layui-inline">
+            <label class="layui-form-label">转品类型</label>
+            <div class="layui-input-block">
+                <select name="status" id="adjustment" class="form-control1" lay-verify="required" >
+                    <option value="2" th:selected="${mode eq 1}">转不良</option>
+                    <option value="1" th:selected="${mode eq 2}">转良</option>
+                </select>
+            </div>  
+        </div>
+    </div>
+    <div class="layui-form-item">
+      
+        <div class="layui-inline">
+            <label class="layui-form-label">物料代码</label>
+            <div class="layui-input-block">
+                <select name="itemId" id="itemId"  class="form-control1" lay-filter="itemId"  lay-verify="" lay-search>
+                    <option value="">请选择客户</option>
+                </select>
+            </div> 
+        </div>
+        <div class="layui-inline">
+            <label class="layui-form-label">批次</label>
+            <div class="layui-input-block">
+                <input type="text" class="layui-input layTime" id="batch" name="batch" lay-verify="required" placeholder="请选择批次">
+            </div>   
+         </div>
+        <div class="layui-inline">
+            <label class="layui-form-label">数量</label>
+                     <div class="layui-input-block">
+                        <input type="text" class="layui-input layTime" lay-filter="number" id="number"   placeholder="请输入数量">
+                    </div> 
+        </div>
+    </div>
+     <div class="layui-form-item">
+         
+        <div class="layui-inline">
+             <label class="layui-form-label">提示:</label>
+            <div class="layui-form-mid layui-word-aux">在数量处回车添加一行，ctrl+enter提交</div>
+        </div>
+    </div>
+<div class="layui-form-item">
+        <fieldset class="layui-elem-field layui-field-title" style="margin-left: 10px;">
+            <legend>库存</legend>
+        </fieldset>
+ </div>      
+ <div class="layui-form-item">
+    <section class="layui-col-md10" style="margin: 0 auto; float: none;width: 80%">
+    <div class="layui-card">
+        <div class="layui-card-body layui-text">
+           
+            <div id="tableRes" class="table-overlay">
+                <table id="dataTable"  lay-data="{id: 'dataTable'}" lay-filter="dataTable" class="layui-table"></table>
+            </div>
+        </div>
+    </div>
+    </section>
+ </div>
+ <div class="layui-form-item">
+        <fieldset class="layui-elem-field layui-field-title" style="margin-left: 10px;">
+            <legend>转品</legend>
+        </fieldset>
+ </div>      
+ <div class="layui-form-item">
+    <section class="layui-col-md10" style="margin: 0 auto; float: none;width: 80%">
+    <div class="layui-card">
+        <div class="layui-card-body layui-text">
+           
+            <div id="materialManageTableRes" class="table-overlay">
+                <table id="materialManageTable"  lay-data="{id: 'materialManageTable'}" lay-filter="materialManageTable" class="layui-table"></table>
+            </div>
+        </div>
+    </div>
+    </section>
+ </div>
+  <div class="layui-form-item">
+        <fieldset class="layui-elem-field layui-field-title" style="margin-left: 10px;">
+            <legend>备注</legend>
+        </fieldset>
+ </div>  
+    <div class="layui-form-item layui-form-text">
+        <div class="layui-input-block" style="width: 80%">
+            <textarea placeholder="备注(不超过200字)" name="remarks" class="layui-textarea"></textarea>
+        </div>
+    </div>
+    <shiro:hasPermission name="warehouse:materialManage:add">
+    <div class="layui-form-item" style="padding-left: 30%;">
+        <div class="layui-input-block">
+            <button  type="button"  class="layui-btn" lay-submit="" id="addmaterialManage" lay-filter="addmaterialManage">立即提交</button>
+            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+        </div>
+    </div>
+    </shiro:hasPermission>
+</form>
+<input type="hidden" id="periodStatus" th:value='${periodStatus}'>
+<input type="hidden" id="options" th:value='${options}'>
+<input type="hidden" id="continuity" th:value='${continuity}'>
+<input type="hidden" id="mode" th:value='${mode}'>
+<script type="text/javascript" th:src="@{/static/layui/layui.js}"></script>
+<script type="text/javascript" th:src="@{/static/warehouse/js/materialManage/materialManageAdd.js}"></script>
+<script type="text/javascript" th:src="@{/static/layui/js/jquery-1.10.2.min.js}">
+ 
+</script>
+<script type="text/javascript">
+    $(function(){
+       
+    })
+</script>
+</body>
+</html>

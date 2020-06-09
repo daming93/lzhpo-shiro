@@ -21,6 +21,18 @@
             <div class="layui-inline">
                 <input type="text" value="" name="s_itemCode" placeholder="物料编号" class="layui-input search_input">
             </div>
+             <div class="layui-inline">
+                <input type="radio" name="s_mode" value="1" title="详情" checked >
+                <input type="radio" name="s_mode" value="2" title="忽略批次" >
+                <input type="radio" name="s_mode" value="3" title="忽略状态" >
+            </div>
+            <div class="layui-input-inline">
+            <span class="layui-badge-dot layui-bg-green"></span>
+             </div>
+            <div class="layui-input-inline">
+                <input type="radio" name="s_continuity" value="on" title="非0" checked >
+                <input type="radio" name="s_continuity" value="off" title="全部" >
+            </div>
             <div class="layui-input-inline">
                 <a class="layui-btn" lay-submit="" lay-filter="searchForm">查询</a>
             </div>
@@ -32,6 +44,7 @@
     <table class="layui-table" id="material-table"  lay-filter="materialList"></table>
     <script type="text/html" id="materialBar">
          <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="history">历史</a>
+         <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="distribution">分布</a>
     </script>
 </div>
 <div id="page"></div>

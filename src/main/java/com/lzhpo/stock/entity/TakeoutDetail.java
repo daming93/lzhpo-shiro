@@ -83,6 +83,19 @@ public class TakeoutDetail extends DataEntity<TakeoutDetail> implements Serializ
     @TableField(exist=false)
     private Integer maxNumber;
     
+    @TableField(exist=false)
+    private String itemCode;
+    
+    
+    
+	public String getItemCode() {
+		return itemCode;
+	}
+
+	public void setItemCode(String itemCode) {
+		this.itemCode = itemCode;
+	}
+
 	public Integer getMaxNumber() {
 		return maxNumber;
 	}

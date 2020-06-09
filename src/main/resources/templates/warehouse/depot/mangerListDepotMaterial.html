@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <meta charset="UTF-8">
+    <title>实时库存</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <link rel="stylesheet" th:href="@{/static/layui/css/layui.css}" media="all" />
+    <link rel="stylesheet" th:href="@{/static/admin/css/list.css}" media="all" />
+</head>
+<body class="childrenBody">
+<fieldset class="layui-elem-field">
+    <legend>选项检索</legend>
+    <div class="layui-field-box">
+        <form class="layui-form">
+            <div class="layui-inline">
+                <input type="text" value="" name="s_itemCode" placeholder="物料编号" class="layui-input search_input">
+            </div>
+            <div class="layui-input-inline">
+                <a class="layui-btn" lay-submit="" lay-filter="searchForm">查询</a>
+            </div>
+        </form>
+    </div>
+</fieldset>
+
+<div class="layui-form users_list">
+    <table class="layui-table" id="material-table"  lay-filter="materialList"></table>
+    <script type="text/html" id="materialBar">
+         <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="change">调仓</a>
+    </script>
+</div>
+<div id="page"></div>
+<div id ="show" hidden="hidden">
+  
+
+</div>
+<script type="text/javascript" th:src="@{/static/layui/layui.js}"></script>
+<script type="text/javascript" th:src="@{/static/admin/js/tools.js}"></script>
+<script type="text/javascript" th:src="@{/static/warehouse/js/depot/mangerDepotMaterialList.js}"></script>
+</body>
+</html>

@@ -105,6 +105,12 @@ public class Storage extends DataEntity<Storage> implements Serializable {
      */
     private Integer adjustment;
     
+    /**
+     * 
+     */
+    @TableField("income_id")
+    private String incomeId;
+    
     @TableField(exist = false)
     private String statusStr;
 
@@ -239,7 +245,11 @@ public class Storage extends DataEntity<Storage> implements Serializable {
 		this.statusStr = statusStr;
 	}
 
-   
+	public String getIncomeId() {
+		return incomeId;
+	}
 
-
+	public void setIncomeId(String incomeId) {
+		this.incomeId = incomeId;
+	}
 }

@@ -1,3 +1,21 @@
+//时间控件
+layui.use('laydate', function(){
+  var laydate = layui.laydate;
+  
+  //执行一个laydate实例
+  laydate.render({
+    elem: '#startTime' //指定元素
+  });
+  var laydate2 = layui.laydate;
+  
+  //执行一个laydate实例
+  laydate2.render({
+    elem: '#overTime' //指定元素
+  });
+});
+
+
+
 layui.use(['layer','form','table'], function() {
     var layer = layui.layer,
         $ = layui.jquery,
@@ -32,6 +50,9 @@ layui.use(['layer','form','table'], function() {
                 layer.full(editIndex);
             });
             layer.full(editIndex);
+        }
+        if(obj.event === 'print'){
+            window.open("/stock/takeout/print?id="+data.id);
         }
         if(obj.event === "del"){
             layer.confirm("你确定要删除该出库么？",{btn:['是的,我确定','我再想想']},
@@ -81,12 +102,6 @@ layui.use(['layer','form','table'], function() {
                             content: $('#show') //这里content是一个DOM，注意：最好该元素要存放在body最外层，否则可能被其它的相对元素所影响
                         });       
                     });
-
-           
-
-
-         
-
          }
         
     });
@@ -138,7 +153,7 @@ layui.use(['layer','form','table'], function() {
             {field:'weight',        title: '重量(kg)'   },
          //   {field:'trayNumber',        title: '件/托(kg)'   },
             {field:'statusStr',        title: '状态'   },
-            {field:'remakes',        title: '备注'   },
+            {field:'remarks',        title: '备注'   },
             {title: '操作',fixed: 'right',  width:'15%',    align: 'center',toolbar: '#takeoutBar'}
         ]]/*,
         done: function () {
@@ -148,16 +163,21 @@ layui.use(['layer','form','table'], function() {
     table.render(t);
     var active={
           addUser : function(){
+            var continuity = $("#continuity")[0].checked;
             addIndex = layer.open({
                 title : "添加出库单",
                 type : 2,
-                content : "/stock/takeout/add",
+                content : "/stock/takeout/add?continuity="+continuity,
                 success : function(layero, addIndex){
                     setTimeout(function(){
                         layer.tips('点击此处返回出库单列表', '.layui-layer-setwin .layui-layer-close', {
                             tips: 3
                         });
                     },500);
+                }, 
+                end: function () {
+                    //重新加载当前页面
+                    location.reload();
                 }
             });
             //改变窗口大小时，重置弹窗的高度，防止超出可视区域（如F12调出debug的操作）

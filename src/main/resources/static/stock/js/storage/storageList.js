@@ -138,7 +138,7 @@ layui.use(['layer','form','table'], function() {
             {field:'weight',        title: '重量(kg)'   },
             {field:'trayNum',        title: '件/托(kg)'   },
             {field:'statusStr',        title: '状态'   },
-            {field:'remakes',        title: '备注'   },
+            {field:'remarks',        title: '备注'   },
             {title: '操作',fixed: 'right',  width:'15%',    align: 'center',toolbar: '#storageBar'}
         ]]/*,
         done: function () {
@@ -148,16 +148,21 @@ layui.use(['layer','form','table'], function() {
     table.render(t);
     var active={
           addUser : function(){
+            var continuity = $("#continuity")[0].checked;
             addIndex = layer.open({
                 title : "添加入库单",
                 type : 2,
-                content : "/stock/storage/add",
+                content : "/stock/storage/add?continuity="+continuity,
                 success : function(layero, addIndex){
                     setTimeout(function(){
                         layer.tips('点击此处返回入库单列表', '.layui-layer-setwin .layui-layer-close', {
                             tips: 3
                         });
                     },500);
+                }, 
+                end: function () {
+                    //重新加载当前页面
+                    location.reload();
                 }
             });
             //改变窗口大小时，重置弹窗的高度，防止超出可视区域（如F12调出debug的操作）

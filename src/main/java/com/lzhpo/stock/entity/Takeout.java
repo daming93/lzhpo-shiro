@@ -183,10 +183,21 @@ public class Takeout extends DataEntity<Takeout> implements Serializable {
     private String statusStr;
 
     @TableField(exist = false)
+    private String pickStatusStr;
+    
+    @TableField(exist = false)
     private Set<TakeoutDetail> detailSet;
     
     
     
+	public String getPickStatusStr() {
+		return pickStatusStr;
+	}
+
+	public void setPickStatusStr(String pickStatusStr) {
+		this.pickStatusStr = pickStatusStr;
+	}
+
 	public Integer getAdjustment() {
 		return adjustment;
 	}

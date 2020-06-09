@@ -81,6 +81,8 @@ public class TakeoutDetailServiceImpl extends ServiceImpl<TakeoutDetailMapper, T
 	@Transactional(rollbackFor = Exception.class)
 	@CacheEvict(value = "TakeoutDetails", allEntries = true)
 	public void deleteTakeoutDetail(TakeoutDetail takeoutDetail,String code) {
+		//撤销出库
+		Integer trunover_type_takeout_back = CacheUtils.keyDict.get("trunover_type_takeout_back").getValue();
 		// 删除需要返回库存
 		// 防止前台传来得数量是修改过得
 		TakeoutDetail entity = baseMapper.selectById(takeoutDetail.getId());
@@ -89,10 +91,10 @@ public class TakeoutDetailServiceImpl extends ServiceImpl<TakeoutDetailMapper, T
 		// 记录流水
 		MaterialOperations materialOperations = new MaterialOperations();
 		materialOperations.setFromCode(code);
-		materialOperations.setFromType(2);// 出库库
+		materialOperations.setFromType(trunover_type_takeout_back);//撤销出库
 		materialOperations.setMaterialId(takeoutDetail.getMaterial());
 		materialOperations.setNumber(0 - entity.getNumber());
-		materialOperations.setType(2);// 出库为-
+		materialOperations.setType(2);// 撤销出库为+
 		materialOperationsService.save(materialOperations);
 		takeoutDetail.setDelFlag(true);
 		baseMapper.deleteById(takeoutDetail.getId());//就直接删除
@@ -116,8 +118,8 @@ public class TakeoutDetailServiceImpl extends ServiceImpl<TakeoutDetailMapper, T
 		if (takeoutDetail.getNumZ() != null) {
 			takeoutDetail.setNumber(CommomUtil.AllToOne(takeoutDetail.getNumZ(), item.getUnitRate()));
 		}
-		// 然后在锁住修改过的数量
-		materialSerivice.lockMaterial(takeoutDetail.getMaterial(), takeoutDetail.getNumber() - entity.getNumber());
+		// 然后在锁住修改过的数量 传的数字就是变更的数字
+		materialSerivice.lockMaterial(takeoutDetail.getMaterial(), takeoutDetail.getNumber() - entity.getNumber(),entity.getDepot());
 		// 记录流水
 		MaterialOperations materialOperations = new MaterialOperations();
 		materialOperations.setFromCode(code);

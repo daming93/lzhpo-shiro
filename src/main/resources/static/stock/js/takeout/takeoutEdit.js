@@ -57,7 +57,7 @@ layui.use('laydate', function(){
             cols: [[
                 {title: '序号', type: 'numbers'},
 
-                { field:'itemId',title:'系统物料编号',align:'center',width:160},
+                { field:'itemCode',title:'系统物料编号',align:'center',width:160},
                 { field:'itemName',title:'品牌系列',align:'center',width:200},
                 { field:'depot',title:'储位',align:'center',width:130},
                 { field:'batch',title:'批次',align:'center',width:100},
@@ -77,8 +77,14 @@ layui.use('laydate', function(){
             var value = obj.value //得到修改后的值
             ,data = obj.data //得到所在行所有键值
             ,field = obj.field; //得到字段
+          
+            //  获取单元格编辑之前td的选择器
+            var selector = obj.tr.selector+' td[data-field="'+obj.field+'"] div';
+            // 单元格编辑之前的值
+            var oldtext = $(selector).text();
             obj.update({
-                      number: zero(value,obj.data.rate)
+                      number: zero(value,obj.data.rate),
+                      maxNumber:obj.data.maxNumber+parseInt(zero(oldtext,obj.data.rate)-zero(value,obj.data.rate))
                     });
              $.ajax({
             type:"POST",

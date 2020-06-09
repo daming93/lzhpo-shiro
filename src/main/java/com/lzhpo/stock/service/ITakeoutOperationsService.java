@@ -35,4 +35,7 @@ public interface ITakeoutOperationsService extends IService<TakeoutOperations> {
 
 	//查询历史操作记录
 	List<TakeoutOperations> selectByTakeoutId(String id);
+	
+	//给出库单ID 操作类型 操作单id
+	void saveOpByIdAndType(String takeoutId,Integer type,String opId);
 }

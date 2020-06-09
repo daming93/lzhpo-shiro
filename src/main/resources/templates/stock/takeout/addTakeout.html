@@ -85,7 +85,7 @@
         <div class="layui-inline">
             <label class="layui-form-label">数量</label>
                      <div class="layui-input-block">
-                        <input type="text" class="layui-input layTime" lay-filter="number" id="number"  lay-verify="required" placeholder="请输入数量">
+                        <input type="text" class="layui-input layTime" lay-filter="number" id="number"   placeholder="请输入数量">
                     </div> 
         </div>
     </div>
@@ -151,6 +151,7 @@
 </form>
 <input type="hidden" id="periodStatus" th:value='${periodStatus}'>
 <input type="hidden" id="options" th:value='${options}'>
+<input type="hidden" id="continuity" th:value='${continuity}'>
 <script type="text/javascript" th:src="@{/static/layui/layui.js}"></script>
 <script type="text/javascript" th:src="@{/static/stock/js/takeout/takeoutAdd.js}"></script>
 <script type="text/javascript" th:src="@{/static/layui/js/jquery-1.10.2.min.js}">

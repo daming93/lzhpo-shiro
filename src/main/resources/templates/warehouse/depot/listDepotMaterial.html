@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <meta charset="UTF-8">
+    <title>实时库存</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <link rel="stylesheet" th:href="@{/static/layui/css/layui.css}" media="all" />
+    <link rel="stylesheet" th:href="@{/static/admin/css/list.css}" media="all" />
+</head>
+<body class="childrenBody">
+<div class="layui-form users_list">
+    <table class="layui-table" id="material-table"  lay-filter="materialList"></table>
+</div>
+
+<div id="page"></div>
+<div id ="show" hidden="hidden">
+  
+<input type="hidden" id="code" th:value='${code}'>
+</div>
+<script type="text/javascript" th:src="@{/static/layui/layui.js}"></script>
+<script type="text/javascript" th:src="@{/static/admin/js/tools.js}"></script>
+<script type="text/javascript" th:src="@{/static/warehouse/js/depot/depotMaterialList.js}"></script>
+</body>
+</html>

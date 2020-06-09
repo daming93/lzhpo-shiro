@@ -31,6 +31,25 @@ layui.use(['layer','form','table' ,'upload'], function() {
     //监听工具条
     table.on('tool(depotList)', function(obj){
         var data = obj.data;
+        if(obj.event === 'list'){
+            var editIndex = layer.open({
+                title : "储位库存",
+                type : 2,
+                content : "/stock/material/listDepotMaterial?code="+data.code,
+                success : function(layero, index){
+                    setTimeout(function(){
+                        layer.tips('点击此处返回储位列表', '.layui-layer-setwin .layui-layer-close', {
+                            tips: 3
+                        });
+                    },500);
+                }
+            });
+            //改变窗口大小时，重置弹窗的高度，防止超出可视区域（如F12调出debug的操作）
+            $(window).resize(function(){
+                layer.full(editIndex);
+            });
+            layer.full(editIndex);
+        }
         if(obj.event === 'edit'){
             var editIndex = layer.open({
                 title : "编辑储位",

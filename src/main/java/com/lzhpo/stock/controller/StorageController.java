@@ -22,6 +22,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.fasterxml.jackson.databind.RuntimeJsonMappingException;
 import com.lzhpo.admin.entity.User;
 import com.lzhpo.admin.service.UserService;
 import com.lzhpo.client.entity.Basicdata;
@@ -79,7 +80,9 @@ public class StorageController {
 	private IClientitemService clientitemService;
 
 	@GetMapping(value = "list")
-	public String list() {
+	public String list(ModelMap modelMap) {
+		List<Basicdata> basicDatas = basicdateService.selectAll();
+		modelMap.put("basicDatas", basicDatas);
 		return "stock/storage/listStorage";
 	}
 
@@ -96,10 +99,26 @@ public class StorageController {
 		QueryWrapper<Storage> storageWrapper = new QueryWrapper<>();
 		// 相当于del_flag = 0;
 		storageWrapper.eq("del_flag", false);
-		if (!map.isEmpty()) {
-			String keys = (String) map.get("name");
-			if (StringUtils.isNotBlank(keys)) {
-				storageWrapper.like("name", keys);
+		if (!map.isEmpty()) {//检索项
+			String clientCode = (String) map.get("clientCode");
+			if (StringUtils.isNotBlank(clientCode)) {
+				storageWrapper.like("client_code", clientCode);
+			}
+			String code = (String) map.get("code");
+			if (StringUtils.isNotBlank(code)) {
+				storageWrapper.like("code", code);
+			}
+			String clientId = (String) map.get("clientId");
+			if (StringUtils.isNotBlank(clientId)) {
+				storageWrapper.eq("client_id", clientId);
+			}
+			String startTime =(String) map.get("startTime");
+			String overTime =(String) map.get("overTime");
+			if (StringUtils.isNotBlank(startTime)) {
+				storageWrapper.ge("create_date", startTime);
+			}
+			if (StringUtils.isNotBlank(overTime)) {
+				storageWrapper.le("create_date", overTime);
 			}
 		}
 		storageWrapper.orderByAsc("status");
@@ -186,9 +205,10 @@ public class StorageController {
 	// }
 
 	@GetMapping("add")
-	public String add(ModelMap modelMap) {
+	public String add(ModelMap modelMap,@RequestParam(value = "continuity", required = false) String continuity) {
 		List<Basicdata> basicDatas = basicdateService.selectAll();
 		modelMap.put("basicDatas", basicDatas);
+		modelMap.put("continuity", continuity);
 		List<Tray> trayList = trayService.selectAll();
 		modelMap.put("trayList", trayList);
 		return "stock/storage/addStorage";
@@ -280,7 +300,14 @@ public class StorageController {
 		// return ResponseEntity.failure("修改提示信息（不能重复)");
 		// }
 		// }
-		storageService.updateStorage(storage);
+		try {
+			storageService.updateStorage(storage);
+		}catch (RuntimeJsonMappingException e) {
+			return ResponseEntity.failure(e.getMessage());
+		}catch (Exception e) {
+			// TODO: handle exception
+		}
+		
 		return ResponseEntity.success("操作成功");
 	}
 

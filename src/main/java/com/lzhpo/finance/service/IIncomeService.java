@@ -1,8 +1,11 @@
 package com.lzhpo.finance.service;
 
-import com.lzhpo.finance.entity.Income;
-import com.baomidou.mybatisplus.extension.service.IService;
 import java.util.List;
+
+import com.baomidou.mybatisplus.extension.service.IService;
+import com.lzhpo.finance.entity.Income;
+import com.lzhpo.stock.entity.Storage;
+import com.lzhpo.stock.entity.Takeout;
 /**
  * <p>
  * 财务收入 服务类
@@ -32,5 +35,8 @@ public interface IIncomeService extends IService<Income> {
 
 	//分页查询数据在父类
 
-
+	//出库装卸费计算
+	void takeoutIncomeMath(Takeout takeout) throws Exception;
+	
+	Storage storageIncomeMath(Storage storage)throws Exception;
 }

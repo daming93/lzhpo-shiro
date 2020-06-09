@@ -18,8 +18,26 @@
     <legend>选项检索</legend>
     <div class="layui-field-box">
         <form class="layui-form">
+             <div class="layui-inline">
+                <select name="s_clientId" id="clientId" class="form-control1" lay-verify="" lay-filter="clientId" lay-search>
+                    <option value="">请选择客户</option>
+                    <option th:each="basic:${basicDatas}" th:value="${basic.id}" lay-verify="required" th:text="${basic.clientShortName}"></option>
+                </select>
+            </div> 
             <div class="layui-inline">
-                <input type="text" value="" name="s_like_name" placeholder="可以输入合同选项名" class="layui-input search_input">
+                <input type="text" value="" name="s_clientCode" placeholder="客户单号" class="layui-input search_input">
+            </div>
+            <div class="layui-inline">
+                <input type="text" value="" name="s_code" placeholder="系统单号" class="layui-input search_input">
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">时间范围</label>
+            </div>
+           <div class="layui-inline">
+                <input type="text" value="" id="startTime" name="s_startTime" placeholder="开始时间" class="layui-input layTime">
+            </div>
+            <div class="layui-inline">
+                <input type="text" value="" id="overTime" name="s_soverTime"  placeholder="结束时间" class="layui-input layTime">
             </div>
             <div class="layui-input-inline">
                 <a class="layui-btn" lay-submit="" lay-filter="searchForm">查询</a>
@@ -39,7 +57,7 @@
               </div>
              </shiro:hasPermission>
              <div class="layui-input-inline">
-                <input type="checkbox" name="yyy" lay-skin="switch" lay-text="连续录入|关闭连续录入" checked>
+                <input type="checkbox" name="continuity" id="continuity" lay-skin="switch" lay-text="连续录入|关闭" >
             </div>
         </form>
     </div>

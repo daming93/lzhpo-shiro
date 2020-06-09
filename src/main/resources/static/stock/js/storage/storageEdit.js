@@ -131,7 +131,17 @@ window.viewObj = {
                 })
             }
         });
-        
+        table.on('edit(dataTable)', function(obj){
+            var value = obj.value //得到修改后的值
+            ,data = obj.data //得到所在行所有键值
+            ,field = obj.field; //得到字段
+            if(obj.field=="numZ"){
+                 obj.update({
+                      number: zero(value,obj.data.rate)
+                 });
+            }
+         
+       });
         //定义事件集合
         var active = {
             addRow: function(){ //添加一行

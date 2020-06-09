@@ -1,5 +1,6 @@
 package com.lzhpo.stock.controller;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -22,20 +23,24 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.fasterxml.jackson.databind.RuntimeJsonMappingException;
 import com.lzhpo.admin.entity.User;
 import com.lzhpo.admin.service.UserService;
 import com.lzhpo.client.entity.Basicdata;
 import com.lzhpo.client.service.IBasicdataService;
 import com.lzhpo.common.annotation.SysLog;
 import com.lzhpo.common.base.PageData;
+import com.lzhpo.common.config.MySysUser;
+import com.lzhpo.common.init.CacheUtils;
 import com.lzhpo.common.util.CommomUtil;
 import com.lzhpo.common.util.ResponseEntity;
 import com.lzhpo.material.item.entity.Clientitem;
 import com.lzhpo.material.item.service.IClientitemService;
-import com.lzhpo.stock.entity.TakeoutOperations;
-import com.lzhpo.stock.entity.Material;
+import com.lzhpo.stock.entity.MaterialDepot;
 import com.lzhpo.stock.entity.Takeout;
 import com.lzhpo.stock.entity.TakeoutDetail;
+import com.lzhpo.stock.entity.TakeoutOperations;
+import com.lzhpo.stock.service.IMaterialDepotService;
 import com.lzhpo.stock.service.IMaterialService;
 import com.lzhpo.stock.service.ITakeoutDetailService;
 import com.lzhpo.stock.service.ITakeoutOperationsService;
@@ -44,6 +49,8 @@ import com.lzhpo.warehouse.entity.Depot;
 import com.lzhpo.warehouse.entity.Tray;
 import com.lzhpo.warehouse.service.IDepotService;
 import com.lzhpo.warehouse.service.ITrayService;
+
+import cn.hutool.core.date.DateUtil;
 
 /**
  * <p>
@@ -83,8 +90,12 @@ public class TakeoutController {
 	@Autowired
 	private IMaterialService materialSrivice;
 	
+	@Autowired
+	private IMaterialDepotService materialDepotService;
 	@GetMapping(value = "list")
-	public String list() {
+	public String list(ModelMap modelMap) {
+		List<Basicdata> basicDatas = basicdateService.selectAll();
+		modelMap.put("basicDatas", basicDatas);
 		return "stock/takeout/listTakeout";
 	}
 
@@ -101,10 +112,26 @@ public class TakeoutController {
 		QueryWrapper<Takeout> takeoutWrapper = new QueryWrapper<>();
 		// 相当于del_flag = 0;
 		takeoutWrapper.eq("del_flag", false);
-		if (!map.isEmpty()) {
-			String keys = (String) map.get("name");
-			if (StringUtils.isNotBlank(keys)) {
-				takeoutWrapper.like("name", keys);
+		if (!map.isEmpty()) {//检索项
+			String clientCode = (String) map.get("clientCode");
+			if (StringUtils.isNotBlank(clientCode)) {
+				takeoutWrapper.like("client_code", clientCode);
+			}
+			String code = (String) map.get("code");
+			if (StringUtils.isNotBlank(code)) {
+				takeoutWrapper.like("code", code);
+			}
+			String clientId = (String) map.get("clientId");
+			if (StringUtils.isNotBlank(clientId)) {
+				takeoutWrapper.eq("client_id", clientId);
+			}
+			String startTime =(String) map.get("startTime");
+			String overTime =(String) map.get("overTime");
+			if (StringUtils.isNotBlank(startTime)) {
+				takeoutWrapper.ge("create_date", startTime);
+			}
+			if (StringUtils.isNotBlank(overTime)) {
+				takeoutWrapper.le("create_date", overTime);
 			}
 		}
 		IPage<Takeout> takeoutPage = takeoutService.page(new Page<>(page, limit), takeoutWrapper);
@@ -136,6 +163,9 @@ public class TakeoutController {
 			if (r.getStatus() != null) {
 				r.setStatusStr(CommomUtil.valueToNameInDict(r.getStatus(), "modify_status"));
 			}
+			if (r.getPickingStatus()!= null) {
+				r.setPickStatusStr(CommomUtil.valueToNameInDict(r.getPickingStatus(), "is_exsit_pick"));
+			}
 		});
 
 		return takeouts;
@@ -150,11 +180,12 @@ public class TakeoutController {
 	// }
 
 	@GetMapping("add")
-	public String add(ModelMap modelMap) {
+	public String add(ModelMap modelMap,@RequestParam(value = "continuity", required = false) String continuity) {
 		List<Basicdata> basicDatas = basicdateService.selectAll();
 		modelMap.put("basicDatas", basicDatas);
 		List<Tray> trayList = trayService.selectAll();
 		modelMap.put("trayList", trayList);
+		modelMap.put("continuity", continuity);
 		return "stock/takeout/addTakeout";
 	}
 
@@ -163,7 +194,14 @@ public class TakeoutController {
 	@ResponseBody
 	@SysLog("保存新增数据")
 	public ResponseEntity add(@RequestBody Takeout takeout) {
-		takeoutService.saveTakeout(takeout);
+		try {
+			takeoutService.saveTakeout(takeout);
+		} catch (RuntimeJsonMappingException e) {
+			return ResponseEntity.failure(e.getMessage());
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.failure("系统异常,请联系管理员处理");
+		}
 		return ResponseEntity.success("操作成功");
 	}
 
@@ -173,7 +211,7 @@ public class TakeoutController {
 	@SysLog("删除数据")
 	public ResponseEntity delete(@RequestParam(value = "id", required = false) String id) {
 		if (StringUtils.isBlank(id)) {
-			return ResponseEntity.failure("角色ID不能为空");
+			return ResponseEntity.failure("ID不能为空");
 		}
 		Takeout takeout = takeoutService.getTakeoutById(id);
 		takeoutService.deleteTakeout(takeout);
@@ -209,6 +247,27 @@ public class TakeoutController {
 		return "stock/takeout/editTakeout";
 	}
 
+	@GetMapping("print")
+	public String print(String id, ModelMap modelMap) {
+		Takeout takeout = takeoutService.getTakeoutById(id);
+		if (StringUtils.isNotBlank(takeout.getCreateId())) {
+			User u = userService.findUserById(takeout.getCreateId());
+			if (StringUtils.isBlank(u.getNickName())) {
+				u.setNickName(u.getLoginName());
+			}
+			takeout.setCreateUser(u);
+		}
+		modelMap.put("printPeople", MySysUser.nickName());
+		modelMap.put("printTime", DateUtil.formatDate(new Date()));
+		modelMap.put("takeout", takeout);
+		List<Basicdata> basicDatas = basicdateService.selectAll();
+		modelMap.put("basicDatas", basicDatas);
+		List<Clientitem> items = clientitemService.selectByClientId(takeout.getClientId());
+		modelMap.put("items", JSONObject.toJSON(items));
+		return "stock/takeout/printTakeout";
+	}
+
+	
 	@RequiresPermissions("stock:takeout:edit")
 	@PostMapping("edit")
 	@ResponseBody
@@ -229,18 +288,11 @@ public class TakeoutController {
 	public PageData<TakeoutDetail> selectDetail(@RequestParam(value = "page", defaultValue = "1") Integer page,
 			@RequestParam(value = "limit", defaultValue = "10") Integer limit, ServletRequest request,
 			String takeoutId) {
-		Map map = WebUtils.getParametersStartingWith(request, "s_");
 		PageData<TakeoutDetail> ConttakeoutDetailData = new PageData<>();
 		QueryWrapper<TakeoutDetail> takeoutDetailWrapper = new QueryWrapper<>();
 		// 相当于del_flag = 0;
 		takeoutDetailWrapper.eq("takeout_id", takeoutId);
 		takeoutDetailWrapper.eq("del_flag", false);
-		if (!map.isEmpty()) {
-			String keys = (String) map.get("key");
-			if (StringUtils.isNotBlank(keys)) {
-				takeoutDetailWrapper.like("name", keys);
-			}
-		}
 		takeoutDetailWrapper.orderByDesc("create_date ");
 		IPage<TakeoutDetail> takeoutDetailPage = takeoutDetailService.page(new Page<>(page, limit),
 				takeoutDetailWrapper);
@@ -255,11 +307,17 @@ public class TakeoutController {
 				Clientitem item = clientitemService.getById(r.getItemId());
 				r.setRate(item.getUnitRate()+"");
 				r.setItemName(item.getName());
+				r.setItemCode(item.getCode());
 				r.setNumZ(r.getNumber() / item.getUnitRate() + "." + r.getNumber() % item.getUnitRate());
 			}
 			if(StringUtils.isNotBlank(r.getMaterial())){
-				Material material = materialSrivice.getById(r.getMaterial());
-				r.setMaxNumber(material.getAvailableNum());
+				//通过储位和物料共同找最大值
+				MaterialDepot mDepot = materialDepotService.getMaterialDepotByMaterialIdAndDepotCode(r.getMaterial(), r.getDepot());
+				if(mDepot!=null){
+					r.setMaxNumber(mDepot.getNumber());
+				}else{
+					r.setMaxNumber(0);
+				}
 			}
 		});
 		return details;
@@ -305,7 +363,7 @@ public class TakeoutController {
 	}
 	@PostMapping("editDetail")
 	@ResponseBody
-	@SysLog("保存编辑数据")
+	@SysLog("保存编辑明细出库数据")
 	public ResponseEntity editDetail(@RequestBody TakeoutDetail detail) {
 		if (StringUtils.isBlank(detail.getId())) {
 			return ResponseEntity.failure("id（不能为空)");
@@ -320,12 +378,110 @@ public class TakeoutController {
 	}
 	@PostMapping("deleteDetail")
 	@ResponseBody
-	@SysLog("保存编辑数据")
+	@SysLog("删除明细数据")
 	public ResponseEntity deleteDetail(@RequestBody TakeoutDetail detail) {
 		if (StringUtils.isBlank(detail.getId())) {
 			return ResponseEntity.failure("id（不能为空)");
 		}
 		takeoutDetailService.deleteTakeoutDetail(detail,takeoutService.getById(detail.getTakeoutId()).getCode());
+		return ResponseEntity.success("操作成功");
+	}
+	
+	/*
+	 * 以下为拣货单
+	 */
+	@GetMapping(value = "pickList")
+	public String pickList() {
+		return "stock/takeout/pickListTakeout";
+	}
+
+	/**
+	 * 查询分页数据
+	 */
+	@RequiresPermissions("stock:takeout:pickList")
+	@PostMapping("pickList")
+	@ResponseBody
+	public PageData<Takeout> pickList(@RequestParam(value = "page", defaultValue = "1") Integer page,
+			@RequestParam(value = "limit", defaultValue = "10") Integer limit, ServletRequest request) {
+		// 可撤销
+		Integer modify_status_revocation = CacheUtils.keyDict.get("modify_status_revocation").getValue();
+		Map map = WebUtils.getParametersStartingWith(request, "s_");
+		PageData<Takeout> takeoutPageData = new PageData<>();
+		QueryWrapper<Takeout> takeoutWrapper = new QueryWrapper<>();
+		// 相当于del_flag = 0;
+		takeoutWrapper.eq("del_flag", false);
+		takeoutWrapper.isNotNull("picking_code");
+		takeoutWrapper.ge("status", modify_status_revocation);
+		if (!map.isEmpty()) {
+			String keys = (String) map.get("name");
+			if (StringUtils.isNotBlank(keys)) {
+				takeoutWrapper.like("name", keys);
+			}
+		}
+		IPage<Takeout> takeoutPage = takeoutService.page(new Page<>(page, limit), takeoutWrapper);
+		takeoutPageData.setCount(takeoutPage.getTotal());
+		takeoutPageData.setData(setUserToTakeout(takeoutPage.getRecords()));
+		return takeoutPageData;
+	}
+	@GetMapping("printPick")
+	public String printPick(String id, ModelMap modelMap) {
+		Integer stock_type_sure = CacheUtils.keyDict.get("stock_type_print").getValue();//打印
+		Takeout takeout = takeoutService.getTakeoutById(id);
+		if (StringUtils.isNotBlank(takeout.getCreateId())) {
+			User u = userService.findUserById(takeout.getCreateId());
+			if (StringUtils.isBlank(u.getNickName())) {
+				u.setNickName(u.getLoginName());
+			}
+			takeout.setCreateUser(u);
+		}
+		modelMap.put("printPeople", MySysUser.nickName());
+		modelMap.put("printTime", DateUtil.formatDate(new Date()));
+		modelMap.put("takeout", takeout);
+		List<Basicdata> basicDatas = basicdateService.selectAll();
+		modelMap.put("basicDatas", basicDatas);
+		List<Clientitem> items = clientitemService.selectByClientId(takeout.getClientId());
+		modelMap.put("items", JSONObject.toJSON(items));
+		//打印人记录下来
+		takeoutOperationsService.saveOpByIdAndType(takeout.getId(), stock_type_sure, takeout.getPickingCode());
+	
+		return "stock/takeout/printPick";
+	}
+	
+	@RequiresPermissions("stock:takeout:ensurePick")
+	@PostMapping("ensurePick")
+	@ResponseBody
+	@SysLog("拣货完成")
+	public ResponseEntity ensurePick(@RequestParam(value = "id", required = false) String id) {
+		if (StringUtils.isBlank(id)) {
+			return ResponseEntity.failure("单据ID不能为空");
+		}
+		Takeout takeout = takeoutService.getTakeoutById(id);
+	
+		//变成正在拣货状态
+		Integer is_exsit_pick_yes = CacheUtils.keyDict.get("is_exsit_pick_yes").getValue();//拣货完成
+		takeout.setPickingStatus(is_exsit_pick_yes);
+		takeoutService.updateById(takeout);
+		return ResponseEntity.success("操作成功");
+	}
+	
+	@RequiresPermissions("stock:takeout:ensurePick")
+	@PostMapping("startPick")
+	@ResponseBody
+	@SysLog("开始拣货")
+	public ResponseEntity startPick(@RequestParam(value = "id", required = false) String id) {
+		if (StringUtils.isBlank(id)) {
+			return ResponseEntity.failure("单据ID不能为空");
+		}
+		Takeout takeout = takeoutService.getTakeoutById(id);
+	
+		//变成正在拣货状态
+		//is_exsit_pick_ing 正在拣货 并且改变 出库单的锁单
+		// 锁定
+		Integer modify_status_lock = CacheUtils.keyDict.get("modify_status_lock").getValue();
+		Integer is_exsit_pick_ing = CacheUtils.keyDict.get("is_exsit_pick_ing").getValue();//正在拣货
+		takeout.setPickingStatus(is_exsit_pick_ing);
+		takeout.setStatus(modify_status_lock);
+		takeoutService.updateById(takeout);
 		return ResponseEntity.success("操作成功");
 	}
 }

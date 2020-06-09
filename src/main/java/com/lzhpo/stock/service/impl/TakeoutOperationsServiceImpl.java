@@ -82,5 +82,14 @@ public class TakeoutOperationsServiceImpl extends ServiceImpl<TakeoutOperationsM
 	     return operations;
 	}
 
+	@Override
+	public void saveOpByIdAndType(String takeoutId, Integer type, String opCode) {
+		TakeoutOperations op = new TakeoutOperations();
+		op.setTakeoutId(takeoutId);
+		op.setType(type);
+		op.setOperationId(opCode);
+		save(op);
+	}
+
 
 }

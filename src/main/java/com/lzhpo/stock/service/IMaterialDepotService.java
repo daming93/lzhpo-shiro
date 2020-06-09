@@ -42,4 +42,7 @@ public interface IMaterialDepotService extends IService<MaterialDepot> {
 	 */
 	void mathNumberBymaterialIdAndDepotId(String materialId,String depotId,Integer number,boolean math);
 
+	List<MaterialDepot> getListByMaterialAndNumber(String materialId,Integer number,String depot) throws Exception;
+	
+	MaterialDepot getMaterialDepotByMaterialIdAndDepotCode(String materialId,String depotCode);
 }

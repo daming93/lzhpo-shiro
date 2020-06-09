@@ -51,7 +51,7 @@ layui.use(['layer','form','table'], function() {
             {field:'fromTypeStr',    align:'center'  ,  title: '来源'   },
             {field:'fromCode',    align:'center'  ,  title: '来源编码'   },
             {field:'createDate',   align:'center'   ,  title: '创建日期'   },
-            {title: '操作',fixed: 'right',  width:'15%',    align: 'center',toolbar: '#materialBar'}
+            // {title: '操作',fixed: 'right',  width:'15%',    align: 'center',toolbar: '#materialBar'}
         ]]/*,
         done: function () {
             $("[data-field='id']").css('display','none');

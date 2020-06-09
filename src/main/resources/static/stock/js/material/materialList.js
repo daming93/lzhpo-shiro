@@ -27,12 +27,25 @@ layui.use(['layer','form','table'], function() {
                             content: $('#show') //这里content是一个DOM，注意：最好该元素要存放在body最外层，否则可能被其它的相对元素所影响
                         });       
                     });
-
-           
-
-
-         
-
+         }
+         if(obj.event === "distribution"){
+           $('#show').html("");//清空上一个
+           $.post("/stock/material/distribution",{"materialId":data.id},function (res){
+                        var html ='<ul class="layui-timeline">';
+                        for(i in res){
+                            html+= ' <li class="layui-timeline-item"> <i class="layui-icon layui-timeline-axis">&#xe63f;</i>                <div class="layui-timeline-content layui-text">'
+                           +'<h3 class="layui-timeline-title">'+res[i].createDate+'</h3><p>'+
+                                '<br>'+ res[i].typeStr+
+                              '</p> </div>  </li>  ';
+                        }
+                        html += '</ul>';
+                        $('#show').html(html);
+                        layer.open({
+                            type: 1,
+                            area: '300px',
+                            content: $('#show') //这里content是一个DOM，注意：最好该元素要存放在body最外层，否则可能被其它的相对元素所影响
+                        });       
+                    });
          }
         
     });
@@ -61,7 +74,7 @@ layui.use(['layer','form','table'], function() {
             { field:'availableNum',title:'数量(零)',align:'center',width:100},
             { field:'rate',title:'换算率',align:'center',width:100},
             {field:'materialStatus',    align:'center'  ,  title: '物料冻结状态'   },
-            {field:'type',   align:'center'   ,  title: '状态'   },
+            {field:'typeStr',   align:'center'   ,  title: '状态'   },
             {title: '操作',fixed: 'right',  width:'15%',    align: 'center',toolbar: '#materialBar'}
         ]]/*,
         done: function () {

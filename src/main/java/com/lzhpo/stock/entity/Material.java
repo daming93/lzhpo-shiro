@@ -95,7 +95,41 @@ public class Material extends DataEntity<Material> implements Serializable {
     @TableField(exist=false)
     private String itemName;
     
+    @TableField(exist=false)
+    private String clientName;
     
+    @TableField(exist=false)
+    private String materialId;
+    
+    @TableField(exist=false)
+    private String typeStr;
+    
+    
+    
+	public String getTypeStr() {
+		return typeStr;
+	}
+
+	public void setTypeStr(String typeStr) {
+		this.typeStr = typeStr;
+	}
+
+	public String getMaterialId() {
+		return materialId;
+	}
+
+	public void setMaterialId(String materialId) {
+		this.materialId = materialId;
+	}
+
+	public String getClientName() {
+		return clientName;
+	}
+
+	public void setClientName(String clientName) {
+		this.clientName = clientName;
+	}
+
 	public String getNumZ() {
 		return numZ;
 	}

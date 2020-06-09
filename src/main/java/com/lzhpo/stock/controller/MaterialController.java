@@ -1,7 +1,6 @@
 package com.lzhpo.stock.controller;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -14,7 +13,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -28,11 +26,12 @@ import com.lzhpo.admin.service.UserService;
 import com.lzhpo.common.annotation.SysLog;
 import com.lzhpo.common.base.PageData;
 import com.lzhpo.common.util.CommomUtil;
-import com.lzhpo.common.util.ResponseEntity;
 import com.lzhpo.material.item.entity.Clientitem;
 import com.lzhpo.material.item.service.IClientitemService;
 import com.lzhpo.stock.entity.Material;
+import com.lzhpo.stock.entity.MaterialDepot;
 import com.lzhpo.stock.entity.MaterialOperations;
+import com.lzhpo.stock.service.IMaterialDepotService;
 import com.lzhpo.stock.service.IMaterialOperationsService;
 import com.lzhpo.stock.service.IMaterialService;
 
@@ -58,6 +57,9 @@ public class MaterialController {
 	
 	@Autowired
 	private IMaterialOperationsService materialOperationsService;
+	
+	@Autowired
+	private IMaterialDepotService materialDepotService;
 
 	@GetMapping(value = "list")
 	public String list() {
@@ -74,24 +76,20 @@ public class MaterialController {
 			@RequestParam(value = "limit", defaultValue = "10") Integer limit, ServletRequest request) {
 		Map map = WebUtils.getParametersStartingWith(request, "s_");
 		PageData<Material> materialPageData = new PageData<>();
-		QueryWrapper<Material> materialWrapper = new QueryWrapper<>();
 		// 相当于del_flag = 0;
-		materialWrapper.eq("del_flag", false);
-		materialWrapper.gt("available_num", 0);// 库存大于0的
+		String itemCode = null;
+		String startTime =null;
+		String overTime =null;
+		String continuity =null;
+		Integer mode = 1;//正常模式
 		if (!map.isEmpty()) {
-			String itemCode = (String) map.get("itemCode");
-			if (StringUtils.isNotBlank(itemCode)) {
-				List<Clientitem> items = clientitemService.selectByItemCode(itemCode);
-				List<String> str =  new ArrayList<>();
-				for (Clientitem clientitem : items) {
-					str.add(clientitem.getId());
-				}
-				materialWrapper.in("item_id", str);
-			}
+			itemCode = (String) map.get("itemCode");
+			mode = Integer.valueOf((String)map.get("mode"));
+			continuity = (String) map.get("continuity");
 		}
-		IPage<Material> materialPage = materialService.page(new Page<>(page, limit), materialWrapper);
-		materialPageData.setCount(materialPage.getTotal());
-		materialPageData.setData(setUserToMaterial(materialPage.getRecords()));
+		Map<String,Object> mapRes = materialService.selectMaterial(itemCode, startTime, overTime,  (page-1)*limit, limit, mode,continuity);
+		materialPageData.setCount((Long) mapRes.get("count"));
+		materialPageData.setData(setUserToMaterial((List<Material>) mapRes.get("list")));
 		return materialPageData;
 	}
 
@@ -118,6 +116,9 @@ public class MaterialController {
 				r.setItemName(item.getName());
 				r.setNumZ(r.getAvailableNum() / item.getUnitRate() + "." + r.getAvailableNum() % item.getUnitRate());
 				r.setSystemCode(item.getCode());
+			}
+			if (StringUtils.isNotBlank(r.getType()+"")) {
+				r.setTypeStr(CommomUtil.valueToNameInDict(r.getType(), "material_type"));
 			}
 		});
 
@@ -234,7 +235,7 @@ public class MaterialController {
 	@ResponseBody
 	public PageData<Material> listByClientIdAndBatch(@RequestParam(value = "page", defaultValue = "1") Integer page,
 			@RequestParam(value = "limit", defaultValue = "100") Integer limit, ServletRequest request, String batch,
-			String itemId) {
+			String itemId,Integer materialType) {
 		Map map = WebUtils.getParametersStartingWith(request, "s_");
 		PageData<Material> materialPageData = new PageData<>();
 		QueryWrapper<Material> materialWrapper = new QueryWrapper<>();
@@ -243,6 +244,7 @@ public class MaterialController {
 		materialWrapper.gt("available_num", 0);
 		materialWrapper.eq("batch_number", batch);
 		materialWrapper.eq("item_id", itemId);
+		materialWrapper.eq("type", materialType);
 		materialWrapper.orderByAsc("batch_number");
 		IPage<Material> materialPage = materialService.page(new Page<>(page, limit), materialWrapper);
 		if (materialPage.getTotal() == 0) {
@@ -252,6 +254,7 @@ public class MaterialController {
 			materialWrapperNew.eq("del_flag", false);
 			materialWrapperNew.gt("available_num", 0);
 			materialWrapperNew.eq("item_id", itemId);
+			materialWrapperNew.eq("type", materialType);
 			materialWrapperNew.orderByAsc("batch_number");
 			materialPage = materialService.page(new Page<>(page, limit), materialWrapperNew);
 		}
@@ -295,21 +298,115 @@ public class MaterialController {
 				o.setUpdateUser(u);
 			}
 			if(StringUtils.isNotBlank(o.getFromType()+"")){
-				String str = "";
-				switch (o.getFromType()) {
-				case 1://1
-					str=o.getFromCode()+"中入库了"+o.getNumber()+"(零数量)";  
-					break;
-				case 2:
-					str=o.getFromCode()+"中出库了"+o.getNumber()+"(零数量)";  
-					break;
-				default:
-					break;
-				}
+				String str =o.getFromCode()+"中"+ CommomUtil.valueToNameInDict(o.getFromType(), "trunover_type")+o.getNumber()+"(零数量)";
+//				switch (o.getFromType()) {
+//				case 0://1
+//					str=o.getFromCode()+"中新建入库了"+o.getNumber()+"(零数量)";  
+//					break;
+//				case 2:
+//					str=o.getFromCode()+"中新建出库了"+o.getNumber()+"(零数量)";  
+//					break;
+//				case 1:
+//					str=o.getFromCode()+"中撤销入库"+o.getNumber()+"(零数量)";  
+//					break;
+//				case 3:
+//					str=o.getFromCode()+"中出库修改了"+o.getNumber()+"(零数量)";  
+//					break;
+//				case 4:
+//					str=o.getFromCode()+"中出库撤销了"+o.getNumber()+"(零数量)";  
+//					break;
+//				default:
+//					break;
+//				}
 				o.setTypeStr(str);
 			}
 		});
 		return operations;
 	}
+	@PostMapping("distribution")
+	@ResponseBody
+	@SysLog("物料分布记录数据")
+	public List<MaterialDepot> distribution(@RequestParam(value = "materialId", required = false) String materialId) {
+		QueryWrapper<MaterialDepot> mDepotWrapper = new QueryWrapper<>();
+		mDepotWrapper.eq("material_id", materialId);
+		mDepotWrapper.ne("number", 0);
+		List<MaterialDepot> mDepot = materialDepotService.list(mDepotWrapper);
+		mDepot.forEach(o -> {
+			if (StringUtils.isNotBlank(o.getCreateId())) {
+				User u = userService.findUserById(o.getCreateId());
+				if (StringUtils.isBlank(u.getNickName())) {
+					u.setNickName(u.getLoginName());
+				}
+				o.setCreateUser(u);
+			}
+			if (StringUtils.isNotBlank(o.getUpdateId())) {
+				User u = userService.findUserById(o.getUpdateId());
+				if (StringUtils.isBlank(u.getNickName())) {
+					u.setNickName(u.getLoginName());
+				}
+				o.setUpdateUser(u);
+			}
+			if(StringUtils.isNotBlank(o.getDepotId()+"")){
+				String str = "在"+o.getDepotId()+"中有"+o.getNumber()+"数量(零)";
+				o.setTypeStr(str);
+			}
+		});
+		return mDepot;
+	}
+	
+	//以下为根据储位来查询库存
+	@GetMapping(value = "listDepotMaterial")
+	public String listDepotMaterial(String code, ModelMap modelMap) {
+		modelMap.put("code", code);
+		return "warehouse/depot/listDepotMaterial";
+	}
 
+	/**
+	 * 查询分页数据
+	 */
+	@PostMapping("listDepotMaterial")
+	@ResponseBody
+	public PageData<Material> listDepotMaterial(@RequestParam(value = "page", defaultValue = "1") Integer page,
+			@RequestParam(value = "limit", defaultValue = "100") Integer limit, ServletRequest request,@RequestParam(value = "depotCode") String depotCode) {
+		Map map = WebUtils.getParametersStartingWith(request, "s_");
+		PageData<Material> materialPageData = new PageData<>();
+		// 相当于del_flag = 0;
+		Map<String,Object> mapRes = materialService.selectMaterialByDepot((page-1)*limit, limit, depotCode);
+		materialPageData.setCount((Long) mapRes.get("count"));
+		materialPageData.setData(setUserToMaterial((List<Material>) mapRes.get("list")));
+		return materialPageData;
+	}
+	
+	//---------------------------以下为调仓------------------------------
+	//以下为根据储位来查询库存
+	@GetMapping(value = "mangerListDepotMaterial")
+	public String mangerListDepotMaterial(String code, ModelMap modelMap) {
+		modelMap.put("code", code);
+		return "warehouse/depot/mangerListDepotMaterial";
+	}
+
+	/**
+	 * 查询分页数据
+	 */
+	@PostMapping("mangerListDepotMaterial")
+	@ResponseBody
+	public PageData<Material> mangerListDepotMaterial(@RequestParam(value = "page", defaultValue = "1") Integer page,
+			@RequestParam(value = "limit", defaultValue = "100") Integer limit, ServletRequest request ) {
+		Map map = WebUtils.getParametersStartingWith(request, "s_");
+		PageData<Material> materialPageData = new PageData<>();
+		String depotCode = null;
+		String itemId = null;
+		String batch = null;
+		if (!map.isEmpty()) {//检索项
+			depotCode = (String) map.get("depotCode");
+			itemId = (String) map.get("itemId");
+			batch = (String) map.get("batch");
+		}	
+		// 相当于del_flag = 0;
+		Map<String,Object> mapRes = materialService.selectMaterialByDepot((page-1)*limit, limit, depotCode,itemId,batch,null);
+		materialPageData.setCount((Long) mapRes.get("count"));
+		materialPageData.setData(setUserToMaterial((List<Material>) mapRes.get("list")));
+		return materialPageData;
+	}
+	
 }

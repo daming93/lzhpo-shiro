@@ -24,13 +24,24 @@ public class MaterialDepot extends DataEntity<MaterialDepot> implements Serializ
 
     private static final long serialVersionUID = 1L;
 
-    @TableId("material_id")
+    @TableField("material_id")
     private String materialId;
 
     @TableField("depot_id")
     private String depotId;
 
     private Integer number;
+
+    @TableField(exist=false)
+    private String typeStr;
+    
+	public String getTypeStr() {
+		return typeStr;
+	}
+
+	public void setTypeStr(String typeStr) {
+		this.typeStr = typeStr;
+	}
 
 	public String getMaterialId() {
 		return materialId;

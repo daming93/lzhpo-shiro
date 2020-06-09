@@ -89,6 +89,7 @@ window.viewObj = {
             if (e.which == 13) {
                activeByType('addRow');
                //清空部分输入框
+               $("#number").val("");
                $("#itemId").parent().find('input:first').val("");
                $("#depot").parent().find('input:first').val("");
                $("#tray").parent().find('input:first').val("");
@@ -360,8 +361,16 @@ window.viewObj = {
                 layer.close(loadIndex);
                 if(res.success){
                     parent.layer.msg("单据添加成功！",{time:1000},function(){
-                        //刷新父页面
-                        parent.location.reload();
+                        var continuity = $("#continuity").val();
+                        // 是否开启连续 录单 
+                        if(continuity=="true"){//开启
+                            var node = parent.document.getElementById("addStorage");
+                         //调用该元素的Click事件
+                            node.click();//连续录单
+                        }else{
+                          // 刷新父页面
+                           parent.location.reload(); 
+                        }
                     });
                 }else{
                     layer.msg(res.message);

@@ -1,7 +1,162 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.lzhpo.stock.mapper.MaterialMapper">
+	<select id="selectMaterial" resultType="com.lzhpo.stock.entity.Material" parameterType="map">
+		SELECT
+			id,
+			client_id AS clientId,
+			depot,
+			tray,
+			item_id AS itemId,
+			batch_number AS batchNumber,
+			depot_code AS depotCode,
+			lock_code AS lockCode,
+			<if test="type == 1" >
+				available_num AS availableNum,
+			</if>
+			<if test="type == 2" >
+				sum(available_num) AS availableNum,
+			</if>
+			<if test="type == 3" >
+				sum(available_num) AS availableNum,
+			</if>	
+			type,
+			material_status AS materialStatus,
+			create_by AS createId,
+			create_date AS createDate,
+			update_by AS updateId,
+			update_date AS updateDate,
+			del_flag AS delFlag,
+			remarks
+		FROM
+			stock_material
+		<if test="continuity == 'on'" >	
+			where available_num!=0
+		</if>
+		<if test="type == 2" >
+			GROUP BY
+			item_id
+		</if>
+		<if test="type == 3" >
+			GROUP BY
+			item_id,material_status
+		</if>	
+		
+		<if test="start != null" >
+			<if test="limit != null" >
+				LIMIT #{start,jdbcType=INTEGER},#{limit,jdbcType=INTEGER}
+			</if>
+        </if>
+	</select>
 	
-	
+		<select id="selectMaterialCount" resultType="java.lang.Long" parameterType="map">
+		select count(1) from (
+		SELECT
+			id,
+			client_id AS clientId,
+			tray,
+			item_id AS itemId,
+			batch_number AS batchNumber,
+			depot_code AS depot,
+			lock_code AS lockCode,
+			<if test="type == 1" >
+				available_num AS availableNum,
+			</if>
+			<if test="type == 2" >
+				sum(available_num) AS availableNum,
+			</if>
+			<if test="type == 3" >
+				sum(available_num) AS availableNum,
+			</if>	
+			
+			type,
+			material_status AS materialStatus,
+			create_by AS createId,
+			create_date AS createDate,
+			update_by AS updateId,
+			update_date AS updateDate,
+			del_flag AS delFlag,
+			remarks
+		FROM
+			stock_material
+		<if test="continuity == 'on'" >	
+			where available_num!=0
+		</if>
+		<if test="type == 2" >
+			GROUP BY
+			item_id
+		</if>
+		<if test="type == 3" >
+			GROUP BY
+			item_id,material_status
+		</if>	
+		) temp
+	</select>
 
+		<select id="selectMaterialByDepot" resultType="com.lzhpo.stock.entity.Material" parameterType="map">
+		SELECT
+			d.id,
+			m.id as materialId,
+			m.client_id AS clientId,
+			m.tray,
+			m.item_id AS itemId,
+			m.batch_number AS batchNumber,
+			m.lock_code AS lockCode,
+			d.depot_id as depot,
+			d.number AS availableNum,
+			m.material_status AS materialStatus,
+			m.create_by AS createId,
+			m.create_date AS createDate,
+			m.update_by AS updateId,
+			m.update_date AS updateDate,
+			m.del_flag AS delFlag,
+			m.remarks
+		FROM
+			stock_material_depot d
+		LEFT JOIN stock_material m ON d.material_id = m.id
+		WHERE
+			d.number != 0
+		<if test="depotCode != null" >
+			and d.depot_id =  #{depotCode,jdbcType=VARCHAR}
+		</if>
+		<if test="depotMaterilId != null" >
+			and d.id =  #{depotMaterilId,jdbcType=VARCHAR}
+		</if>
+		<if test="start != null" >
+			<if test="limit != null" >
+				LIMIT #{start,jdbcType=INTEGER},#{limit,jdbcType=INTEGER}
+			</if>
+        </if>
+	</select>
+	<select id="selectMaterialByDepotCount" resultType="java.lang.Long" parameterType="map">
+		select count(1) from (
+		SELECT
+			d.id,
+			m.client_id AS clientId,
+			m.depot,
+			m.tray,
+			m.item_id AS itemId,
+			m.batch_number AS batchNumber,
+			d.depot_id AS depotCode,
+			m.lock_code AS lockCode,
+			d.number AS availableNum,
+			m.material_status AS materialStatus,
+			m.create_by AS createId,
+			m.create_date AS createDate,
+			m.update_by AS updateId,
+			m.update_date AS updateDate,
+			m.del_flag AS delFlag,
+			m.remarks
+		FROM
+			stock_material_depot d
+		LEFT JOIN stock_material m ON d.material_id = m.id
+		WHERE
+			d.number != 0
+		<if test="depotCode != null" >
+			and d.depot_id =  #{depotCode,jdbcType=VARCHAR}
+		</if>
+		
+		) temp 
+	</select>
+	
 </mapper>

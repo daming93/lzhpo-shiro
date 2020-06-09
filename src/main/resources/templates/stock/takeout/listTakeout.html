@@ -19,13 +19,31 @@
     <div class="layui-field-box">
         <form class="layui-form">
             <div class="layui-inline">
-                <input type="text" value="" name="s_like_name" placeholder="可以输出合同选项名" class="layui-input search_input">
+                <select name="s_clientId" id="clientId" class="form-control1" lay-verify="" lay-filter="clientId" lay-search>
+                    <option value="">请选择客户</option>
+                    <option th:each="basic:${basicDatas}" th:value="${basic.id}" lay-verify="required" th:text="${basic.clientShortName}"></option>
+                </select>
+            </div> 
+            <div class="layui-inline">
+                <input type="text" value="" name="s_clientCode" placeholder="客户单号" class="layui-input search_input">
+            </div>
+            <div class="layui-inline">
+                <input type="text" value="" name="s_code" placeholder="系统单号" class="layui-input search_input">
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">时间范围</label>
+            </div>
+           <div class="layui-inline">
+                <input type="text" value="" id="startTime" name="s_startTime" placeholder="开始时间" class="layui-input layTime">
+            </div>
+            <div class="layui-inline">
+                <input type="text" value="" id="overTime" name="s_soverTime"  placeholder="结束时间" class="layui-input layTime">
             </div>
             <div class="layui-input-inline">
                 <a class="layui-btn" lay-submit="" lay-filter="searchForm">查询</a>
             </div>
-        <!--     <shiro:hasPermission name="stock:takeout:delete">
-            <div class="layui-inline">
+        <!--   <shiro:hasPermission name="stock:takeout:delete">
+                <div class="layui-inline">
                 <a class="layui-btn layui-btn-danger" data-type="deleteSome">批量删除</a>
             </div>
             </shiro:hasPermission> -->
@@ -35,11 +53,11 @@
 
             </div>
              <div class="layui-input-inline">
-                  <div class="layui-form-mid layui-word-aux">双击行查看详情,ctrl+enter新建出库</div>
+                  <div class="layui-form-mid layui-word-aux">提示:双击行查看详情,ctrl+enter新建出库</div>
               </div>
              </shiro:hasPermission>
              <div class="layui-input-inline">
-                <input type="checkbox" name="yyy" lay-skin="switch" lay-text="连续录出|关闭连续录出" checked>
+                <input type="checkbox" name="s_continuity" id="continuity" lay-skin="switch" lay-text="连续录出|关闭" >
             </div>
         </form>
     </div>
@@ -62,6 +80,7 @@
     </shiro:hasPermission>
     {{#  } }}
          <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="history">历史</a>
+         <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="print">打印</a>
     </script>
 </div>
 <div id="page"></div>

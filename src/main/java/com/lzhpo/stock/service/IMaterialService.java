@@ -2,11 +2,14 @@ package com.lzhpo.stock.service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.lzhpo.stock.entity.Material;
+import com.lzhpo.stock.entity.MaterialDepot;
 /**
  * <p>
  * 仓储明细表 服务类
@@ -36,16 +39,34 @@ public interface IMaterialService extends IService<Material> {
 
 	//分页查询数据在父类
 	
-	//物料中 品项id和批次联合字段作为识别字段
+	//物料中 品项id和批次 加入品质 (良品和不良品)联合字段作为识别字段
 	
-	Material getMaterialByItemId(String itemid,LocalDate batch );
+	Material getMaterialByItemId(String itemid,LocalDate batch ,Integer MaterialStatus);
 	
 	
-	@Transactional(rollbackFor=Exception.class)
-	void lockMaterial (String materialId,Integer number)  throws Exception;
+	List<MaterialDepot> lockMaterial (String materialId,Integer number,String depotCode)  throws Exception;
 	
 	
 	void unlockMaterial (String materialId,Integer number);
 	
+	/**
+	 * type 1 正常 2忽略批次 3忽略物料状态 continuity on 全部 其他 为非0
+	 * @param itemName
+	 * @param startTime
+	 * @param endTime
+	 * @param flag
+	 * @return
+	 */
+	Map<String,Object> selectMaterial(String itemName,String startTime,String endTime,Integer start,Integer limit,Integer type,String continuity);
 	
+	/**
+	 * 查询储位上面有多少物资分布
+	 * @param start
+	 * @param limit
+	 * @param depotCode
+	 * @return
+	 */
+	Map<String,Object>  selectMaterialByDepot(Integer start,Integer limit,String depotCode);
+	
+	Map<String,Object>  selectMaterialByDepot(Integer start,Integer limit,String depotCode,String itemId,String batch,String materialDepotId);
 }

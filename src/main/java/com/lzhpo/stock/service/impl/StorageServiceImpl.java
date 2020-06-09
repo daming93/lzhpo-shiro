@@ -12,7 +12,9 @@ import org.springframework.transaction.annotation.Transactional;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.fasterxml.jackson.databind.RuntimeJsonMappingException;
 import com.lzhpo.common.init.CacheUtils;
+import com.lzhpo.finance.service.IIncomeService;
 import com.lzhpo.stock.entity.Material;
 import com.lzhpo.stock.entity.MaterialOperations;
 import com.lzhpo.stock.entity.MathStockNumber;
@@ -60,7 +62,8 @@ public class StorageServiceImpl extends ServiceImpl<StorageMapper, Storage> impl
 
 	@Autowired
 	private IMaterialOperationsService materialOperationsService;
-
+	@Autowired
+	private IIncomeService incomeService;
 	@Override
 	public long getStorageCount(String name) {
 		QueryWrapper<Storage> wrapper = new QueryWrapper<>();
@@ -116,6 +119,9 @@ public class StorageServiceImpl extends ServiceImpl<StorageMapper, Storage> impl
 		
 		// 可撤销
 		Integer modify_status_revocation = CacheUtils.keyDict.get("modify_status_revocation").getValue();
+		
+		//良品
+		Integer material_type_good = CacheUtils.keyDict.get("material_type_good").getValue();
 		storage.setStatus(modify_status_revocation);
 		// 删除有关子表
 		detailService.deleteStorageDetailById(storage.getId());
@@ -124,7 +130,7 @@ public class StorageServiceImpl extends ServiceImpl<StorageMapper, Storage> impl
 			// 根据品项找到物料对应的信息
 			// 先加入库存
 			Material material = materialService.getMaterialByItemId(storageDetail.getItemId(),
-					storageDetail.getBatch());
+					storageDetail.getBatch(),material_type_good);
 			// 先找到有没有对应物料
 			if (material != null) {
 				material.setDelFlag(false);
@@ -140,6 +146,7 @@ public class StorageServiceImpl extends ServiceImpl<StorageMapper, Storage> impl
 				material.setBatchNumber(storageDetail.getBatch());
 				material.setClientId(storage.getClientId());
 				material.setLockCode(0);
+				material.setType(material_type_good);//良品
 				materialService.save(material);
 			}
 
@@ -178,9 +185,15 @@ public class StorageServiceImpl extends ServiceImpl<StorageMapper, Storage> impl
 		storage.setTotal(math.getNumZ());
 		storage.setTrayNum(math.getTray());
 		storage.setNumber(math.getNumber());
-
-		// 还有计算入库装卸费 （待完成）
-
+		storage.setIncomeId(getById(storage.getId()).getIncomeId());
+		// 还有计算入库装卸费 
+		try {
+			incomeService.storageIncomeMath(storage);
+		} catch (RuntimeJsonMappingException e) {
+			throw new RuntimeJsonMappingException(e.getMessage());
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
 		baseMapper.updateById(storage);
 		/**
 		 * 预留编辑代码
@@ -197,10 +210,12 @@ public class StorageServiceImpl extends ServiceImpl<StorageMapper, Storage> impl
 		Integer modify_status_await = CacheUtils.keyDict.get("modify_status_await").getValue();
 		Storage storage = getById(storageId);
 		List<StorageDetail> detailSet = detailService.selectStorageDetailByStorageId(storageId);
+		//良品
+		Integer material_type_good = CacheUtils.keyDict.get("material_type_good").getValue();
 		for (StorageDetail storageDetail : detailSet) {
 			// 先减去库存
 			Material material = materialService.getMaterialByItemId(storageDetail.getItemId(),
-					storageDetail.getBatch());
+					storageDetail.getBatch(),material_type_good);
 			// 先找到有没有对应物料
 			if (material != null) {
 				material.setDelFlag(false);
