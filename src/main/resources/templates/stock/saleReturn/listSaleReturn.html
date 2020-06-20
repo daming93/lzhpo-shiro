@@ -3,7 +3,7 @@
       xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
 <head>
     <meta charset="UTF-8">
-    <title>合同主体</title>
+    <title>退库管理</title>
     <meta name="renderer" content="webkit">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
@@ -18,7 +18,7 @@
     <legend>选项检索</legend>
     <div class="layui-field-box">
         <form class="layui-form">
-            <div class="layui-inline">
+             <div class="layui-inline">
                 <select name="s_clientId" id="clientId" class="form-control1" lay-verify="" lay-filter="clientId" lay-search>
                     <option value="">请选择客户</option>
                     <option th:each="basic:${basicDatas}" th:value="${basic.id}" lay-verify="required" th:text="${basic.clientShortName}"></option>
@@ -42,49 +42,53 @@
             <div class="layui-input-inline">
                 <a class="layui-btn" lay-submit="" lay-filter="searchForm">查询</a>
             </div>
-        <!--   <shiro:hasPermission name="warehouse:materialManage:delete">
-                <div class="layui-inline">
+        <!--     <shiro:hasPermission name="stock:saleReturn:delete">
+            <div class="layui-inline">
                 <a class="layui-btn layui-btn-danger" data-type="deleteSome">批量删除</a>
             </div>
             </shiro:hasPermission> -->
-            <shiro:hasPermission name="warehouse:materialManage:add">
+            <shiro:hasPermission name="stock:saleReturn:add">
             <div class="layui-inline">
-                <a class="layui-btn layui-btn-normal" id="addmaterialManage" data-type="addUser">添加转品</a>
+                <a class="layui-btn layui-btn-normal" id="addsaleReturn" data-type="addUser">添加退库</a>
 
             </div>
              <div class="layui-input-inline">
-                  <div class="layui-form-mid layui-word-aux">提示:双击行查看详情,ctrl+enter新建出库</div>
+                  <div class="layui-form-mid layui-word-aux">双击行查看详情,ctrl+enter新建退库</div>
               </div>
              </shiro:hasPermission>
-             <div class="layui-inline">
-                <input type="radio" name="s_mode" value="2" title="转良"  >
-                <input type="radio" name="s_mode" value="1" title="转不良" checked>
-            </div>
              <div class="layui-input-inline">
-                <input type="checkbox" name="s_continuity" id="continuity" lay-skin="switch" lay-text="连续录出|关闭" >
+                <input type="checkbox" name="continuity" id="continuity" lay-skin="switch" lay-text="连续录入|关闭" >
             </div>
         </form>
     </div>
 </fieldset>
 
 <div class="layui-form users_list">
-    <table class="layui-table" id="materialManage-table"  lay-filter="materialManageList"></table>
-    <script type="text/html" id="materialManageBar">
-      
-     {{# if (d.modifyStatus==1){ }}
-    <shiro:hasPermission name="warehouse:materialManage:edit">
+    <table class="layui-table" id="saleReturn-table"  lay-filter="saleReturnList"></table>
+    <script type="text/html" id="saleReturnBar">
+       {{# if (d.statusStr=='可撤销'){ }}
+    <shiro:hasPermission name="stock:saleReturn:back">
+        <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="back">撤销</a>
+    </shiro:hasPermission>
+      {{#  } }}
+     {{# if (d.status==1){ }}
+    <shiro:hasPermission name="stock:saleReturn:edit">
         <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
     </shiro:hasPermission>
+       <shiro:hasPermission name="stock:saleReturn:delete">
+        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+    </shiro:hasPermission>
     {{#  } }}
+         <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="history">历史</a>
     </script>
 </div>
 <div id="page"></div>
-
 <div id ="show" hidden="hidden">
+  
 
 </div>
 <script type="text/javascript" th:src="@{/static/layui/layui.js}"></script>
 <script type="text/javascript" th:src="@{/static/admin/js/tools.js}"></script>
-<script type="text/javascript" th:src="@{/static/warehouse/js/materialManage/materialManageList.js}"></script>
+<script type="text/javascript" th:src="@{/static/stock/js/saleReturn/saleReturnList.js}"></script>
 </body>
 </html>

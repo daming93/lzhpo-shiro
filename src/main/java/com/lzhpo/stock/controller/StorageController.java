@@ -305,7 +305,7 @@ public class StorageController {
 		}catch (RuntimeJsonMappingException e) {
 			return ResponseEntity.failure(e.getMessage());
 		}catch (Exception e) {
-			// TODO: handle exception
+			return ResponseEntity.failure("系统异常请联系管理员");
 		}
 		
 		return ResponseEntity.success("操作成功");

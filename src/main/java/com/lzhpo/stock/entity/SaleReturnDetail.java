@@ -69,6 +69,41 @@ public class SaleReturnDetail extends DataEntity<SaleReturnDetail> implements Se
     @TableField("takeout_num")
     private Integer takeoutNum;
 
+    @TableField(exist=false)
+    private String itemName;
+    
+    @TableField(exist=false)
+    private String rate;
+    
+    @TableField(exist=false)
+    private String numZ;
+    
+    
+    
+	public String getItemName() {
+		return itemName;
+	}
+
+	public void setItemName(String itemName) {
+		this.itemName = itemName;
+	}
+
+	public String getRate() {
+		return rate;
+	}
+
+	public void setRate(String rate) {
+		this.rate = rate;
+	}
+
+	public String getNumZ() {
+		return numZ;
+	}
+
+	public void setNumZ(String numZ) {
+		this.numZ = numZ;
+	}
+
 	public String getSalesReturnId() {
 		return salesReturnId;
 	}

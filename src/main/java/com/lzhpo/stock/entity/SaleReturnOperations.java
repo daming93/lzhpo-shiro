@@ -41,6 +41,17 @@ public class SaleReturnOperations extends DataEntity<SaleReturnOperations> imple
     @TableField("operation_id")
     private String operationId;
 
+    @TableField(exist = false)
+    private String typeStr;
+    
+	public String getTypeStr() {
+		return typeStr;
+	}
+
+	public void setTypeStr(String typeStr) {
+		this.typeStr = typeStr;
+	}
+
 	public String getReturnId() {
 		return returnId;
 	}

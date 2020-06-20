@@ -32,5 +32,5 @@ public interface IAbnormityService extends IService<Abnormity> {
 
 	//分页查询数据在父类
 
-
+	List<Abnormity> selectAbnorityByType(Integer type);
 }

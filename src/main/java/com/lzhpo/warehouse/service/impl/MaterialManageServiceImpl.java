@@ -7,6 +7,7 @@ import com.lzhpo.stock.entity.MaterialOperations;
 import com.lzhpo.stock.service.IMaterialDepotService;
 import com.lzhpo.stock.service.IMaterialOperationsService;
 import com.lzhpo.stock.service.IMaterialService;
+import com.lzhpo.stock.service.ISaleReturnService;
 import com.lzhpo.stock.service.IStorageService;
 import com.lzhpo.sys.service.IGenerateNoService;
 import com.lzhpo.warehouse.entity.MaterialManage;
@@ -57,7 +58,8 @@ public class MaterialManageServiceImpl extends ServiceImpl<MaterialManageMapper,
 	private IStorageService storageService;
 	@Autowired
 	private IMaterialDepotService materialDepotService;
-
+	@Autowired
+	private ISaleReturnService saleReturnService;
 	@Override
 	public long getMaterialManageCount(String name) {
 		QueryWrapper<MaterialManage> wrapper = new QueryWrapper<>();
@@ -108,9 +110,14 @@ public class MaterialManageServiceImpl extends ServiceImpl<MaterialManageMapper,
 			switch (materialManage.getStatus()) {
 			case 1: // 转良 物料流水记录
 				materialOperations.setFromType(trunover_type_manage_good);
+				//锁退货单
+				saleReturnService.lockSaleReturn(materialManageDetail.getMaterial());
+			
 				break;
 
 			default: // 转不良 物料流水记录
+				// 锁入库单
+				storageService.lockStorage(materialManageDetail.getMaterial());
 				materialOperations.setFromType(trunover_type_manage_bad);
 				break;
 			}
@@ -118,8 +125,7 @@ public class MaterialManageServiceImpl extends ServiceImpl<MaterialManageMapper,
 			materialOperations.setNumber(materialManageDetail.getNumber());
 			materialOperations.setType(2);// 出库为-
 			materialOperationsService.save(materialOperations);
-			// 锁入库单
-			storageService.lockStorage(materialManageDetail.getMaterial());
+		
 			materialManageDetail.setManageId(materialManage.getId());
 			// 在带确认得状态下只减不加，当确认之后 良品数量和不良品数量在开始增减
 			try {
@@ -136,6 +142,7 @@ public class MaterialManageServiceImpl extends ServiceImpl<MaterialManageMapper,
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
+			
 
 		}
 		return materialManage;

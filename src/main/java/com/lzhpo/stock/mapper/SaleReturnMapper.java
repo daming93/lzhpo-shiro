@@ -1,6 +1,10 @@
 package com.lzhpo.stock.mapper;
 
+import com.lzhpo.stock.entity.MathStockNumber;
 import com.lzhpo.stock.entity.SaleReturn;
+
+import org.apache.ibatis.annotations.Param;
+
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**
@@ -12,5 +16,5 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  * @since 2020-06-09
  */
 public interface SaleReturnMapper extends BaseMapper<SaleReturn> {
-
+	MathStockNumber selectMathReturnNumberByReturnId(@Param("returnId") String returnId);
 }

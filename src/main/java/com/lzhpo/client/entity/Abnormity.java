@@ -35,6 +35,19 @@ public class Abnormity extends DataEntity<Abnormity> implements Serializable {
      */
     private String cause;
 
+    @TableField(exist=false)
+    private String abnormityTypeStr;
+    
+    
+    
+	public String getAbnormityTypeStr() {
+		return abnormityTypeStr;
+	}
+
+	public void setAbnormityTypeStr(String abnormityTypeStr) {
+		this.abnormityTypeStr = abnormityTypeStr;
+	}
+
 	public Integer getAbnormityType() {
 		return abnormityType;
 	}

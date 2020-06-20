@@ -299,25 +299,6 @@ public class MaterialController {
 			}
 			if(StringUtils.isNotBlank(o.getFromType()+"")){
 				String str =o.getFromCode()+"中"+ CommomUtil.valueToNameInDict(o.getFromType(), "trunover_type")+o.getNumber()+"(零数量)";
-//				switch (o.getFromType()) {
-//				case 0://1
-//					str=o.getFromCode()+"中新建入库了"+o.getNumber()+"(零数量)";  
-//					break;
-//				case 2:
-//					str=o.getFromCode()+"中新建出库了"+o.getNumber()+"(零数量)";  
-//					break;
-//				case 1:
-//					str=o.getFromCode()+"中撤销入库"+o.getNumber()+"(零数量)";  
-//					break;
-//				case 3:
-//					str=o.getFromCode()+"中出库修改了"+o.getNumber()+"(零数量)";  
-//					break;
-//				case 4:
-//					str=o.getFromCode()+"中出库撤销了"+o.getNumber()+"(零数量)";  
-//					break;
-//				default:
-//					break;
-//				}
 				o.setTypeStr(str);
 			}
 		});

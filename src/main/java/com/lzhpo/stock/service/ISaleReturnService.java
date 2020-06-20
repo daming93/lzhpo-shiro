@@ -32,5 +32,10 @@ public interface ISaleReturnService extends IService<SaleReturn> {
 
 	//分页查询数据在父类
 
-
+	//撤回退货单
+	void backSaleReturn(String saleReturnId);
+	
+	//锁住单据 如果出库用了某单的物品
+	
+	void lockSaleReturn(String materialId);
 }

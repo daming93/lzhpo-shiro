@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.lzhpo.finance.entity.Income;
+import com.lzhpo.stock.entity.SaleReturn;
 import com.lzhpo.stock.entity.Storage;
 import com.lzhpo.stock.entity.Takeout;
 /**
@@ -39,4 +40,6 @@ public interface IIncomeService extends IService<Income> {
 	void takeoutIncomeMath(Takeout takeout) throws Exception;
 	
 	Storage storageIncomeMath(Storage storage)throws Exception;
+	
+	SaleReturn saleReturnIncomeMath(SaleReturn saleReturn)throws Exception;
 }

@@ -1,15 +1,17 @@
 package com.lzhpo.stock.entity;
 
-import java.math.BigDecimal;
-import com.baomidou.mybatisplus.annotation.TableName;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import com.baomidou.mybatisplus.annotation.TableField;
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.Set;
+
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableName;
+import com.lzhpo.common.base.DataEntity;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
-import com.lzhpo.common.base.DataEntity;
 /**
  * <p>
  * 退货表
@@ -98,7 +100,7 @@ public class SaleReturn extends DataEntity<SaleReturn> implements Serializable {
     /**
      * 退货总量(零)
      */
-    private BigDecimal number;
+    private Integer number;
 
     /**
      * 材积
@@ -113,7 +115,7 @@ public class SaleReturn extends DataEntity<SaleReturn> implements Serializable {
     /**
      * 件/托
      */
-    private Integer tray;
+    private String tray;
 
     private BigDecimal retrueMoney;
 
@@ -127,6 +129,58 @@ public class SaleReturn extends DataEntity<SaleReturn> implements Serializable {
      */
     @TableField("print_num")
     private Integer printNum;
+    
+    /**
+     * 
+     */
+    @TableField("income_id")
+    private String incomeId;
+    
+    @TableField(exist = false)
+    private String statusStr;
+
+    @TableField(exist = false)
+    private Set<SaleReturnDetail> detailSet;
+    
+    /**
+     * 客户名称
+     */
+    @TableField(exist = false)
+    private String clientName;
+    
+    
+
+	public String getClientName() {
+		return clientName;
+	}
+
+	public void setClientName(String clientName) {
+		this.clientName = clientName;
+	}
+
+	public String getIncomeId() {
+		return incomeId;
+	}
+
+	public void setIncomeId(String incomeId) {
+		this.incomeId = incomeId;
+	}
+
+	public String getStatusStr() {
+		return statusStr;
+	}
+
+	public void setStatusStr(String statusStr) {
+		this.statusStr = statusStr;
+	}
+
+	public Set<SaleReturnDetail> getDetailSet() {
+		return detailSet;
+	}
+
+	public void setDetailSet(Set<SaleReturnDetail> detailSet) {
+		this.detailSet = detailSet;
+	}
 
 	public String getClientId() {
 		return clientId;
@@ -224,11 +278,11 @@ public class SaleReturn extends DataEntity<SaleReturn> implements Serializable {
 		this.total = total;
 	}
 
-	public BigDecimal getNumber() {
+	public Integer getNumber() {
 		return number;
 	}
 
-	public void setNumber(BigDecimal number) {
+	public void setNumber(Integer number) {
 		this.number = number;
 	}
 
@@ -248,11 +302,11 @@ public class SaleReturn extends DataEntity<SaleReturn> implements Serializable {
 		this.weight = weight;
 	}
 
-	public Integer getTray() {
+	public String getTray() {
 		return tray;
 	}
 
-	public void setTray(Integer tray) {
+	public void setTray(String tray) {
 		this.tray = tray;
 	}
 

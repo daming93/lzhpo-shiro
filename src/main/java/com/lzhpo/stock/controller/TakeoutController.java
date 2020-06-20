@@ -86,9 +86,6 @@ public class TakeoutController {
 	
 	@Autowired
 	private IClientitemService clientitemService;
-
-	@Autowired
-	private IMaterialService materialSrivice;
 	
 	@Autowired
 	private IMaterialDepotService materialDepotService;
@@ -368,6 +365,13 @@ public class TakeoutController {
 		if (StringUtils.isBlank(detail.getId())) {
 			return ResponseEntity.failure("id（不能为空)");
 		}
+		//只能改带确认状态得出库单
+		// 待确认
+		Integer modify_status_await = CacheUtils.keyDict.get("modify_status_await").getValue();
+		String takoutId = takeoutDetailService.getById(detail.getId()).getTakeoutId();
+		if(!modify_status_await.equals(takeoutService.getById(takoutId).getStatus())){
+			return ResponseEntity.failure("该单据不在待确认状态无法修改");
+		}
 		try {
 			takeoutDetailService.updateNumber(detail,takeoutService.getById(detail.getTakeoutId()).getCode());
 		} catch (Exception e) {
@@ -382,6 +386,13 @@ public class TakeoutController {
 	public ResponseEntity deleteDetail(@RequestBody TakeoutDetail detail) {
 		if (StringUtils.isBlank(detail.getId())) {
 			return ResponseEntity.failure("id（不能为空)");
+		}
+		//只能改带确认状态得出库单
+		// 待确认
+		Integer modify_status_await = CacheUtils.keyDict.get("modify_status_await").getValue();
+		String takoutId = takeoutDetailService.getById(detail.getId()).getTakeoutId();
+		if(!modify_status_await.equals(takeoutService.getById(takoutId).getStatus())){
+			return ResponseEntity.failure("该单据不在待确认状态无法修改");
 		}
 		takeoutDetailService.deleteTakeoutDetail(detail,takeoutService.getById(detail.getTakeoutId()).getCode());
 		return ResponseEntity.success("操作成功");
@@ -455,12 +466,7 @@ public class TakeoutController {
 		if (StringUtils.isBlank(id)) {
 			return ResponseEntity.failure("单据ID不能为空");
 		}
-		Takeout takeout = takeoutService.getTakeoutById(id);
-	
-		//变成正在拣货状态
-		Integer is_exsit_pick_yes = CacheUtils.keyDict.get("is_exsit_pick_yes").getValue();//拣货完成
-		takeout.setPickingStatus(is_exsit_pick_yes);
-		takeoutService.updateById(takeout);
+		takeoutService.ensurePick(id);
 		return ResponseEntity.success("操作成功");
 	}
 	

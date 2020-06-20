@@ -15,9 +15,11 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.fasterxml.jackson.databind.RuntimeJsonMappingException;
 import com.lzhpo.client.entity.ContractMain;
 import com.lzhpo.client.service.IContractMainService;
+import com.lzhpo.common.config.MySysUser;
 import com.lzhpo.finance.entity.Income;
 import com.lzhpo.finance.mapper.IncomeMapper;
 import com.lzhpo.finance.service.IIncomeService;
+import com.lzhpo.stock.entity.SaleReturn;
 import com.lzhpo.stock.entity.Storage;
 import com.lzhpo.stock.entity.Takeout;
 import com.lzhpo.sys.service.IGenerateNoService;
@@ -65,6 +67,7 @@ public class IncomeServiceImpl extends ServiceImpl<IncomeMapper, Income> impleme
     @Transactional(rollbackFor = Exception.class)
     @CacheEvict(value = "Incomes", allEntries = true)
     public void updateIncome(Income income) {
+    	income.setAuditMan(MySysUser.id());
         baseMapper.updateById(income);
         /**
 	*预留编辑代码
@@ -167,5 +170,52 @@ public class IncomeServiceImpl extends ServiceImpl<IncomeMapper, Income> impleme
 			throw new RuntimeJsonMappingException("该客户暂无正在使用的合同");
 		}
 		return storage;
+	}
+
+	@Override
+	public SaleReturn saleReturnIncomeMath(SaleReturn saleReturn) throws Exception {
+
+		//入库装卸费
+		String opId = "4c089061ca5243fd97f02213015d44e6";
+		//没有的加
+		//找到客户对应在使用的合同
+		String usingContractId = contractMainService.getUsingContractId(saleReturn.getClientId());
+		if (StringUtils.isNotBlank(usingContractId)) {
+			ContractMain contractMain = contractMainService.getById(usingContractId);
+			BigDecimal money = new BigDecimal(0.0);
+			BigDecimal handingStorageMoney = contractMain.getHandingStorageMoney();
+			//有合同看他装卸类型是怎算的
+			switch (contractMain.getHandingType()) {
+			case 1:// 按件
+				money = handingStorageMoney.multiply(new BigDecimal(saleReturn.getTotal()));
+				break;
+			case 2:// 按体积
+				money = handingStorageMoney.multiply(saleReturn.getVolume());
+				break;
+			case 3:// 按重量
+				money = handingStorageMoney.multiply(saleReturn.getWeight());
+				break;	
+			default:
+				break;
+			}
+			
+			if (StringUtils.isNotBlank(saleReturn.getIncomeId())) {//有的更新 就更新钱
+				Income income = getById(saleReturn.getIncomeId());
+				income.setMoeny(money);
+				updateById(income);
+			}else{
+				Income income = new Income();
+				income.setCode(generateNoService.nextCode("SR"));
+				income.setBasis(contractMain.getContractCode());
+				income.setClientId(contractMain.getClientId());
+				income.setOptionId(opId);
+				income.setMoeny(money);
+				save(income);
+				saleReturn.setIncomeId(income.getId());
+			}
+		}else{
+			throw new RuntimeJsonMappingException("该客户暂无正在使用的合同");
+		}
+		return saleReturn;
 	}
 }

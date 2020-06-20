@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html style="height: 100%">
+   <head>
+       <meta charset="utf-8">
+   </head>
+   <body style="height: 100%; margin: 0">
+
+     <div class="layui-form-item">
+        <fieldset class="layui-elem-field layui-field-title" style="margin-top: 30px;margin-left: 10px;">
+            <legend>今日单据</legend>
+        </fieldset>
+    </div>
+     <div id="container"  style="height: 100%"></div> 
+     <div class="layui-form-item">
+        <fieldset class="layui-elem-field layui-field-title" style="margin-top: 30px;margin-left: 10px;">
+            <legend>近三十日入库重方及件数统计</legend>
+        </fieldset>
+    </div> 
+     <div id="storageMonth"  style="height: 100%"></div>      
+     <div class="layui-form-item">
+        <fieldset class="layui-elem-field layui-field-title" style="margin-top: 30px;margin-left: 10px;">
+            <legend>近三十日出库重方及件数统计</legend>
+        </fieldset>
+    </div> 
+     <div id="takeoutMonth"  style="height: 100%"></div>
+     <div class="layui-form-item">
+        <fieldset class="layui-elem-field layui-field-title" style="margin-top: 30px;margin-left: 10px;">
+            <legend>近三十日退库重方及件数统计</legend>
+        </fieldset>
+    </div> 
+    <div id="saleReturnMonth"  style="height: 100%"></div>       
+      <div class="layui-form-item">
+        <fieldset class="layui-elem-field layui-field-title" style="margin-top: 30px;margin-left: 10px;">
+            <legend>今日客户数据(体积前十)</legend>
+        </fieldset>
+    </div> 
+     <div id="client"  style="height: 100%"></div>
+    <div class="layui-form-item">
+        <fieldset class="layui-elem-field layui-field-title" style="margin-top: 30px;margin-left: 10px;">
+            <legend>今日客户数据(重量前十)</legend>
+        </fieldset>
+    </div> 
+     <div id="clientWeight"  style="height: 100%"></div>   
+    <div class="layui-form-item">
+        <fieldset class="layui-elem-field layui-field-title" style="margin-top: 30px;margin-left: 10px;">
+            <legend>今日客户数据(零数量前十)</legend>
+        </fieldset>
+    </div> 
+     <div id="clientNumber"  style="height: 100%"></div>      
+     <div class="layui-form-item">
+        <fieldset class="layui-elem-field layui-field-title" style="margin-top: 30px;margin-left: 10px;">
+            <legend>今日客户数据(总数量前十)</legend>
+        </fieldset>
+    </div> 
+     <div id="clientTotal"  style="height: 100%"></div>        
+   <input type="hidden" id="map" th:value='${mapModel}'>
+
+
+
+
+       <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
+       <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts-gl/dist/echarts-gl.min.js"></script>
+       <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts-stat/dist/ecStat.min.js"></script>
+       <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts/dist/extension/dataTool.min.js"></script>
+       <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts/map/js/china.js"></script>
+       <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts/map/js/world.js"></script>
+       <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts/dist/extension/bmap.min.js"></script>
+       <script type="text/javascript" th:src="@{/static/layui/layui.js}"></script>
+        <script type="text/javascript" th:src="@{/static/layui/js/jquery-1.8.0.min.js}"></script>
+        <link rel="stylesheet" th:href="@{/static/layui/css/layui.css}" media="all" />
+        <style type="text/css">
+            .layui-form-item .layui-inline{ min-width:15%; float:left; margin-right:0; }
+            .layui-form-item .abnormity-box {
+                position: relative;
+            }
+       </style>
+       <script type="text/javascript">
+        $(function(){
+            var dom = document.getElementById("container");
+            var myChart = echarts.init(dom);
+            var app = {};
+            option = null;
+
+            var map = JSON.parse($("#map").val());
+            var 　　seriesData = [];
+            for (var i = 0, size = map.list.length; i < size; i++) {
+                var labelData = ['{title|{b}}{abg|}','{valueHead|单据状态}{rateHead|占比}','{hr|}'];
+                  for (var j = 0, sizej = map.list[i].charts.length; j < sizej; j++) {
+                        var str = '{value|'+map.list[i].charts[j].statusStr+'}{rate|'+map.list[i].charts[j].rate+'%}';
+                        labelData.push( str  );
+                  }   
+                　　seriesData.push({
+                                value: map.list[i].value,
+                                name: map.list[i].name,
+                                label: {
+                                    formatter:  labelData.join('\n'),
+                                    backgroundColor: '#eee',
+                                    borderColor: '#777',
+                                    borderWidth: 1,
+                                    borderRadius: 4,
+                                    rich: {
+                                        title: {
+                                            color: '#eee',
+                                            align: 'center'
+                                        },
+                                        abg: {
+                                            backgroundColor: '#333',
+                                            width: '100%',
+                                            align: 'right',
+                                            height: 25,
+                                            borderRadius: [4, 4, 0, 0]
+                                        },
+                                        hr: {
+                                            borderColor: '#777',
+                                            width: '100%',
+                                            borderWidth: 0.5,
+                                            height: 0
+                                        },
+                                        value: {
+                                            width: 40,
+                                            padding: [0, 20, 0, 30],
+                                            align: 'left'
+                                        },
+                                        valueHead: {
+                                            color: '#333',
+                                            width: 40,
+                                            padding: [0, 20, 0, 30],
+                                            align: 'center'
+                                        },
+                                        rate: {
+                                            width: 60,
+                                            align: 'right',
+                                            padding: [0, 10, 0, 0]
+                                        },
+                                        rateHead: {
+                                            color: '#333',
+                                            width: 60,
+                                            align: 'center',
+                                            padding: [0, 10, 0, 0]
+                                        }
+                                    }
+                                }
+            　　});
+
+            }
+            option = {
+                title: {
+                    text: '今日单据数量',
+                    subtext: '',
+                    left: 'center'
+                },
+                tooltip: {
+                    trigger: 'item',
+                    formatter: '{a} <br/>{b} : {c} ({d}%)'
+                },
+                legend: {
+                    // orient: 'vertical',
+                    // top: 'middle',
+                    bottom: 10,
+                    left: 'center',
+                    data: map.nameList
+                },
+                series: [
+                    {
+                        type: 'pie',
+                        radius: '65%',
+                        center: ['50%', '50%'],
+                        selectedMode: 'single',
+                        data: 　　seriesData,
+                        emphasis: {
+                            itemStyle: {
+                                shadowBlur: 10,
+                                shadowOffsetX: 0,
+                                shadowColor: 'rgba(0, 0, 0, 0.5)'
+                            }
+                        }
+                    }
+                ]
+            };
+            ;
+            if (option && typeof option === "object") {
+                myChart.setOption(option, true);
+            }
+                
+        })
+        
+
+
+//30日内入库总方重
+  $.ajax({
+          url: "/charts/count/monthStorage"
+          ,type:"get"
+          ,async:false
+          ,dataType:"json"
+          , success: function(result){
+              var storageMonthdom = document.getElementById("storageMonth");
+              var storageMonthChart = echarts.init(storageMonthdom);
+              var app = {};
+                storageMonthstorageMonthOption = null;
+                storageMonthOption = {
+                    title: {
+                        text: '近三十日入库重方及件数统计'
+                    },
+                    tooltip: {
+                        trigger: 'axis'
+                    },
+                    legend: {
+                        data: ['体积(㎡)', '重量(kg)', '数量(零)', '数量(整)']
+                    },
+                    grid: {
+                        left: '3%',
+                        right: '4%',
+                        bottom: '3%',
+                        containLabel: true
+                    },
+                    toolbox: {
+                        feature: {
+                            saveAsImage: {}
+                        }
+                    },
+                    xAxis: {
+                        type: 'category',
+                        boundaryGap: false,
+                        data: result.dates
+                    },
+                    yAxis: {
+                        type: 'value'
+                    },
+                    series: [
+                        {
+                            name: '体积(㎡)',
+                            type: 'line',
+                            stack: '总量',
+                            data:  result.volumes,
+                        },
+                        {
+                            name: '重量(kg)',
+                            type: 'line',
+                            stack: '总量',
+                            data: result.weights,
+                        },
+                        {
+                            name: '数量(零)',
+                            type: 'line',
+                            stack: '总量',
+                            data: result.numbers,
+                        },
+                        {
+                            name: '数量(整)',
+                            type: 'line',
+                            stack: '总量',
+                            data: result.totals,
+                        }
+                    ]
+                };
+                ;
+                if (storageMonthOption && typeof storageMonthOption === "object") {
+                    storageMonthChart.setOption(storageMonthOption, true);
+                }  
+
+              tableData=result.data;
+          }
+        });
+
+  //30日内出库总方重
+  $.ajax({
+          url: "/charts/count/monthTakout"
+          ,type:"get"
+          ,async:false
+          ,dataType:"json"
+          , success: function(result){
+              var takeoutMonthdom = document.getElementById("takeoutMonth");
+              var takeoutMonthChart = echarts.init(takeoutMonthdom);
+              var app = {};
+                takeoutMonthOption = null;
+                takeoutMonthOption = {
+                    title: {
+                        text: '近三十日出库重方及件数统计'
+                    },
+                    tooltip: {
+                        trigger: 'axis'
+                    },
+                    legend: {
+                        data: ['体积(㎡)', '重量(kg)', '数量(零)', '数量(整)']
+                    },
+                    grid: {
+                        left: '3%',
+                        right: '4%',
+                        bottom: '3%',
+                        containLabel: true
+                    },
+                    toolbox: {
+                        feature: {
+                            saveAsImage: {}
+                        }
+                    },
+                    xAxis: {
+                        type: 'category',
+                        boundaryGap: false,
+                        data: result.dates
+                    },
+                    yAxis: {
+                        type: 'value'
+                    },
+                    series: [
+                        {
+                            name: '体积(㎡)',
+                            type: 'line',
+                            stack: '总量',
+                            data:  result.volumes,
+                        },
+                        {
+                            name: '重量(kg)',
+                            type: 'line',
+                            stack: '总量',
+                            data: result.weights,
+                        },
+                        {
+                            name: '数量(零)',
+                            type: 'line',
+                            stack: '总量',
+                            data: result.numbers,
+                        },
+                        {
+                            name: '数量(整)',
+                            type: 'line',
+                            stack: '总量',
+                            data: result.totals,
+                        }
+                    ]
+                };
+                ;
+                if (takeoutMonthOption && typeof takeoutMonthOption === "object") {
+                    takeoutMonthChart.setOption(takeoutMonthOption, true);
+                }  
+
+              tableData=result.data;
+          }
+        });
+
+   //30日内退库总方重
+  $.ajax({
+          url: "/charts/count/monthReturn"
+          ,type:"get"
+          ,async:false
+          ,dataType:"json"
+          , success: function(result){
+              var saleReturnMonthdom = document.getElementById("saleReturnMonth");
+              var saleReturnMonthChart = echarts.init(saleReturnMonthdom);
+              var app = {};
+                saleReturnMonthOption = null;
+                saleReturnMonthOption = {
+                    title: {
+                        text: '近三十日退库重方及件数统计'
+                    },
+                    tooltip: {
+                        trigger: 'axis'
+                    },
+                    legend: {
+                        data: ['体积(㎡)', '重量(kg)', '数量(零)', '数量(整)']
+                    },
+                    grid: {
+                        left: '3%',
+                        right: '4%',
+                        bottom: '3%',
+                        containLabel: true
+                    },
+                    toolbox: {
+                        feature: {
+                            saveAsImage: {}
+                        }
+                    },
+                    xAxis: {
+                        type: 'category',
+                        boundaryGap: false,
+                        data: result.dates
+                    },
+                    yAxis: {
+                        type: 'value'
+                    },
+                    series: [
+                        {
+                            name: '体积(㎡)',
+                            type: 'line',
+                            stack: '总量',
+                            data:  result.volumes,
+                        },
+                        {
+                            name: '重量(kg)',
+                            type: 'line',
+                            stack: '总量',
+                            data: result.weights,
+                        },
+                        {
+                            name: '数量(零)',
+                            type: 'line',
+                            stack: '总量',
+                            data: result.numbers,
+                        },
+                        {
+                            name: '数量(整)',
+                            type: 'line',
+                            stack: '总量',
+                            data: result.totals,
+                        }
+                    ]
+                };
+                ;
+                if (saleReturnMonthOption && typeof saleReturnMonthOption === "object") {
+                    saleReturnMonthChart.setOption(saleReturnMonthOption, true);
+                }  
+
+              tableData=result.data;
+          }
+        });
+
+ //今天前十客户 方重量
+  $.ajax({
+          url: "/charts/count/showclientCountAll?type=1"
+          ,type:"get"
+          ,async:false
+          ,dataType:"json"
+          , success: function(result){
+            var domclient = document.getElementById("client");
+            var clientChart = echarts.init(domclient);
+            var app = {};
+            option = null;
+            option = {
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {            // 坐标轴指示器，坐标轴触发有效
+                        type: 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+                    }
+                },
+                legend: {
+                    data: ['退库总体积', '入库总体积', '出库总体积']
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                xAxis: [
+                    {
+                        type: 'category',
+                        data: result.clientName
+                    }
+                ],
+                yAxis: [
+                    {
+                        type: 'value'
+                    }
+                ],
+                series: [
+                    {
+                        name: '退库总体积',
+                        type: 'bar',
+                        data: result.returnVolume
+                    },
+                    {
+                        name: '入库总体积',
+                        type: 'bar',
+                        data: result.storageVolume
+                    },
+                    {
+                        name: '出库总体积',
+                        type: 'bar',
+                        data: result.takeoutVolume
+                    }
+                ]
+            };
+            ;
+            if (option && typeof option === "object") {
+                clientChart.setOption(option, true);
+            }
+
+      
+          }
+        }); 
+
+  $.ajax({
+          url: "/charts/count/showclientCountAll?type=2"
+          ,type:"get"
+          ,async:false
+          ,dataType:"json"
+          , success: function(result){
+            //重量
+             var domclient = document.getElementById("clientWeight");
+            var clientChart = echarts.init(domclient);
+            var app = {};
+            option = null;
+            option = {
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {            // 坐标轴指示器，坐标轴触发有效
+                        type: 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+                    }
+                },
+                legend: {
+                    data: ['退库总重量', '入库总重量', '出库总重量']
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                xAxis: [
+                    {
+                        type: 'category',
+                        data: result.clientName
+                    }
+                ],
+                yAxis: [
+                    {
+                        type: 'value'
+                    }
+                ],
+                series: [
+                    {
+                        name: '退库总重量',
+                        type: 'bar',
+                        data: result.returnWeight
+                    },
+                    {
+                        name: '入库总重量',
+                        type: 'bar',
+                        data: result.storageWeight
+                    },
+                    {
+                        name: '出库总重量',
+                        type: 'bar',
+                        data: result.takeoutWeight
+                    }
+                ]
+            };
+            ;
+            if (option && typeof option === "object") {
+                clientChart.setOption(option, true);
+            }
+          }
+        }); 
+
+  $.ajax({
+          url: "/charts/count/showclientCountAll?type=3"
+          ,type:"get"
+          ,async:false
+          ,dataType:"json"
+          , success: function(result){
+               
+            //零数量
+             var domclient = document.getElementById("clientNumber");
+            var clientChart = echarts.init(domclient);
+            var app = {};
+            option = null;
+            option = {
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {            // 坐标轴指示器，坐标轴触发有效
+                        type: 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+                    }
+                },
+                legend: {
+                    data: ['退库总零数', '入库总零数', '出库总零数']
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                xAxis: [
+                    {
+                        type: 'category',
+                        data: result.clientName
+                    }
+                ],
+                yAxis: [
+                    {
+                        type: 'value'
+                    }
+                ],
+                series: [
+                    {
+                        name: '退库总零数',
+                        type: 'bar',
+                        data: result.returnNumber
+                    },
+                    {
+                        name: '入库总零数',
+                        type: 'bar',
+                        data: result.storageNumber
+                    },
+                    {
+                        name: '出库总零数',
+                        type: 'bar',
+                        data: result.takeoutNumber
+                    }
+                ]
+            };
+            ;
+            if (option && typeof option === "object") {
+                clientChart.setOption(option, true);
+            }
+
+          }
+        }); 
+     
+ $.ajax({
+          url: "/charts/count/showclientCountAll?type=4"
+          ,type:"get"
+          ,async:false
+          ,dataType:"json"
+          , success: function(result){
+            //整数量
+             var domclient = document.getElementById("clientTotal");
+            var clientChart = echarts.init(domclient);
+            var app = {};
+            option = null;
+            option = {
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {            // 坐标轴指示器，坐标轴触发有效
+                        type: 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+                    }
+                },
+                legend: {
+                    data: ['退库总整数', '入库总整数', '出库总整数']
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                xAxis: [
+                    {
+                        type: 'category',
+                        data: result.clientName
+                    }
+                ],
+                yAxis: [
+                    {
+                        type: 'value'
+                    }
+                ],
+                series: [
+                    {
+                        name: '退库总整数',
+                        type: 'bar',
+                        data: result.returnTotal
+                    },
+                    {
+                        name: '入库总整数',
+                        type: 'bar',
+                        data: result.storageTotal
+                    },
+                    {
+                        name: '出库总整数',
+                        type: 'bar',
+                        data: result.takeoutTotal
+                    }
+                ]
+            };
+            ;
+            if (option && typeof option === "object") {
+                clientChart.setOption(option, true);
+            }
+          }
+        }); 
+         
+   </script>
+   </body>
+</html>

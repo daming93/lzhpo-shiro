@@ -3,6 +3,7 @@ package com.lzhpo.stock.service;
 import com.lzhpo.stock.entity.SaleReturnDetail;
 import com.baomidou.mybatisplus.extension.service.IService;
 import java.util.List;
+import java.util.Set;
 /**
  * <p>
  * 退货详情表 服务类
@@ -32,5 +33,11 @@ public interface ISaleReturnDetailService extends IService<SaleReturnDetail> {
 
 	//分页查询数据在父类
 
-
+	//根据主表id删除子表 硬删
+	void deleteSaleReturnDetailByReturnId(String returnId);
+	
+	List<SaleReturnDetail> selectSaleReturnDetailBySaleReturnId(String returnId);
+	
+	Set<String> selectSaleReturnIdsByMaterialId(String materialId);
+	
 }

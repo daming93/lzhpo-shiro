@@ -31,6 +31,6 @@ public interface ISaleReturnOperationsService extends IService<SaleReturnOperati
 	List<SaleReturnOperations> selectAll();
 
 	//分页查询数据在父类
-
+	List<SaleReturnOperations> selectByReturnId(String returnId);
 
 }

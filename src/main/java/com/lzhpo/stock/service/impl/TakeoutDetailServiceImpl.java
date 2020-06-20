@@ -114,7 +114,10 @@ public class TakeoutDetailServiceImpl extends ServiceImpl<TakeoutDetailMapper, T
 		Integer trunover_type_takeout_edit = CacheUtils.keyDict.get("trunover_type_takeout_edit").getValue();
 		// 防止前台传来得数量是修改过得
 		TakeoutDetail entity = baseMapper.selectById(takeoutDetail.getId());
+	
+		
 		Clientitem item = clientitemService.getById(entity.getItemId());
+		
 		if (takeoutDetail.getNumZ() != null) {
 			takeoutDetail.setNumber(CommomUtil.AllToOne(takeoutDetail.getNumZ(), item.getUnitRate()));
 		}

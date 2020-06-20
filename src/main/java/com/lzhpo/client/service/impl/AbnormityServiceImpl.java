@@ -74,5 +74,13 @@ public class AbnormityServiceImpl extends ServiceImpl<AbnormityMapper, Abnormity
         return baseMapper.selectList(wrapper);
     }
 
+	@Override
+	public List<Abnormity> selectAbnorityByType(Integer type) {
+		QueryWrapper<Abnormity> wrapper = new QueryWrapper<>();
+		wrapper.eq("abnormity_type", type);
+        wrapper.eq("del_flag",false);
+        return baseMapper.selectList(wrapper);
+	}
+
 
 }

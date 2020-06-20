@@ -13,6 +13,7 @@ import org.springframework.cache.annotation.Cacheable;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.springframework.transaction.annotation.Transactional;
+
 /**
  * <p>
  * 出库操作表 服务实现类
@@ -22,57 +23,65 @@ import org.springframework.transaction.annotation.Transactional;
  * @since 2020-06-09
  */
 @Service
-public class SaleReturnOperationsServiceImpl extends ServiceImpl<SaleReturnOperationsMapper, SaleReturnOperations> implements ISaleReturnOperationsService {
+public class SaleReturnOperationsServiceImpl extends ServiceImpl<SaleReturnOperationsMapper, SaleReturnOperations>
+		implements ISaleReturnOperationsService {
 	@Override
-    public long getSaleReturnOperationsCount(String name) {
-        QueryWrapper<SaleReturnOperations> wrapper = new QueryWrapper<>();
-	// 下行编辑条件
-        wrapper.eq("del_flag",false); 
-       // wrapper.eq("name",name);
-        return baseMapper.selectCount(wrapper);
-    }
+	public long getSaleReturnOperationsCount(String name) {
+		QueryWrapper<SaleReturnOperations> wrapper = new QueryWrapper<>();
+		// 下行编辑条件
+		wrapper.eq("del_flag", false);
+		// wrapper.eq("name",name);
+		return baseMapper.selectCount(wrapper);
+	}
 
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    @CacheEvict(value = "SaleReturnOperationss", allEntries = true)
-    public SaleReturnOperations saveSaleReturnOperations(SaleReturnOperations saleReturnOperations) {
-        baseMapper.insert(saleReturnOperations);
-        /**
-	*预留编辑代码 
-	*/
-        return saleReturnOperations;
-    }
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	@CacheEvict(value = "SaleReturnOperationss", allEntries = true)
+	public SaleReturnOperations saveSaleReturnOperations(SaleReturnOperations saleReturnOperations) {
+		baseMapper.insert(saleReturnOperations);
+		/**
+		 * 预留编辑代码
+		 */
+		return saleReturnOperations;
+	}
 
-    @Override
-    public SaleReturnOperations getSaleReturnOperationsById(String id) {
-        return baseMapper.selectById(id);
-    }
+	@Override
+	public SaleReturnOperations getSaleReturnOperationsById(String id) {
+		return baseMapper.selectById(id);
+	}
 
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    @CacheEvict(value = "SaleReturnOperationss", allEntries = true)
-    public void updateSaleReturnOperations(SaleReturnOperations saleReturnOperations) {
-        baseMapper.updateById(saleReturnOperations);
-        /**
-	*预留编辑代码
-	*/
-    }
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	@CacheEvict(value = "SaleReturnOperationss", allEntries = true)
+	public void updateSaleReturnOperations(SaleReturnOperations saleReturnOperations) {
+		baseMapper.updateById(saleReturnOperations);
+		/**
+		 * 预留编辑代码
+		 */
+	}
 
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    @CacheEvict(value = "SaleReturnOperationss", allEntries = true)
-    public void deleteSaleReturnOperations(SaleReturnOperations saleReturnOperations) {
-        saleReturnOperations.setDelFlag(true);
-        baseMapper.updateById(saleReturnOperations);
-    }
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	@CacheEvict(value = "SaleReturnOperationss", allEntries = true)
+	public void deleteSaleReturnOperations(SaleReturnOperations saleReturnOperations) {
+		saleReturnOperations.setDelFlag(true);
+		baseMapper.updateById(saleReturnOperations);
+	}
 
-    @Override
-    @Cacheable("SaleReturnOperationss")
-    public List<SaleReturnOperations> selectAll() {
-        QueryWrapper<SaleReturnOperations> wrapper = new QueryWrapper<>();
-        wrapper.eq("del_flag",false);
-        return baseMapper.selectList(wrapper);
-    }
+	@Override
+	@Cacheable("SaleReturnOperationss")
+	public List<SaleReturnOperations> selectAll() {
+		QueryWrapper<SaleReturnOperations> wrapper = new QueryWrapper<>();
+		wrapper.eq("del_flag", false);
+		return baseMapper.selectList(wrapper);
+	}
 
+	@Override
+	public List<SaleReturnOperations> selectByReturnId(String returnId) {
+		QueryWrapper<SaleReturnOperations> wrapper = new QueryWrapper<>();
+		wrapper.eq("del_flag", false);
+		wrapper.eq("return_id", returnId);
+		return baseMapper.selectList(wrapper);
+	}
 
 }

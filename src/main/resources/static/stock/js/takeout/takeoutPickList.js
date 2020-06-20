@@ -121,7 +121,7 @@ layui.use(['layer','form','table'], function() {
             {field:'clientName',        title: '客户名称'   },
             {field:'clientCode',        title: '客户单号' ,    width:'12%'  },
             {field:'pickingCode',        title: '拣货单号' ,    width:'13%'   },
-            {field:'code',        title: '拣货单号' ,    width:'13%'   },
+            {field:'code',        title: '出库单号' ,    width:'13%'   },
             {field:'total',  title: '数量(整)'}, 
             {field:'number',        title: '数量(零)'   },
             {field:'volume',        title: '体积(m³) '   },

@@ -70,6 +70,41 @@ public class Income extends DataEntity<Income> implements Serializable {
     @TableField("audit_man")
     private String auditMan;
 
+    @TableField(exist=false)
+    private String clientName;
+    
+    @TableField(exist=false)
+    private String typeStr;
+    
+    @TableField(exist=false)
+    private String optionName;
+    
+    
+    
+	public String getTypeStr() {
+		return typeStr;
+	}
+
+	public void setTypeStr(String typeStr) {
+		this.typeStr = typeStr;
+	}
+
+	public String getOptionName() {
+		return optionName;
+	}
+
+	public void setOptionName(String optionName) {
+		this.optionName = optionName;
+	}
+
+	public String getClientName() {
+		return clientName;
+	}
+
+	public void setClientName(String clientName) {
+		this.clientName = clientName;
+	}
+
 	public String getCode() {
 		return code;
 	}

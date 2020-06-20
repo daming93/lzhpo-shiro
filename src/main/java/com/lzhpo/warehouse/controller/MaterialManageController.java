@@ -30,6 +30,7 @@ import com.lzhpo.client.entity.Basicdata;
 import com.lzhpo.client.service.IBasicdataService;
 import com.lzhpo.common.annotation.SysLog;
 import com.lzhpo.common.base.PageData;
+import com.lzhpo.common.init.CacheUtils;
 import com.lzhpo.common.util.CommomUtil;
 import com.lzhpo.common.util.ResponseEntity;
 import com.lzhpo.material.item.entity.Clientitem;
@@ -278,6 +279,13 @@ public class MaterialManageController {
 		if (StringUtils.isBlank(detail.getId())) {
 			return ResponseEntity.failure("id（不能为空)");
 		}
+		String manageId = materialManageDetailService.getById(detail.getId()).getManageId();
+		//只能改带确认状态得出库单
+		// 待确认
+		Integer modify_status_await = CacheUtils.keyDict.get("modify_status_await").getValue();
+		if(!modify_status_await.equals(materialManageService.getById(manageId).getModifyStatus())){
+			return ResponseEntity.failure("该单据不在待确认状态无法修改");
+		}
 		try {
 			materialManageDetailService.updateNumber(detail,materialManageService.getById(detail.getManageId()).getSystemCode(),type);
 		} catch (Exception e) {
@@ -292,6 +300,13 @@ public class MaterialManageController {
 	public ResponseEntity deleteDetail(@RequestBody MaterialManageDetail detail,Integer type) {
 		if (StringUtils.isBlank(detail.getId())) {
 			return ResponseEntity.failure("id（不能为空)");
+		}
+		String manageId = materialManageDetailService.getById(detail.getId()).getManageId();
+		//只能改带确认状态得出库单
+		// 待确认
+		Integer modify_status_await = CacheUtils.keyDict.get("modify_status_await").getValue();
+		if(!modify_status_await.equals(materialManageService.getById(manageId).getModifyStatus())){
+			return ResponseEntity.failure("该单据不在待确认状态无法修改");
 		}
 		materialManageDetailService.deleteMaterialManageDetail(detail,materialManageService.getById(detail.getManageId()).getSystemCode(),type);
 		return ResponseEntity.success("操作成功");
