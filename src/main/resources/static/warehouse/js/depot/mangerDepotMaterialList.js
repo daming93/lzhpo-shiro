@@ -55,7 +55,7 @@ layui.use(['layer','form','table'], function() {
             { field:'availableNum',title:'数量(零)',align:'center',width:100},
             { field:'rate',title:'换算率',align:'center',width:100},
             {field:'materialStatus',    align:'center'  ,  title: '物料冻结状态'   },
-            {field:'type',   align:'center'   ,  title: '状态'   },
+            {field:'typeStr',   align:'center'   ,  title: '状态'   },
             {title: '操作',fixed: 'right',  width:'15%',    align: 'center',toolbar: '#materialBar'}
         ]]/*,
         done: function () {

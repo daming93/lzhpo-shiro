@@ -65,7 +65,9 @@ public class ClientitemController {
 	private ICategoryService categoryService;
 
 	@GetMapping(value = "list")
-	public String list() {
+	public String list(ModelMap modelMap) {
+		List<Basicdata> basicDatas = basicdateService.selectAll();
+		modelMap.put("basicDatas", basicDatas); 
 		return "material/item/clientitem/listClientitem";
 	}
 
@@ -83,9 +85,17 @@ public class ClientitemController {
 		// 相当于del_flag = 0;
 		clientitemWrapper.eq("del_flag", false);
 		if (!map.isEmpty()) {
-			String keys = (String) map.get("name");
-			if (StringUtils.isNotBlank(keys)) {
-				clientitemWrapper.like("name", keys);
+			String name = (String) map.get("name");
+			if (StringUtils.isNotBlank(name)) {
+				clientitemWrapper.like("name", name);
+			}
+			String code = (String) map.get("code");
+			if (StringUtils.isNotBlank(code)) {
+				clientitemWrapper.like("code", code);
+			}
+			String clientId = (String) map.get("clientId");
+			if (StringUtils.isNotBlank(clientId)) {
+				clientitemWrapper.like("client_id", clientId);
 			}
 		}
 		IPage<Clientitem> clientitemPage = clientitemService.page(new Page<>(page, limit), clientitemWrapper);

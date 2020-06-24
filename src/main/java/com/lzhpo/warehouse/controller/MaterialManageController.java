@@ -296,7 +296,7 @@ public class MaterialManageController {
 	}
 	@PostMapping("deleteDetail")
 	@ResponseBody
-	@SysLog("删除明细数据")
+	@SysLog("删除明细数据")//
 	public ResponseEntity deleteDetail(@RequestBody MaterialManageDetail detail,Integer type) {
 		if (StringUtils.isBlank(detail.getId())) {
 			return ResponseEntity.failure("id（不能为空)");

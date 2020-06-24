@@ -89,12 +89,12 @@ public class MaterialController {
 		}
 		Map<String,Object> mapRes = materialService.selectMaterial(itemCode, startTime, overTime,  (page-1)*limit, limit, mode,continuity);
 		materialPageData.setCount((Long) mapRes.get("count"));
-		materialPageData.setData(setUserToMaterial((List<Material>) mapRes.get("list")));
+		materialPageData.setData(setUserToMaterial((List<Material>) mapRes.get("list"),mode));
 		return materialPageData;
 	}
 
 	// 创建者，和修改人
-	private List<Material> setUserToMaterial(List<Material> materials) {
+	private List<Material> setUserToMaterial(List<Material> materials,Integer mode) {
 		materials.forEach(r -> {
 			if (StringUtils.isNotBlank(r.getCreateId())) {
 				User u = userService.findUserById(r.getCreateId());
@@ -117,8 +117,12 @@ public class MaterialController {
 				r.setNumZ(r.getAvailableNum() / item.getUnitRate() + "." + r.getAvailableNum() % item.getUnitRate());
 				r.setSystemCode(item.getCode());
 			}
+			
 			if (StringUtils.isNotBlank(r.getType()+"")) {
 				r.setTypeStr(CommomUtil.valueToNameInDict(r.getType(), "material_type"));
+			}
+			if(mode.equals(3)||mode.equals(4)){
+				r.setTypeStr("合计");
 			}
 		});
 
@@ -354,7 +358,7 @@ public class MaterialController {
 		// 相当于del_flag = 0;
 		Map<String,Object> mapRes = materialService.selectMaterialByDepot((page-1)*limit, limit, depotCode);
 		materialPageData.setCount((Long) mapRes.get("count"));
-		materialPageData.setData(setUserToMaterial((List<Material>) mapRes.get("list")));
+		materialPageData.setData(setUserToMaterial((List<Material>) mapRes.get("list"),1));
 		return materialPageData;
 	}
 	
@@ -386,7 +390,7 @@ public class MaterialController {
 		// 相当于del_flag = 0;
 		Map<String,Object> mapRes = materialService.selectMaterialByDepot((page-1)*limit, limit, depotCode,itemId,batch,null);
 		materialPageData.setCount((Long) mapRes.get("count"));
-		materialPageData.setData(setUserToMaterial((List<Material>) mapRes.get("list")));
+		materialPageData.setData(setUserToMaterial((List<Material>) mapRes.get("list"),1));
 		return materialPageData;
 	}
 	

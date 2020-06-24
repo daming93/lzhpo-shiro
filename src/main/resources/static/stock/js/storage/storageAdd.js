@@ -348,6 +348,10 @@ window.viewObj = {
         activeByType('save');    //更新行记录对象
       
         data.field.detailSet = table.cache[layTableId];  
+        if(!data.field.detailSet){
+              layer.msg("请填写子表");
+              return;
+        }
         var loadIndex = layer.load(2, {
             shade: [0.3, '#333']
         });

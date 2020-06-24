@@ -1,0 +1,1713 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lzhpo.charts.mapper.ChartsMapper">
+
+  <resultMap id="showBillCount" type="com.lzhpo.charts.entity.Charts">
+    <result property="name"       column="name" />
+    <result property="value"      column="value"/>
+    <result property="type"    column="type"/>
+      <collection property="charts" select="showBillCountByType"  column="type = type,time = time }">
+    </collection>
+  
+  </resultMap>
+ <resultMap id="showBillCountDetail" type="com.lzhpo.charts.entity.ChartsChlidren">
+    <result property="name"       column="name" />
+    <result property="value"      column="value"/>
+    <result property="rate"    column="rate"/>
+  </resultMap>
+  
+  <sql id = "storageWhere">
+  	 <if test="time!=null"><!-- 时间不为空，这个是单天 多天时间段就是startTime 和 endTime  time不能为空 默认传入今天 -->
+    	and storage_time = #{time} 
+    </if>
+   	<if test="startTime!=null and startTime!=''">
+   		and storage_time &gt;= #{startTime} 
+   	</if>
+   	<if test="endTime!=null and endTime!=''">
+   		and storage_time &lt;= #{endTime} 
+   	</if>
+  </sql>
+   <sql id = "takeoutWhere">
+  	 <if test="time!=null"><!-- 时间不为空，这个是单天 多天时间段就是startTime 和 endTime  time不能为空 默认传入今天 -->
+    	and takeout_time = #{time} 
+    </if>
+   	<if test="startTime!=null and startTime!=''">
+   		and takeout_time &gt;= #{startTime} 
+   	</if>
+   	<if test="endTime!=null and endTime!=''" >
+   		and takeout_time &lt;= #{endTime} 
+   	</if>
+  </sql>
+  <sql id = "returnWhere">
+  	 <if test="time!=null"><!-- 时间不为空，这个是单天 多天时间段就是startTime 和 endTime  time不能为空 默认传入今天 -->
+    	and return_time = #{time} 
+    </if>
+   	<if test="startTime!=null and startTime!=''">
+   		and return_time &gt;= #{startTime} 
+   	</if>
+   	<if test="endTime!=null and endTime!=''">
+   		and return_time &lt;= #{endTime} 
+   	</if>
+  </sql>
+  <sql id = "pickingWhere">
+  	 <if test="time!=null"><!-- 时间不为空，这个是单天 多天时间段就是startTime 和 endTime  time不能为空 默认传入今天 -->
+  	 <!-- 拣货单得时间可能要调整成为出库得时间 考虑下 -->
+    	and picking_time = #{time} 
+    </if>
+   	<if test="startTime!=null and startTime!=''">
+   		and picking_time &gt;= #{startTime} 
+   	</if>
+   	<if test="endTime!=null and endTime!=''">
+   		and picking_time &lt;= #{endTime} 
+   	</if>
+  </sql>
+   <sql id = "manageWhere">
+  	 <if test="time!=null"><!-- 时间不为空，这个是单天 多天时间段就是startTime 和 endTime  time不能为空 默认传入今天 -->
+    	and time = #{time} 
+    </if>
+   	<if test="startTime!=null and startTime!=''" >
+   		and time &gt;= #{startTime} 
+   	</if>
+   	<if test="endTime!=null and endTime!=''">
+   		and time &lt;= #{endTime} 
+   	</if>
+  </sql>
+  <select id="showBillCountAll" resultMap="showBillCount" parameterType="java.util.Map">
+    SELECT '入库' name,count(1) value ,1 type ,#{time} time from stock_storage where del_flag=0 
+  	<include refid="storageWhere"/>
+	UNION ALL
+	SELECT '出库',count(1) value,2 type ,#{time} time from stock_takeout where del_flag=0 
+	<include refid="takeoutWhere"/>
+	UNION ALL
+	SELECT '退库',count(1) value ,3 type ,#{time} time from stock_sale_return where del_flag=0 
+	<include refid="returnWhere"/>
+	UNION ALL 
+	SELECT '拣货单',count(1) value ,4 type ,#{time} time from stock_takeout where del_flag=0 and picking_code is not NULL and `status`>1
+	<include refid="pickingWhere"/>
+	UNION ALL 
+	SELECT '转良',count(1) value,5 type ,#{time} time from warehouse_material_manage ware where del_flag=0  and `status`=1
+	<include refid="manageWhere"/>
+	UNION ALL 
+	SELECT '转不良',count(1) value,6 type,#{time} time  from warehouse_material_manage  where del_flag=0  and `status`=2
+	<include refid="manageWhere"/>
+  </select>
+
+  <select id="showBillCountByType" resultMap="showBillCountDetail" parameterType="java.util.Map">
+    <if test="type == 1">
+    	SELECT
+		`status`,
+		count(1)	value		,
+			1 type,
+		
+		FORMAT(IF (
+		(
+			SELECT
+				count(1)
+			FROM
+				stock_storage
+			WHERE
+				del_flag = 0
+				<include refid="storageWhere"/>
+		) != 0,
+		count(1) / (
+			SELECT
+				count(1)
+			FROM
+				stock_storage
+			WHERE
+				del_flag = 0
+				<include refid="storageWhere"/>
+		) * 100,
+		0
+	) ,2) rate
+		FROM
+			stock_storage
+		WHERE
+			del_flag = 0
+			 <include refid="storageWhere"/>
+		GROUP BY
+		`status`
+    </if>
+     <if test="type == 2">
+    	SELECT
+			`status`,
+			count(1)	value,
+			1 type,
+		
+		FORMAT(IF (
+		(
+			SELECT
+				count(1)
+			FROM
+				stock_takeout
+			WHERE
+				del_flag = 0
+				<include refid="takeoutWhere"/>
+		) != 0,
+		count(1) / (
+			SELECT
+				count(1)
+			FROM
+				stock_takeout
+			WHERE
+				del_flag = 0
+				<include refid="takeoutWhere"/>
+		) * 100,
+		0
+	) ,2) rate
+		FROM
+			stock_takeout
+		WHERE
+			del_flag = 0 <include refid="takeoutWhere"/>
+		GROUP BY
+			`status`
+    </if>
+     <if test="type == 3">
+    	SELECT
+			`status`,
+			count(1) value	,
+			1 type,
+		
+		FORMAT(IF (
+			(
+				SELECT
+					count(1)
+				FROM
+					stock_sale_return
+				WHERE
+					del_flag = 0 <include refid="returnWhere"/>
+			) != 0,
+			count(1) / (
+				SELECT
+					count(1)
+				FROM
+					stock_sale_return
+				WHERE
+					del_flag = 0 <include refid="returnWhere"/>
+			) * 100,
+			0
+		),2) rate
+		FROM
+			stock_sale_return
+		WHERE
+			del_flag = 0 <include refid="returnWhere"/>
+		GROUP BY
+			`status`
+    </if>
+    <if test="type == 4">
+    	SELECT
+			`picking_status` status,
+			count(1) value,
+			1 type,
+		
+		FORMAT(IF (
+			(
+				SELECT
+					count(1)
+				FROM
+					stock_takeout
+				WHERE
+					del_flag = 0 and picking_code is not NULL and `status`>1  <include refid="pickingWhere"/>
+			) != 0,
+			count(1) / (
+				SELECT
+					count(1)
+				FROM
+					stock_takeout
+				WHERE
+					del_flag = 0 and picking_code is not NULL and `status`>1 <include refid="pickingWhere"/>
+			) * 100,
+			0
+		) ,2)rate
+		FROM
+			stock_takeout
+		WHERE
+			del_flag=0 and picking_code is not NULL and `status`>1 <include refid="pickingWhere"/>
+		GROUP BY
+			`picking_status`
+    </if>
+     <if test="type == 5">
+    	SELECT
+			`modify_status` status,
+			count(1) value		,
+			1 type,
+		
+		FORMAT(IF (
+			(
+				SELECT
+					count(1)
+				FROM
+					warehouse_material_manage
+				WHERE
+					del_flag = 0 and `status`=1 <include refid="manageWhere"/>
+			) != 0,
+			count(1) / (
+				SELECT
+					count(1)
+				FROM
+					warehouse_material_manage
+				WHERE
+					del_flag = 0 and `status`=1 <include refid="manageWhere"/>
+			) * 100,
+			0
+		),2) rate
+		FROM
+			warehouse_material_manage
+		WHERE
+			del_flag = 0  and `status`=1 <include refid="manageWhere"/>
+		GROUP BY
+			`modify_status`
+    </if>
+      <if test="type == 6">
+    	SELECT
+			`modify_status` status,
+			count(1) value	,
+			1 type,
+		
+		FORMAT(IF (
+			(
+				SELECT
+					count(1)
+				FROM
+					warehouse_material_manage
+				WHERE
+					del_flag = 0 and `status`=2 <include refid="manageWhere"/>
+			) != 0,
+			count(1) / (
+				SELECT
+					count(1)
+				FROM
+					warehouse_material_manage
+				WHERE
+					del_flag = 0 and `status`=2 <include refid="manageWhere"/>
+			) * 100,
+			0
+		) ,2)rate
+		FROM
+			warehouse_material_manage
+		WHERE
+			del_flag = 0  and `status`=2 <include refid="manageWhere"/>
+		GROUP BY
+			`modify_status`
+    </if>
+  </select>
+  <!-- 近三十天得入库重方体积数量折线图 -->
+  	 <resultMap id="StorageCount" type="com.lzhpo.charts.entity.WeightVolumeQuantity">
+	    <result property="name"       column="name" />
+	    <result property="value"      column="value"/>
+	    <result property="date"       column="date" />
+	    <result property="volume"      column="volume"/>
+	    <result property="weight"       column="weight" />
+	    <result property="number"      column="number"/>
+	    <result property="total"      column="total"/>
+  	</resultMap>
+  <!-- 入库数据得标准是状态 不是待确认 的数据 -->
+    <select id="showStorageCountAll" resultMap="StorageCount" parameterType="java.util.Map">
+   	   	 	SELECT
+				d.time date,
+				IFNULL(volume,0) volume, 
+				IFNULL(weight,0) weight,
+				IFNULL(number,0) number,
+				IFNULL(total,0) total
+		FROM
+			(
+				SELECT
+			<choose>
+                <when test="type == 1"><!-- 年度 -->
+                   	YEAR (date) time
+                </when>
+                <when test="type == 2"><!-- 月度 -->
+                   	MONTH (date) time
+                </when>
+                <when test="type == 3"><!-- 周度 -->
+                   	WEEK (date) time
+                </when>
+                <when test="type == 4"><!-- 天 -->
+                   	date time
+                </when>
+                <otherwise>
+                     	date time
+                </otherwise>
+            </choose>
+				FROM
+					sys_date d
+			where  1=1
+			<if test="startTime==null and endTime==null">
+			 and d.date  between DATE_SUB(now(), INTERVAL 30 DAY)  and now() 
+			</if>
+			<if test="startTime!=null and startTime!=''">
+		   		and d.date   &gt;= #{startTime} 
+		   	</if>
+		   	<if test="endTime!=null and endTime!=''">
+		   		and d.date   &lt;= #{endTime} 
+		   	</if>	
+				GROUP BY
+			<choose>
+                <when test="type == 1"><!-- 年度 -->
+                   	YEAR (date)
+                </when>
+                <when test="type == 2"><!-- 月度 -->
+                   	MONTH (date)
+                </when>
+                <when test="type == 3"><!-- 周度 -->
+                   	WEEK (date)
+                </when>
+                <when test="type == 4"><!-- 天 -->
+                   	date
+                </when>
+                <otherwise>
+                     	date
+                </otherwise>
+            </choose>
+			) d
+		LEFT JOIN (
+			SELECT
+				'出库' NAME,
+				1 type,
+				SUM(volume) volume,
+				SUM(weight) weight,
+				SUM(number) number,
+				SUM(total) total,
+				<choose>
+                <when test="type == 1"><!-- 年度 -->
+                   	YEAR (storage_time) time
+                </when>
+                <when test="type == 2"><!-- 月度 -->
+                   	MONTH (storage_time) time
+                </when>
+                <when test="type == 3"><!-- 周度 -->
+                   	WEEK (storage_time) time
+                </when>
+                <when test="type == 4"><!-- 天 -->
+                   	storage_time time
+                </when>
+                <otherwise>
+                     	storage_time time
+                </otherwise>
+            </choose>
+			FROM
+				stock_storage
+			WHERE
+				del_flag = 0
+			AND `status` > 1
+			<if test="clientId != null and clientId!=''">
+				and client_id = #{clientId}
+			</if>
+			GROUP BY
+			<choose>
+                <when test="type == 1"><!-- 年度 -->
+                   	YEAR (storage_time)
+                </when>
+                <when test="type == 2"><!-- 月度 -->
+                   	MONTH (storage_time)
+                </when>
+                <when test="type == 3"><!-- 周度 -->
+                   	WEEK (storage_time)
+                </when>
+                <when test="type == 4"><!-- 天 -->
+                   	storage_time
+                </when>
+                <otherwise>
+                     	storage_time
+                </otherwise>
+            </choose>
+		) s ON d.time = s.time
+  </select>
+      <select id="showTakoutCountAll" resultMap="StorageCount" parameterType="java.util.Map">
+   	 	SELECT
+				d.time date,
+				IFNULL(volume,0) volume, 
+				IFNULL(weight,0) weight,
+				IFNULL(number,0) number,
+				IFNULL(total,0) total
+		FROM
+			(
+				SELECT
+			<choose>
+                <when test="type == 1"><!-- 年度 -->
+                   	YEAR (date) time
+                </when>
+                <when test="type == 2"><!-- 月度 -->
+                   	MONTH (date) time
+                </when>
+                <when test="type == 3"><!-- 周度 -->
+                   	WEEK (date) time
+                </when>
+                <when test="type == 4"><!-- 天 -->
+                   	date time
+                </when>
+                <otherwise>
+                     	date time
+                </otherwise>
+            </choose>
+				FROM
+					sys_date d
+			where  1=1
+			<if test="startTime==null and endTime==null">
+			 and d.date  between DATE_SUB(now(), INTERVAL 30 DAY)  and now() 
+			</if>
+			<if test="startTime!=null and startTime!=''">
+		   		and d.date   &gt;= #{startTime} 
+		   	</if>
+		   	<if test="endTime!=null and endTime!=''">
+		   		and d.date   &lt;= #{endTime} 
+		   	</if>	
+				GROUP BY
+			<choose>
+                <when test="type == 1"><!-- 年度 -->
+                   	YEAR (date)
+                </when>
+                <when test="type == 2"><!-- 月度 -->
+                   	MONTH (date)
+                </when>
+                <when test="type == 3"><!-- 周度 -->
+                   	WEEK (date)
+                </when>
+                <when test="type == 4"><!-- 天 -->
+                   	date
+                </when>
+                <otherwise>
+                     	date
+                </otherwise>
+            </choose>
+			) d
+		LEFT JOIN (
+			SELECT
+				'出库' NAME,
+				1 type,
+				
+				SUM(volume) volume,
+				SUM(weight) weight,
+				SUM(number) number,
+				SUM(total) total,
+				<choose>
+                <when test="type == 1"><!-- 年度 -->
+                   	YEAR (takeout_time) time
+                </when>
+                <when test="type == 2"><!-- 月度 -->
+                   	MONTH (takeout_time) time
+                </when>
+                <when test="type == 3"><!-- 周度 -->
+                   	WEEK (takeout_time) time
+                </when>
+                <when test="type == 4"><!-- 天 -->
+                   	takeout_time time
+                </when>
+                <otherwise>
+                     	takeout_time time
+                </otherwise>
+            </choose>
+			FROM
+				stock_takeout
+			WHERE
+				del_flag = 0
+			AND `status` > 1
+			<if test="clientId != null and clientId!=''">
+				and client_id = #{clientId}
+			</if>
+			GROUP BY
+			<choose>
+                <when test="type == 1"><!-- 年度 -->
+                   	YEAR (takeout_time)
+                </when>
+                <when test="type == 2"><!-- 月度 -->
+                   	MONTH (takeout_time)
+                </when>
+                <when test="type == 3"><!-- 周度 -->
+                   	WEEK (takeout_time)
+                </when>
+                <when test="type == 4"><!-- 天 -->
+                   	takeout_time
+                </when>
+                <otherwise>
+                     	takeout_time
+                </otherwise>
+            </choose>
+		) s ON d.time = s.time
+	
+		
+  </select>
+  
+       <select id="showReturnCountAll" resultMap="StorageCount" parameterType="java.util.Map">
+   	 	SELECT
+				d.time date,
+				IFNULL(volume,0) volume, 
+				IFNULL(weight,0) weight,
+				IFNULL(number,0) number,
+				IFNULL(total,0) total
+		FROM
+			(
+				SELECT
+			<choose>
+                <when test="type == 1"><!-- 年度 -->
+                   	YEAR (date) time
+                </when>
+                <when test="type == 2"><!-- 月度 -->
+                   	MONTH (date) time
+                </when>
+                <when test="type == 3"><!-- 周度 -->
+                   	WEEK (date) time
+                </when>
+                <when test="type == 4"><!-- 天 -->
+                   	date time
+                </when>
+                <otherwise>
+                     	date time
+                </otherwise>
+            </choose>
+				FROM
+					sys_date d
+			where  1=1
+			<if test="startTime==null and endTime==null">
+			 and d.date  between DATE_SUB(now(), INTERVAL 30 DAY)  and now() 
+			</if>
+			<if test="startTime!=null and startTime!=''">
+		   		and d.date   &gt;= #{startTime} 
+		   	</if>
+		   	<if test="endTime!=null and endTime!=''">
+		   		and d.date   &lt;= #{endTime} 
+		   	</if>	
+				GROUP BY
+			<choose>
+                <when test="type == 1"><!-- 年度 -->
+                   	YEAR (date)
+                </when>
+                <when test="type == 2"><!-- 月度 -->
+                   	MONTH (date)
+                </when>
+                <when test="type == 3"><!-- 周度 -->
+                   	WEEK (date)
+                </when>
+                <when test="type == 4"><!-- 天 -->
+                   	date
+                </when>
+                <otherwise>
+                     	date
+                </otherwise>
+            </choose>
+			) d
+		LEFT JOIN (
+			SELECT
+				'出库' NAME,
+				1 type,
+				SUM(volume) volume,
+				SUM(weight) weight,
+				SUM(number) number,
+				SUM(total) total,
+				<choose>
+                <when test="type == 1"><!-- 年度 -->
+                   	YEAR (return_time) time
+                </when>
+                <when test="type == 2"><!-- 月度 -->
+                   	MONTH (return_time) time
+                </when>
+                <when test="type == 3"><!-- 周度 -->
+                   	WEEK (return_time) time
+                </when>
+                <when test="type == 4"><!-- 天 -->
+                   	return_time time
+                </when>
+                <otherwise>
+                     	return_time time
+                </otherwise>
+            </choose>
+			FROM
+				stock_sale_return
+			WHERE
+				del_flag = 0
+			AND `status` > 1
+			<if test="clientId != null and clientId!=''">
+				and client_id = #{clientId}
+			</if>
+			GROUP BY
+			<choose>
+                <when test="type == 1"><!-- 年度 -->
+                   	YEAR (return_time)
+                </when>
+                <when test="type == 2"><!-- 月度 -->
+                   	MONTH (return_time)
+                </when>
+                <when test="type == 3"><!-- 周度 -->
+                   	WEEK (return_time)
+                </when>
+                <when test="type == 4"><!-- 天 -->
+                   	return_time
+                </when>
+                <otherwise>
+                     	return_time
+                </otherwise>
+            </choose>
+		) s ON d.time = s.time
+		
+  </select>
+  
+  <!-- 只能是今日得数量排序 -->
+  <select id="showclientCountAll" resultType="com.lzhpo.charts.entity.ClientCountWVQ" parameterType="java.util.Map">
+   	 	SELECT
+			client_short_name clientName,
+			return_time date,
+			IFNULL(r.volume,0) returnVolume,
+			IFNULL(r.weight,0)  returnWeight,
+			IFNULL(r.number,0)  returnNumber,
+			IFNULL(r.total,0)  returnTotal ,
+			IFNULL(t.volume,0)  takeoutVolume,
+			IFNULL(t.weight,0)  takeoutWeight,
+			IFNULL(t.number,0)  takeoutNumber,
+			IFNULL(t.total,0) takeoutTotal ,
+			IFNULL(s.volume,0)  storageVolume,
+			IFNULL(s.weight,0)  storageWeight,
+			IFNULL(s.number,0)  storageNumber,
+			IFNULL( s.total,0) storageTotal 
+		FROM
+		(SELECT id ,client_short_name
+		from client_basicdata	
+		where del_flag =0) client
+		LEFT JOIN 
+		(
+				SELECT
+					client_id,
+					return_time,
+					SUM(volume) volume,
+					SUM(weight) weight,
+					SUM(number) number,
+					SUM(total) total
+				FROM
+					stock_sale_return
+				WHERE
+					del_flag = 0
+				AND return_time = DATE_FORMAT(NOW(), '%Y-%m-%d')
+				AND `status` > 1
+				GROUP BY
+					client_id
+			) r on client.id = r.client_id
+		LEFT JOIN (
+			SELECT
+				client_id,
+				takeout_time,
+				SUM(volume) volume,
+				SUM(weight) weight,
+				SUM(number) number,
+				SUM(total) total
+			FROM
+				stock_takeout
+			WHERE
+				del_flag = 0
+			AND takeout_time = DATE_FORMAT(NOW(), '%Y-%m-%d')
+			AND `status` > 1
+			GROUP BY
+				client_id
+		) t ON r.client_id = t.client_id
+		LEFT JOIN (
+			SELECT
+				client_id,
+				storage_time,
+				SUM(volume) volume,
+				SUM(weight) weight,
+				SUM(number) number,
+				SUM(total) total
+			FROM
+				stock_storage
+			WHERE
+				del_flag = 0
+			AND storage_time = DATE_FORMAT(NOW(), '%Y-%m-%d')
+			AND `status` > 1
+			GROUP BY
+				client_id
+		) s ON r.client_id = s.client_id
+		<if test="type == 1"><!-- 按体积排序 -->
+			ORDER BY (returnVolume+takeoutVolume+storageVolume) LIMIT 0,10
+		</if>
+		<if test="type == 2"><!-- 按重量排序 -->
+			ORDER BY (returnWeight+takeoutWeight+storageWeight) LIMIT 0,10
+		</if>
+		<if test="type == 3"><!-- 按零数排序 -->
+			ORDER BY (returnNumber+takeoutNumber+storageNumber) LIMIT 0,10
+		</if>
+		<if test="type == 4"><!-- 按总数排序 -->
+			ORDER BY (returnTotal+takeoutTotal+storageTotal) LIMIT 0,10
+		</if>
+  </select>
+  
+  <!-- 按时间统计客户得出入库总方重 -->
+ 
+  <select id="showclientCountByTime" resultType="com.lzhpo.charts.entity.ClientCountWVQ" parameterType="java.util.Map">
+   	 	SELECT
+			client_short_name clientName,
+			return_time date,
+			IFNULL(r.volume,0) returnVolume,
+			IFNULL(r.weight,0)  returnWeight,
+			IFNULL(r.number,0)  returnNumber,
+			IFNULL(r.total,0)  returnTotal ,
+			IFNULL(t.volume,0)  takeoutVolume,
+			IFNULL(t.weight,0)  takeoutWeight,
+			IFNULL(t.number,0)  takeoutNumber,
+			IFNULL(t.total,0) takeoutTotal ,
+			IFNULL(s.volume,0)  storageVolume,
+			IFNULL(s.weight,0)  storageWeight,
+			IFNULL(s.number,0)  storageNumber,
+			IFNULL( s.total,0) storageTotal 
+		FROM
+		(SELECT id ,client_short_name
+		from client_basicdata	
+		where del_flag =0
+		<if test="clientId !=null and clientId !=''">
+			and id = #{clientId}
+		</if>
+		) client
+		LEFT JOIN 
+		(
+				SELECT
+					client_id,
+					return_time,
+					SUM(volume) volume,
+					SUM(weight) weight,
+					SUM(number) number,
+					SUM(total) total
+				FROM
+					stock_sale_return
+				WHERE
+					del_flag = 0
+				<include refid="returnWhere"/>
+				AND `status` > 1
+				GROUP BY
+					client_id
+			) r on client.id = r.client_id
+		LEFT JOIN (
+			SELECT
+				client_id,
+				takeout_time,
+				SUM(volume) volume,
+				SUM(weight) weight,
+				SUM(number) number,
+				SUM(total) total
+			FROM
+				stock_takeout
+			WHERE
+				del_flag = 0
+			<include refid="takeoutWhere"/>
+			AND `status` > 1
+			GROUP BY
+				client_id
+		) t ON r.client_id = t.client_id
+		LEFT JOIN (
+			SELECT
+				client_id,
+				storage_time,
+				SUM(volume) volume,
+				SUM(weight) weight,
+				SUM(number) number,
+				SUM(total) total
+			FROM
+				stock_storage
+			WHERE
+				del_flag = 0
+			<include refid="storageWhere"/>
+			AND `status` > 1
+			GROUP BY
+				client_id
+		) s ON r.client_id = s.client_id
+		<if test="start != null" >
+			<if test="limit != null" >
+				LIMIT #{start,jdbcType=INTEGER},#{limit,jdbcType=INTEGER}
+			</if>
+        </if>
+  </select>
+   <select id="showclientCountByTimeCount" resultType="java.lang.Long" parameterType="java.util.Map">
+   	 	select ifnull(count(1),0) from (
+   	 	SELECT
+			client_short_name clientName,
+			return_time date,
+			IFNULL(r.volume,0) returnVolume,
+			IFNULL(r.weight,0)  returnWeight,
+			IFNULL(r.number,0)  returnNumber,
+			IFNULL(r.total,0)  returnTotal ,
+			IFNULL(t.volume,0)  takeoutVolume,
+			IFNULL(t.weight,0)  takeoutWeight,
+			IFNULL(t.number,0)  takeoutNumber,
+			IFNULL(t.total,0) takeoutTotal ,
+			IFNULL(s.volume,0)  storageVolume,
+			IFNULL(s.weight,0)  storageWeight,
+			IFNULL(s.number,0)  storageNumber,
+			IFNULL( s.total,0) storageTotal 
+		FROM
+		(SELECT id ,client_short_name
+		from client_basicdata	
+		where del_flag =0
+		<if test="clientId !=null and clientId !=''">
+			and id = #{clientId}
+		</if>
+		) client
+		LEFT JOIN 
+		(
+				SELECT
+					client_id,
+					return_time,
+					SUM(volume) volume,
+					SUM(weight) weight,
+					SUM(number) number,
+					SUM(total) total
+				FROM
+					stock_sale_return
+				WHERE
+					del_flag = 0
+				<include refid="returnWhere"/>
+				AND `status` > 1
+				GROUP BY
+					client_id
+			) r on client.id = r.client_id
+		LEFT JOIN (
+			SELECT
+				client_id,
+				takeout_time,
+				SUM(volume) volume,
+				SUM(weight) weight,
+				SUM(number) number,
+				SUM(total) total
+			FROM
+				stock_takeout
+			WHERE
+				del_flag = 0
+			<include refid="takeoutWhere"/>
+			AND `status` > 1
+			GROUP BY
+				client_id
+		) t ON r.client_id = t.client_id
+		LEFT JOIN (
+			SELECT
+				client_id,
+				storage_time,
+				SUM(volume) volume,
+				SUM(weight) weight,
+				SUM(number) number,
+				SUM(total) total
+			FROM
+				stock_storage
+			WHERE
+				del_flag = 0
+			<include refid="storageWhere"/>
+			AND `status` > 1
+			GROUP BY
+				client_id
+		) s ON r.client_id = s.client_id
+		) temp 
+  </select>
+  <!-- 客户单据量 -->
+  <select id="listClientDocumentQuantity" resultType="com.lzhpo.charts.entity.DocumentQuantity" parameterType="map">
+		SELECT
+			c.id,
+			c.client_name clientName,
+			c.client_short_name,
+			IFNULL(s.count,0) storageCount,
+			IFNULL(t.count,0) takeoutCount,
+			IFNULL(sa.count,0) returnCout,
+			IFNULL(zl.count,0) zlCount,
+			IFNULL(zbl.count,0) zblCount,
+  			IFNULL(s.count,0)+IFNULL(t.count,0)+IFNULL(sa.count,0)+IFNULL(zl.count,0)+IFNULL(zbl.count,0) allCount
+		FROM
+			(
+				SELECT
+					*
+				FROM
+					client_basicdata
+				WHERE
+					del_flag = 0
+			) c
+		LEFT JOIN (
+			SELECT
+				client_id,
+				count(1) count
+			FROM
+				stock_storage
+			WHERE
+				del_flag = 0
+				<include refid="storageWhere"/>
+			GROUP BY
+				client_id
+		) s ON c.id = s.client_id
+		LEFT JOIN (
+			SELECT
+				client_id,
+				count(1) count
+			FROM
+				stock_takeout
+			WHERE
+				del_flag = 0
+				<include refid="takeoutWhere"/>
+			GROUP BY
+				client_id
+		) t ON c.id = t.client_id
+		LEFT JOIN (
+			SELECT
+				client_id,
+				count(1) count
+			FROM
+				stock_sale_return
+			
+			WHERE
+				del_flag = 0 	<include refid="returnWhere"/>
+			GROUP BY
+				client_id
+		) sa ON c.id = sa.client_id
+		LEFT JOIN (
+			SELECT
+				client_id,
+				count(1) count
+			FROM
+				warehouse_material_manage
+			WHERE
+				del_flag = 0  and `status`=1
+				<include refid="manageWhere"/>
+			GROUP BY
+				client_id
+		) zl ON c.id = zl.client_id
+		LEFT JOIN (
+			SELECT
+				client_id,
+				count(1) count
+			FROM
+				warehouse_material_manage
+			WHERE
+				del_flag = 0  and `status`=2
+				<include refid="manageWhere"/>
+			GROUP BY
+				client_id
+		) zbl ON c.id = zbl.client_id 
+		where 1=1
+		<if test="clientId!=null and clientId!=''">
+			and c.id = #{clientId}
+		</if>		
+		<if test="start != null" >
+			<if test="limit != null" >
+				LIMIT #{start,jdbcType=INTEGER},#{limit,jdbcType=INTEGER}
+			</if>
+        </if>
+	</select>
+	
+	 <select id="countClientDocumentQuantity" resultType="java.lang.Long" parameterType="map">
+	 select IFNULL(count(1),0) count from (
+		SELECT
+			c.id,
+			c.client_name clientName,
+			c.client_short_name,
+			IFNULL(s.count,0) storageCount,
+			IFNULL(t.count,0) takeoutCount,
+			IFNULL(sa.count,0) returnCout,
+			IFNULL(zl.count,0) zlCount,
+			IFNULL(zbl.count,0) zblCount
+		FROM
+			(
+				SELECT
+					*
+				FROM
+					client_basicdata
+				WHERE
+					del_flag = 0
+			) c
+		LEFT JOIN (
+			SELECT
+				client_id,
+				count(1) count
+			FROM
+				stock_storage
+			WHERE
+				del_flag = 0
+				<include refid="storageWhere"/>
+			GROUP BY
+				client_id
+		) s ON c.id = s.client_id
+		LEFT JOIN (
+			SELECT
+				client_id,
+				count(1) count
+			FROM
+				stock_takeout
+			WHERE
+				del_flag = 0
+				<include refid="takeoutWhere"/>
+			GROUP BY
+				client_id
+		) t ON c.id = t.client_id
+		LEFT JOIN (
+			SELECT
+				client_id,
+				count(1) count
+			FROM
+				stock_sale_return
+				
+			WHERE
+				del_flag = 0
+				<include refid="returnWhere"/>
+			GROUP BY
+				client_id
+		) sa ON c.id = sa.client_id
+		LEFT JOIN (
+			SELECT
+				client_id,
+				count(1) count
+			FROM
+				warehouse_material_manage
+			WHERE
+				del_flag = 0  and `status`=1
+				<include refid="manageWhere"/>
+			GROUP BY
+				client_id
+		) zl ON c.id = zl.client_id
+		LEFT JOIN (
+			SELECT
+				client_id,
+				count(1) count
+			FROM
+				warehouse_material_manage
+			WHERE
+				del_flag = 0  and `status`=2
+				<include refid="manageWhere"/>
+			GROUP BY
+				client_id
+		) zbl ON c.id = zbl.client_id 
+		where 1=1
+		<if test="clientId!=null and clientId!=''">
+			and c.id = #{clientId}
+		</if>		
+		) temp 
+	</select>
+	<select id="listStorageDocumentQuantity" resultType="com.lzhpo.charts.entity.DocumentQuantity" parameterType="map">
+		SELECT
+			client_id id,
+			<choose>
+                <when test="clientId!=null and clientId!=''">
+                   	c.client_name clientName,
+                </when>
+                <otherwise>
+                    '合计' clientName,
+                </otherwise>
+            </choose>
+			count(1) count,
+			<choose>
+                <when test="type == 1"><!-- 年度 -->
+                   	YEAR (storage_time) time
+                </when>
+                <when test="type == 2"><!-- 月度 -->
+                   	MONTH (storage_time) time
+                </when>
+                <when test="type == 3"><!-- 周度 -->
+                   	WEEK (storage_time) time
+                </when>
+                <when test="type == 4"><!-- 天 -->
+                   	storage_time time
+                </when>
+                <otherwise>
+                     	YEAR (storage_time) time
+                </otherwise>
+            </choose>
+		FROM
+			stock_storage s
+		LEFT JOIN client_basicdata c ON s.client_id = c.id
+		WHERE
+			s.del_flag = 0
+			<include refid="storageWhere"/>
+			<if test="clientId!=null and clientId!=''">
+				and c.id = #{clientId}
+			</if>
+		GROUP BY
+			<choose>
+                <when test="type == 1"><!-- 年度 -->
+                   	YEAR (storage_time)
+                </when>
+                <when test="type == 2"><!-- 月度 -->
+                   	MONTH (storage_time)
+                </when>
+                <when test="type == 3"><!-- 周度 -->
+                   	WEEK (storage_time)
+                </when>
+                <when test="type == 4"><!-- 天 -->
+                   	storage_time
+                </when>
+                <otherwise>
+                     	YEAR (storage_time)
+                </otherwise>
+            </choose>
+			ORDER BY time
+	</select>
+		<select id="listTakeoutDocumentQuantity" resultType="com.lzhpo.charts.entity.DocumentQuantity" parameterType="map">
+		SELECT
+			client_id id,
+			<choose>
+                <when test="clientId!=null and clientId!=''">
+                   	c.client_name clientName,
+                </when>
+                <otherwise>
+                    '合计' clientName,
+                </otherwise>
+            </choose>
+			count(1) count,
+			<choose>
+                <when test="type == 1"><!-- 年度 -->
+                   	YEAR (takeout_time) time
+                </when>
+                <when test="type == 2"><!-- 月度 -->
+                   	MONTH (takeout_time) time
+                </when>
+                <when test="type == 3"><!-- 周度 -->
+                   	WEEK (takeout_time) time
+                </when>
+                <when test="type == 4"><!-- 天 -->
+                   	takeout_time time
+                </when>
+                <otherwise>
+                     	YEAR (takeout_time) time
+                </otherwise>
+            </choose>
+		FROM
+			stock_takeout s
+		LEFT JOIN client_basicdata c ON s.client_id = c.id
+		WHERE
+			s.del_flag = 0
+			<include refid="takeoutWhere"/>
+			<if test="clientId!=null and clientId!=''">
+				and c.id = #{clientId}
+			</if>
+		GROUP BY
+			<choose>
+                <when test="type == 1"><!-- 年度 -->
+                   	YEAR (takeout_time)
+                </when>
+                <when test="type == 2"><!-- 月度 -->
+                   	MONTH (takeout_time)
+                </when>
+                <when test="type == 3"><!-- 周度 -->
+                   	WEEK (takeout_time)
+                </when>
+                <when test="type == 4"><!-- 天 -->
+                   	takeout_time
+                </when>
+                <otherwise>
+                     	YEAR (takeout_time)
+                </otherwise>
+            </choose>
+			ORDER BY time
+	</select>
+	
+		<select id="listReturnDocumentQuantity" resultType="com.lzhpo.charts.entity.DocumentQuantity" parameterType="map">
+		SELECT
+			client_id id,
+			<choose>
+                <when test="clientId!=null and clientId!=''">
+                   	c.client_name clientName,
+                </when>
+                <otherwise>
+                    '合计' clientName,
+                </otherwise>
+            </choose>
+			count(1) count,
+			<choose>
+                <when test="type == 1"><!-- 年度 -->
+                   	YEAR (return_time) time
+                </when>
+                <when test="type == 2"><!-- 月度 -->
+                   	MONTH (return_time) time
+                </when>
+                <when test="type == 3"><!-- 周度 -->
+                   	WEEK (return_time) time
+                </when>
+                <when test="type == 4"><!-- 天 -->
+                   	return_time time
+                </when>
+                <otherwise>
+                     	YEAR (return_time) time
+                </otherwise>
+            </choose>
+		FROM
+			stock_sale_return s
+		LEFT JOIN client_basicdata c ON s.client_id = c.id
+		WHERE
+			s.del_flag = 0
+			<include refid="returnWhere"/>
+			<if test="clientId!=null and clientId!=''">
+				and c.id = #{clientId}
+			</if>
+		GROUP BY
+			<choose>
+                <when test="type == 1"><!-- 年度 -->
+                   	YEAR (return_time)
+                </when>
+                <when test="type == 2"><!-- 月度 -->
+                   	MONTH (return_time)
+                </when>
+                <when test="type == 3"><!-- 周度 -->
+                   	WEEK (return_time)
+                </when>
+                <when test="type == 4"><!-- 天 -->
+                   	return_time
+                </when>
+                <otherwise>
+                     	YEAR (return_time)
+                </otherwise>
+            </choose>
+			ORDER BY time
+	</select>
+	
+		<select id="listZLDocumentQuantity" resultType="com.lzhpo.charts.entity.DocumentQuantity" parameterType="map">
+		SELECT
+			client_id id,
+			<choose>
+                <when test="clientId!=null and clientId!=''">
+                   	c.client_name clientName,
+                </when>
+                <otherwise>
+                    '合计' clientName,
+                </otherwise>
+            </choose>
+			count(1) count,
+			<choose>
+                <when test="type == 1"><!-- 年度 -->
+                   	YEAR (time) time
+                </when>
+                <when test="type == 2"><!-- 月度 -->
+                   	MONTH (time) time
+                </when>
+                <when test="type == 3"><!-- 周度 -->
+                   	WEEK (time) time
+                </when>
+                <when test="type == 4"><!-- 天 -->
+                   	time time
+                </when>
+                <otherwise>
+                     	YEAR (time) time
+                </otherwise>
+            </choose>
+		FROM
+				warehouse_material_manage s
+			
+		LEFT JOIN client_basicdata c ON s.client_id = c.id
+		WHERE
+			s.del_flag = 0 and `status`=1
+			<include refid="manageWhere"/>
+			<if test="clientId!=null and clientId!=''">
+				and c.id = #{clientId}
+			</if>
+		GROUP BY
+			<choose>
+                <when test="type == 1"><!-- 年度 -->
+                   	YEAR (time)
+                </when>
+                <when test="type == 2"><!-- 月度 -->
+                   	MONTH (time)
+                </when>
+                <when test="type == 3"><!-- 周度 -->
+                   	WEEK (time)
+                </when>
+                <when test="type == 4"><!-- 天 -->
+                   	time
+                </when>
+                <otherwise>
+                     	YEAR (time)
+                </otherwise>
+            </choose>
+			ORDER BY time
+	</select>
+	
+	<select id="listZBLDocumentQuantity" resultType="com.lzhpo.charts.entity.DocumentQuantity" parameterType="map">
+		SELECT
+			client_id id,
+			<choose>
+                <when test="clientId!=null and clientId!=''">
+                   	c.client_name clientName,
+                </when>
+                <otherwise>
+                    '合计' clientName,
+                </otherwise>
+            </choose>
+			count(1) count,
+			<choose>
+                <when test="type == 1"><!-- 年度 -->
+                   	YEAR (time) time
+                </when>
+                <when test="type == 2"><!-- 月度 -->
+                   	MONTH (time) time
+                </when>
+                <when test="type == 3"><!-- 周度 -->
+                   	WEEK (time) time
+                </when>
+                <when test="type == 4"><!-- 天 -->
+                   	time time
+                </when>
+                <otherwise>
+                     	YEAR (time) time
+                </otherwise>
+            </choose>
+		FROM
+				warehouse_material_manage s
+		
+		LEFT JOIN client_basicdata c ON s.client_id = c.id
+				WHERE
+			s.del_flag = 0 and `status`=2
+			<include refid="manageWhere"/>
+			<if test="clientId!=null and clientId!=''">
+				and c.id = #{clientId}
+			</if>
+		GROUP BY
+			<choose>
+                <when test="type == 1"><!-- 年度 -->
+                   	YEAR (time)
+                </when>
+                <when test="type == 2"><!-- 月度 -->
+                   	MONTH (time)
+                </when>
+                <when test="type == 3"><!-- 周度 -->
+                   	WEEK (time)
+                </when>
+                <when test="type == 4"><!-- 天 -->
+                   	time
+                </when>
+                <otherwise>
+                     	YEAR (time)
+                </otherwise>
+            </choose>
+			ORDER BY time
+	</select>
+	
+	 <select id="showStorageCountItem" resultMap="StorageCount" parameterType="java.util.Map">
+   	 	SELECT
+				d.time date,
+				IFNULL(volume,0) volume, 
+				IFNULL(weight,0) weight,
+				IFNULL(number,0) number,
+				IFNULL(total,0) total
+		FROM
+			(
+				SELECT
+			<choose>
+                <when test="type == 1"><!-- 年度 -->
+                   	YEAR (date) time
+                </when>
+                <when test="type == 2"><!-- 月度 -->
+                   	MONTH (date) time
+                </when>
+                <when test="type == 3"><!-- 周度 -->
+                   	WEEK (date) time
+                </when>
+                <when test="type == 4"><!-- 天 -->
+                   	date time
+                </when>
+                <otherwise>
+                     	date time
+                </otherwise>
+            </choose>
+				FROM
+					sys_date d
+			where  1=1
+			<if test="startTime==null and endTime==null">
+			 and d.date  between DATE_SUB(now(), INTERVAL 30 DAY)  and now() 
+			</if>
+			<if test="startTime!=null and startTime!=''">
+		   		and d.date   &gt;= #{startTime} 
+		   	</if>
+		   	<if test="endTime!=null and endTime!=''">
+		   		and d.date   &lt;= #{endTime} 
+		   	</if>	
+				GROUP BY
+			<choose>
+                <when test="type == 1"><!-- 年度 -->
+                   	YEAR (date)
+                </when>
+                <when test="type == 2"><!-- 月度 -->
+                   	MONTH (date)
+                </when>
+                <when test="type == 3"><!-- 周度 -->
+                   	WEEK (date)
+                </when>
+                <when test="type == 4"><!-- 天 -->
+                   	date
+                </when>
+                <otherwise>
+                     	date
+                </otherwise>
+            </choose>
+			) d
+		LEFT JOIN (
+			SELECT
+				i.NAME,
+				CEILING(sum(d.number) / i.unit_rate) total,
+				d.number,
+				CEILING(sum(d.number) / i.unit_rate) * i.item_volume volume,
+				CEILING(sum(d.number) / i.unit_rate) * i.item_weight weight,
+				<choose>
+                <when test="type == 1"><!-- 年度 -->
+                   	YEAR (storage_time) time
+                </when>
+                <when test="type == 2"><!-- 月度 -->
+                   	MONTH (storage_time) time
+                </when>
+                <when test="type == 3"><!-- 周度 -->
+                   	WEEK (storage_time) time
+                </when>
+                <when test="type == 4"><!-- 天 -->
+                   	storage_time time
+                </when>
+                <otherwise>
+                     	storage_time time
+                </otherwise>
+            </choose>
+			FROM
+				stock_storage_detail d
+			LEFT JOIN stock_storage s ON d.storage_id = s.id
+			LEFT JOIN material_item_clientitem i ON d.item_id = i.id
+			WHERE
+				s.del_flag = 0
+			AND s. STATUS > 1
+			<if test="itemId != null and itemId !=''">
+				and i.id = #{itemId}
+			</if>
+			GROUP BY
+			<choose>
+                <when test="type == 1"><!-- 年度 -->
+                   	YEAR (storage_time)
+                </when>
+                <when test="type == 2"><!-- 月度 -->
+                   	MONTH (storage_time)
+                </when>
+                <when test="type == 3"><!-- 周度 -->
+                   	WEEK (storage_time)
+                </when>
+                <when test="type == 4"><!-- 天 -->
+                   	storage_time
+                </when>
+                <otherwise>
+                     	storage_time
+                </otherwise>
+            </choose>
+            ,item_id
+		) s ON d.time = s.time
+		
+  </select>
+  
+  <select id="showTakeoutCountItem" resultMap="StorageCount" parameterType="java.util.Map">
+   	 	SELECT
+				d.time date,
+				IFNULL(volume,0) volume, 
+				IFNULL(weight,0) weight,
+				IFNULL(number,0) number,
+				IFNULL(total,0) total
+		FROM
+			(
+				SELECT
+			<choose>
+                <when test="type == 1"><!-- 年度 -->
+                   	YEAR (date) time
+                </when>
+                <when test="type == 2"><!-- 月度 -->
+                   	MONTH (date) time
+                </when>
+                <when test="type == 3"><!-- 周度 -->
+                   	WEEK (date) time
+                </when>
+                <when test="type == 4"><!-- 天 -->
+                   	date time
+                </when>
+                <otherwise>
+                     	date time
+                </otherwise>
+            </choose>
+				FROM
+					sys_date d
+			where  1=1
+			<if test="startTime==null and endTime==null">
+			 and d.date  between DATE_SUB(now(), INTERVAL 30 DAY)  and now() 
+			</if>
+			<if test="startTime!=null and startTime!=''">
+		   		and d.date   &gt;= #{startTime} 
+		   	</if>
+		   	<if test="endTime!=null and endTime!=''">
+		   		and d.date   &lt;= #{endTime} 
+		   	</if>	
+				GROUP BY
+			<choose>
+                <when test="type == 1"><!-- 年度 -->
+                   	YEAR (date)
+                </when>
+                <when test="type == 2"><!-- 月度 -->
+                   	MONTH (date)
+                </when>
+                <when test="type == 3"><!-- 周度 -->
+                   	WEEK (date)
+                </when>
+                <when test="type == 4"><!-- 天 -->
+                   	date
+                </when>
+                <otherwise>
+                     	date
+                </otherwise>
+            </choose>
+			) d
+		LEFT JOIN (
+			SELECT
+				i.NAME,
+				CEILING(sum(d.number) / i.unit_rate) total,
+				d.number,
+				CEILING(sum(d.number) / i.unit_rate) * i.item_volume volume,
+				CEILING(sum(d.number) / i.unit_rate) * i.item_weight weight,
+				<choose>
+                <when test="type == 1"><!-- 年度 -->
+                   	YEAR (takeout_time) time
+                </when>
+                <when test="type == 2"><!-- 月度 -->
+                   	MONTH (takeout_time) time
+                </when>
+                <when test="type == 3"><!-- 周度 -->
+                   	WEEK (takeout_time) time
+                </when>
+                <when test="type == 4"><!-- 天 -->
+                   	takeout_time time
+                </when>
+                <otherwise>
+                     	takeout_time time
+                </otherwise>
+            </choose>
+			FROM
+				stock_takeout_detail d
+			LEFT JOIN stock_takeout s ON d.takeout_id = s.id
+			LEFT JOIN material_item_clientitem i ON d.item_id = i.id
+			WHERE
+				s.del_flag = 0
+			AND s. STATUS > 1
+			<if test="itemId != null and itemId !=''">
+				and i.id = #{itemId}
+			</if>
+			GROUP BY
+			<choose>
+                <when test="type == 1"><!-- 年度 -->
+                   	YEAR (takeout_time)
+                </when>
+                <when test="type == 2"><!-- 月度 -->
+                   	MONTH (takeout_time)
+                </when>
+                <when test="type == 3"><!-- 周度 -->
+                   	WEEK (takeout_time)
+                </when>
+                <when test="type == 4"><!-- 天 -->
+                   	takeout_time
+                </when>
+                <otherwise>
+                     	takeout_time
+                </otherwise>
+            </choose>
+            ,item_id
+		) s ON d.time = s.time
+		
+  </select>
+  
+    <select id="showReturnCountItem" resultMap="StorageCount" parameterType="java.util.Map">
+   	 	SELECT
+				d.time date,
+				IFNULL(volume,0) volume, 
+				IFNULL(weight,0) weight,
+				IFNULL(number,0) number,
+				IFNULL(total,0) total
+		FROM
+			(
+				SELECT
+			<choose>
+                <when test="type == 1"><!-- 年度 -->
+                   	YEAR (date) time
+                </when>
+                <when test="type == 2"><!-- 月度 -->
+                   	MONTH (date) time
+                </when>
+                <when test="type == 3"><!-- 周度 -->
+                   	WEEK (date) time
+                </when>
+                <when test="type == 4"><!-- 天 -->
+                   	date time
+                </when>
+                <otherwise>
+                     	date time
+                </otherwise>
+            </choose>
+				FROM
+					sys_date d
+			where  1=1
+			<if test="startTime==null and endTime==null">
+			 and d.date  between DATE_SUB(now(), INTERVAL 30 DAY)  and now() 
+			</if>
+			<if test="startTime!=null and startTime!=''">
+		   		and d.date   &gt;= #{startTime} 
+		   	</if>
+		   	<if test="endTime!=null and endTime!=''">
+		   		and d.date   &lt;= #{endTime} 
+		   	</if>	
+				GROUP BY
+			<choose>
+                <when test="type == 1"><!-- 年度 -->
+                   	YEAR (date)
+                </when>
+                <when test="type == 2"><!-- 月度 -->
+                   	MONTH (date)
+                </when>
+                <when test="type == 3"><!-- 周度 -->
+                   	WEEK (date)
+                </when>
+                <when test="type == 4"><!-- 天 -->
+                   	date
+                </when>
+                <otherwise>
+                     	date
+                </otherwise>
+            </choose>
+			) d
+		LEFT JOIN (
+			SELECT
+				i.NAME,
+				CEILING(sum(d.number) / i.unit_rate) total,
+				d.number,
+				CEILING(sum(d.number) / i.unit_rate) * i.item_volume volume,
+				CEILING(sum(d.number) / i.unit_rate) * i.item_weight weight,
+				<choose>
+                <when test="type == 1"><!-- 年度 -->
+                   	YEAR (return_time) time
+                </when>
+                <when test="type == 2"><!-- 月度 -->
+                   	MONTH (return_time) time
+                </when>
+                <when test="type == 3"><!-- 周度 -->
+                   	WEEK (return_time) time
+                </when>
+                <when test="type == 4"><!-- 天 -->
+                   	return_time time
+                </when>
+                <otherwise>
+                     	return_time time
+                </otherwise>
+            </choose>
+			FROM
+				stock_sale_return_detail d
+			LEFT JOIN stock_sale_return s ON d.sales_return_id = s.id
+			LEFT JOIN material_item_clientitem i ON d.item_id = i.id
+			WHERE
+				s.del_flag = 0
+			AND s. STATUS > 1
+			<if test="itemId != null and itemId !=''">
+				and i.id = #{itemId}
+			</if>
+			GROUP BY
+			<choose>
+                <when test="type == 1"><!-- 年度 -->
+                   	YEAR (return_time)
+                </when>
+                <when test="type == 2"><!-- 月度 -->
+                   	MONTH (return_time)
+                </when>
+                <when test="type == 3"><!-- 周度 -->
+                   	WEEK (return_time)
+                </when>
+                <when test="type == 4"><!-- 天 -->
+                   	return_time
+                </when>
+                <otherwise>
+                     	return_time
+                </otherwise>
+            </choose>
+            ,item_id
+		) s ON d.time = s.time
+		
+  </select>
+</mapper>

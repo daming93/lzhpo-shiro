@@ -146,6 +146,10 @@ window.viewObj = {
                     
                 }
                 $("#number").val("");
+                //执行清空
+                $("#itemId").val("");
+                //重新渲染
+                form.render("select");
                 $("#itemId").parent().find('input:first').val("");
                 $("#itemId").parent().find('input:first').click();
                 $("#itemId").parent().find('input:first').focus();

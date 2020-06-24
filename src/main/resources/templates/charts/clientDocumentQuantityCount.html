@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html style="height: 100%">
+   <head>
+       <meta charset="utf-8">
+   </head>
+   <body style="height: 100%; margin: 0">
+<fieldset class="layui-elem-field">
+    <legend>选项检索</legend>
+    <div class="layui-field-box">
+        <form class="layui-form">
+            <div class="layui-inline">
+                <select name="s_clientId" id="clientId" class="form-control1" lay-verify="" lay-search>
+                    <option value="">请选择客户</option>
+                    <option th:each="basic:${basicDatas}" th:value="${basic.id}" lay-verify="required" th:text="${basic.clientShortName}"></option>
+                </select>
+            </div> 
+            <div class="layui-inline">
+                <label class="layui-form-label">时间范围</label>
+            </div>
+           <div class="layui-inline">
+                <input type="text" value="" id="startTime" name="s_startTime" placeholder="开始时间" class="layui-input layTime">
+            </div>
+            <div class="layui-inline">
+                <input type="text" value="" id="overTime" name="s_endTime"  placeholder="结束时间" class="layui-input layTime">
+            </div>
+            <div class="layui-inline">
+                <input type="radio" name="s_type" value="1" title="年" checked >
+                <input type="radio" name="s_type" value="2" title="月" >
+                <input type="radio" name="s_type" value="3" title="周" >
+                <input type="radio" name="s_type" value="4" title="日" >
+            </div>
+            <div class="layui-input-inline">
+                <a class="layui-btn" lay-submit="" onclick="searchForm()">查询</a>
+            </div>
+        </form>
+    </div>
+</fieldset>
+     <div class="layui-form-item">
+        <fieldset class="layui-elem-field layui-field-title" style="margin-top: 30px;margin-left: 10px;">
+                 <legend>提示：用年方式进行统计，时间区域长度应超过一年，在使用月，周时，时间区域长度不应超过一年，用日统计得时候不建议使用长时间段</legend>
+        </fieldset>
+    </div>
+   
+     <div id="takeoutMonth"  style="height: 100%"></div>        
+     <input type="hidden" id="mode" th:value="${mode}">
+       <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
+       <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts-gl/dist/echarts-gl.min.js"></script>
+       <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts-stat/dist/ecStat.min.js"></script>
+       <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts/dist/extension/dataTool.min.js"></script>
+       <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts/map/js/china.js"></script>
+       <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts/map/js/world.js"></script>
+       <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts/dist/extension/bmap.min.js"></script>
+       <script type="text/javascript" th:src="@{/static/layui/layui.js}"></script>
+        <script type="text/javascript" th:src="@{/static/layui/js/jquery-1.8.0.min.js}"></script>
+        <link rel="stylesheet" th:href="@{/static/layui/css/layui.css}" media="all" />
+        <style type="text/css">
+            .layui-form-item .layui-inline{ min-width:15%; float:left; margin-right:0; }
+            .layui-form-item .abnormity-box {
+                position: relative;
+            }
+       </style>
+       <script type="text/javascript">
+
+                //时间控件
+        layui.use('laydate', function(){
+          var laydate = layui.laydate;
+          
+          //执行一个laydate实例
+          laydate.render({
+            elem: '#startTime' //指定元素
+          });
+          var laydate2 = layui.laydate;
+          
+          //执行一个laydate实例
+          laydate2.render({
+            elem: '#overTime' //指定元素
+          });
+        });
+
+        layui.use(['layer','form','table'], function() {
+            var layer = layui.layer,
+                $ = layui.jquery,
+                form = layui.form,
+                table = layui.table,
+                t; //表格变量
+
+
+          
+            $('.layui-inline .layui-btn').on('click', function(){
+                var type = $(this).data('type');
+                active[type] ? active[type].call(this) : '';
+            });
+           
+        
+        });
+
+        $(function(){
+                searchForm()
+        });
+  function searchForm(){
+    var clientName ='';
+    
+    var clientId = $("#clientId").val();
+    if(clientId){
+        clientName+=$("#clientId").find("option:selected").text();
+    }
+    var startTime = $("#startTime").val();
+    if(startTime){
+         clientName+=startTime+'开始';
+    }
+    var endTime = $("#overTime").val();
+    if(endTime){
+        clientName+=endTime+'截止';
+    }
+    var typeStr = $('input:radio:checked').val();
+    if(typeStr){
+        clientName+='按'+$('input:radio:checked').attr("title")+'方式得';
+    }
+    var mode = $("#mode").val();
+    if(mode==1){
+       clientName+='入库单据量统计'
+    }else if(mode==2){
+       clientName+='出库单据量统计'
+    }else if(mode==3){
+       clientName+='退库单据量统计'
+    }else if(mode==4){
+       clientName+='转良单据量统计'
+    }else if(mode==5){
+       clientName+='转不良单据量统计'
+    }
+     //30日内出库总方重
+     $.ajax({
+          url: "/charts/count/countStorageDocumentQuantity?clientId="+clientId+"&startTime="+startTime+"&endTime="+endTime+"&type="+typeStr+"&mode="+mode
+          ,type:"get"
+          ,async:false
+          ,dataType:"json"
+          , success: function(result){
+              var takeoutMonthdom = document.getElementById("takeoutMonth");
+              var takeoutMonthChart = echarts.init(takeoutMonthdom);
+              var app = {};
+                takeoutMonthOption = null;
+                takeoutMonthOption = {
+                    title: {
+                        text: clientName
+                    },
+                    tooltip: {
+                        trigger: 'axis'
+                    },
+                    grid: {
+                        left: '3%',
+                        right: '4%',
+                        bottom: '3%',
+                        containLabel: true
+                    },
+                    toolbox: {
+                        feature: {
+                            saveAsImage: {}
+                        }
+                    },
+                    xAxis: {
+                        type: 'category',
+                        boundaryGap: false,
+                        data: result.time
+                    },
+                    yAxis: {
+                        type: 'value'
+                    },
+                    series: [
+                        {
+                            name: '统计量',
+                            type: 'line',
+                            data:  result.count,
+                        }
+                    ]
+                };
+                ;
+                if (takeoutMonthOption && typeof takeoutMonthOption === "object") {
+                    takeoutMonthChart.setOption(takeoutMonthOption, true);
+                }  
+
+              tableData=result.data;
+          }
+        });
+
+  }
+   </script>
+   </body>
+</html>

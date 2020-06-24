@@ -1,6 +1,11 @@
 package com.lzhpo.material.item.mapper;
 
 import com.lzhpo.material.item.entity.Clientitem;
+
+import java.util.List;
+
+import org.apache.ibatis.annotations.Param;
+
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**
@@ -12,5 +17,6 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  * @since 2020-04-16
  */
 public interface ClientitemMapper extends BaseMapper<Clientitem> {
+	public List<Clientitem> selectByClientId(@Param("clientId") String clientId);
 
 }

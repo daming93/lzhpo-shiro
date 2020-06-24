@@ -10,27 +10,9 @@ layui.use(['layer','form','table'], function() {
         if(obj.event === 'print'){
             window.open("/stock/takeout/printPick?id="+data.id);
         }
-        if(obj.event === "history"){
-           $('#show').html("");//清空上一个
-           $.post("/stock/takeout/history",{"takeoutId":data.id},function (res){
-                        var html ='<ul class="layui-timeline">';
-                        for(i in res){
-                            html+= ' <li class="layui-timeline-item"> <i class="layui-icon layui-timeline-axis">&#xe63f;</i>                <div class="layui-timeline-content layui-text">'
-                           +'<h3 class="layui-timeline-title">'+res[i].createDate+'</h3><p>'+
-                                '<br>'+res[i].createUser.nickName+'对该张单据进行了'+ res[i].typeStr+'操作'+
-                              '</p> </div>  </li>  ';
-                        }
-                        html += '</ul>';
-                        $('#show').html(html);
-                        layer.open({
-                            type: 1,
-                            area: '300px',
-                            content: $('#show') //这里content是一个DOM，注意：最好该元素要存放在body最外层，否则可能被其它的相对元素所影响
-                        });       
-                    });
-         }
+     
          if(obj.event === "history"){
-           $('#show').html("");//清空上一个
+           $('#showpick').html("");//清空上一个
            $.post("/stock/takeout/history",{"takeoutId":data.id},function (res){
                         var html ='<ul class="layui-timeline">';
                         for(i in res){
@@ -40,11 +22,11 @@ layui.use(['layer','form','table'], function() {
                               '</p> </div>  </li>  ';
                         }
                         html += '</ul>';
-                        $('#show').html(html);
+                        $('#showpick').html(html);
                         layer.open({
                             type: 1,
                             area: '300px',
-                            content: $('#show') //这里content是一个DOM，注意：最好该元素要存放在body最外层，否则可能被其它的相对元素所影响
+                            content: $('#showpick') //这里content是一个DOM，注意：最好该元素要存放在body最外层，否则可能被其它的相对元素所影响
                         });       
                     });
          }

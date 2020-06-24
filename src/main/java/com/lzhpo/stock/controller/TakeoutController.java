@@ -131,6 +131,8 @@ public class TakeoutController {
 				takeoutWrapper.le("create_date", overTime);
 			}
 		}
+		takeoutWrapper.orderByAsc("status");
+		takeoutWrapper.orderByDesc("takeout_time");
 		IPage<Takeout> takeoutPage = takeoutService.page(new Page<>(page, limit), takeoutWrapper);
 		takeoutPageData.setCount(takeoutPage.getTotal());
 		takeoutPageData.setData(setUserToTakeout(takeoutPage.getRecords()));

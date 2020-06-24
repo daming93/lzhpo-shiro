@@ -16,12 +16,12 @@ layui.use(['layer','form','table'], function() {
         var data = obj.data;
         if(obj.event === 'edit'){
             var editIndex = layer.open({
-                title : "编辑入库",
+                title : "编辑退库",
                 type : 2,
                 content : "/stock/saleReturn/edit?id="+data.id,
                 success : function(layero, index){
                     setTimeout(function(){
-                        layer.tips('点击此处返回入库列表', '.layui-layer-setwin .layui-layer-close', {
+                        layer.tips('点击此处返回退库列表', '.layui-layer-setwin .layui-layer-close', {
                             tips: 3
                         });
                     },500);
@@ -34,7 +34,7 @@ layui.use(['layer','form','table'], function() {
             layer.full(editIndex);
         }
         if(obj.event === "del"){
-            layer.confirm("你确定要删除该入库么？",{btn:['是的,我确定','我再想想']},
+            layer.confirm("你确定要删除该退库么？",{btn:['是的,我确定','我再想想']},
                 function(){
                     $.post("/stock/saleReturn/delete",{"id":data.id},function (res){
                         if(res.success){
@@ -49,7 +49,7 @@ layui.use(['layer','form','table'], function() {
             )
         }
         if(obj.event === "back"){
-            layer.confirm("你确定要撤销该入库么？",{btn:['是的,我确定','我再想想']},
+            layer.confirm("你确定要撤销该退库么？",{btn:['是的,我确定','我再想想']},
                 function(){
                     $.post("/stock/saleReturn/back",{"id":data.id,"status":1},function (res){
                         if(res.success){
@@ -93,12 +93,12 @@ layui.use(['layer','form','table'], function() {
     table.on('rowDouble(saleReturnList)', function(obj){
         var data = obj.data;
         var editIndex = layer.open({
-            title : "入库详情",
+            title : "退库详情",
             type : 2,
             content : "/stock/saleReturn/edit?id="+data.id,
             success : function(layero, index){
                 setTimeout(function(){
-                    layer.tips('点击此处返回入库列表', '.layui-layer-setwin .layui-layer-close', {
+                    layer.tips('点击此处返回退库列表', '.layui-layer-setwin .layui-layer-close', {
                         tips: 3
                     });
                 },500);
@@ -116,7 +116,7 @@ layui.use(['layer','form','table'], function() {
         url:'/stock/saleReturn/list',
         method:'post',
         toolbar: true ,
-        page: { //支持传入 laypage 组件的所有参数（某些参数除外，如：jump/elem） - 详见文档
+        page: { //支持传退 laypage 组件的所有参数（某些参数除外，如：jump/elem） - 详见文档
             layout: ['limit', 'count', 'prev', 'page', 'next', 'skip'], //自定义分页布局
             //,curr: 5 //设定初始在第 5 页
             groups: 6, //只显示 1 个连续页码
@@ -128,7 +128,7 @@ layui.use(['layer','form','table'], function() {
         cols: [[
             {type:'checkbox'},
            /* {field:'id',        title: 'ID'   },*/
-            {field:'saleReturnTime',  title: '入库时间',    width:'10%'}, 
+            {field:'returnTime',  title: '退库时间',    width:'10%'}, 
             {field:'clientName',        title: '客户名称'   },
             {field:'clientCode',        title: '客户单号' ,    width:'12%'  },
             {field:'systemCode',        title: '系统单号' ,    width:'13%'   },
@@ -150,12 +150,12 @@ layui.use(['layer','form','table'], function() {
           addUser : function(){
             var continuity = $("#continuity")[0].checked;
             addIndex = layer.open({
-                title : "添加入库单",
+                title : "添加退库单",
                 type : 2,
                 content : "/stock/saleReturn/add?continuity="+continuity,
                 success : function(layero, addIndex){
                     setTimeout(function(){
-                        layer.tips('点击此处返回入库单列表', '.layui-layer-setwin .layui-layer-close', {
+                        layer.tips('点击此处返回退库单列表', '.layui-layer-setwin .layui-layer-close', {
                             tips: 3
                         });
                     },500);
@@ -177,7 +177,7 @@ layui.use(['layer','form','table'], function() {
                 data = checkStatus.data;
             if(data.length > 0){
                 console.log(JSON.stringify(data));
-                layer.confirm("你确定要删除这些入库么？",{btn:['是的,我确定','我再想想']},
+                layer.confirm("你确定要删除这些退库么？",{btn:['是的,我确定','我再想想']},
                     function(){
                         var deleteindex = layer.msg('删除中，请稍候',{icon: 16,time:false,shade:0.8});
                         $.ajax({
@@ -200,7 +200,7 @@ layui.use(['layer','form','table'], function() {
                     }
                 )
             }else{
-                layer.msg("请选择需要删除的入库",{time:1000});
+                layer.msg("请选择需要删除的退库",{time:1000});
             }
         }
     };
