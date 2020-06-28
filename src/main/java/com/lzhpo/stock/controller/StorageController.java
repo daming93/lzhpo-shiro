@@ -278,7 +278,7 @@ public class StorageController {
 		modelMap.put("trayList", JSONObject.toJSON(trayList));
 		List<Depot> depots = depotService.selectByClientId(storage.getClientId());
 		modelMap.put("depots", JSONObject.toJSON(depots));
-		List<Clientitem> items = clientitemService.selectByClientId(storage.getClientId());
+		List<Clientitem> items = clientitemService.selectByClientIdAll(storage.getClientId());
 		modelMap.put("items", JSONObject.toJSON(items));
 		return "stock/storage/editStorage";
 	}

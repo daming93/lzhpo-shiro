@@ -130,14 +130,25 @@ public class ClientitemController {
 	}
 
 	/**
-	 * 根据客户id查询
+	 * 根据客户id查询(出库，退货使用) 出库使用
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/getByClientId")
 	public List<Clientitem> getByClientId(@RequestParam("clientId") String clientId) {
 		return clientitemService.selectByClientId(clientId);
 	}
-
+	/**
+	 * 根据客户id查询(入库，退货使用) 全部品项
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/getByClientIdAll")
+	public List<Clientitem> getByClientIdAll(@RequestParam("clientId") String clientId) {
+		QueryWrapper<Clientitem> clientitemWrapper = new QueryWrapper<>();
+		// 相当于del_flag = 0;
+		clientitemWrapper.eq("del_flag", false);
+		clientitemWrapper.eq("client_id", clientId);
+		return clientitemService.list(clientitemWrapper);
+	}
 	/**
 	 * 根据id查询
 	 */

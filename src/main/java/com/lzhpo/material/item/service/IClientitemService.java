@@ -41,4 +41,5 @@ public interface IClientitemService extends IService<Clientitem> {
 	
 	List<Clientitem> selectByItemCode(String itemCode);
 	
+	public List<Clientitem> selectByClientIdAll(String clientId);
 }

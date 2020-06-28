@@ -231,7 +231,7 @@ public class SaleReturnController {
 		modelMap.put("trayList", JSONObject.toJSON(trayList));
 		List<Depot> depots = depotService.selectByClientId(saleReturn.getClientId());
 		modelMap.put("depots", JSONObject.toJSON(depots));
-		List<Clientitem> items = clientitemService.selectByClientId(saleReturn.getClientId());
+		List<Clientitem> items = clientitemService.selectByClientIdAll(saleReturn.getClientId());
 		modelMap.put("items", JSONObject.toJSON(items));
 		modelMap.put("saleReturn", saleReturn);
 		return "stock/saleReturn/editSaleReturn";
