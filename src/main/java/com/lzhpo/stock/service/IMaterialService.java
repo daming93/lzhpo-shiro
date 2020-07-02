@@ -57,7 +57,7 @@ public interface IMaterialService extends IService<Material> {
 	 * @param flag
 	 * @return
 	 */
-	Map<String,Object> selectMaterial(String itemName,String startTime,String endTime,Integer start,Integer limit,Integer type,String continuity);
+	Map<String,Object> selectMaterial(String itemName,String startTime,String endTime,Integer start,Integer limit,Integer type,String continuity,String clientId);
 	
 	/**
 	 * 查询储位上面有多少物资分布
@@ -69,4 +69,13 @@ public interface IMaterialService extends IService<Material> {
 	Map<String,Object>  selectMaterialByDepot(Integer start,Integer limit,String depotCode);
 	
 	Map<String,Object>  selectMaterialByDepot(Integer start,Integer limit,String depotCode,String itemId,String batch,String materialDepotId);
+	
+	/**
+	 * 根据开始时间结束时间 和 客户id去找在物料流水里面 规定时间里面异动盘点使用
+	 * @param startTime
+	 * @param endTine
+	 * @param clientId
+	 * @return
+	 */
+	List<Material> selectListByClientAndTiem(LocalDate startTime,LocalDate endTine,String clientId);
 }

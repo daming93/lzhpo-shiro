@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <meta charset="utf-8">
+    <title>修改--单据主体</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <link rel="stylesheet" th:href="@{/static/layui/css/layui.css}" media="all" />
+    <style type="text/css">
+        .layui-form-item .layui-inline{ min-width:15%; float:left; margin-right:0 }
+        .layui-form-item .inventory-box {
+            position: relative;
+        }
+          /*您可以将下列样式写入自己的样式表中*/
+        .childBody{padding: 15px;}
+        
+        /*layui 元素样式改写*/
+        .layui-btn-sm{line-height: normal; font-size: 12.5px;}      
+        .layui-table-view .layui-table-body{min-height: 256px;}
+        .layui-table-cell .layui-input.layui-unselect{height: 30px; line-height: 30px;}
+        
+        /*设置 layui 表格中单元格内容溢出可见样式*/
+        .table-overlay .layui-table-view,
+        .table-overlay .layui-table-box,
+        .table-overlay .layui-table-body{overflow: visible;}
+        .table-overlay .layui-table-cell{height: auto; overflow: visible;}
+        
+        /*文本对齐方式*/
+        .text-center{text-align: center;}
+
+        #tableRes{width: 105%};
+    </style>
+</head>
+<body class="childrenBody">
+<form class="layui-form">
+   <input name="id" id="inventoryId" type="hidden" th:value="${inventory.id}">
+     <div class="layui-form-item">
+        <div class="layui-inline">
+            <label class="layui-form-label">客户</label>
+            <div class="layui-input-block">
+                <select name="clientId" id="clientId" disabled class="form-control1" lay-verify="" lay-filter="clientId" lay-search>
+                    <option value="">请选择客户</option>
+                    <option th:each="basic:${basicDatas}" th:selected="${inventory.clientId eq basic.id}" th:value="${basic.id}" lay-verify="required" th:text="${basic.clientShortName}"></option>
+                </select>
+            </div>  
+        </div>
+        <div class="layui-inline">
+             <label class="layui-form-label">盘点时间</label>
+            <div class="layui-input-block">
+                <input type="text" class="layui-input layTime" th:value="${inventory.inventoryTime}" id="inventoryTime" name="inventoryTime" lay-verify="required" placeholder="请输入出库时间">
+            </div>
+        </div>
+        <div  class="layui-inline">
+            <label class="layui-form-label">盘点状态</label>
+             <div class="layui-input-block">
+                <select name="batchStatus" id="batchStatus" disabled class="form-control1" lay-verify="required" >
+                        <option th:selected="${inventory.batchStatus eq 1}" value="1">详情</option>
+                        <option th:selected="${inventory.batchStatus eq 2}" value="2">忽略批次</option>
+                        <option th:selected="${inventory.batchStatus eq 3}" value="3">忽略状态</option>
+                        <option th:selected="${inventory.batchStatus eq 4}" value="4">忽略批次状态</option>
+                </select>
+            </div>
+        </div>
+        <div class="layui-inline">
+            <label class="layui-form-label">盘点类型</label>
+            <div class="layui-input-block">
+                <select name="auditorType" id="auditorType" disabled class="form-control1" lay-verify="required" >
+                    <option th:selected="${inventory.auditorType eq 0}" value="0">全盘</option>
+                    <option th:selected="${inventory.auditorType eq 2}" value="2">异动</option>
+                </select>
+            </div>  
+        </div>
+    </div>
+
+ <div class="layui-form-item">
+    <section class="layui-col-md10" style="margin: 0 auto; float: none;">
+    <div class="layui-card">
+        <div class="layui-card-body layui-text">
+            <div id="tableRes" class="table-overlay">
+                <table id="dataTable" lay-filter="dataTable" class="layui-hide"></table>
+            </div>
+        </div>
+    </div>
+    </section>
+ </div>
+ <div class="layui-form-item">
+    <div class="layui-form-item">
+        <fieldset class="layui-elem-field layui-field-title"  style="margin-top: 30px;margin-left: 10px;">
+            <legend>备注</legend>
+        </fieldset>
+    </div>
+    <div class="layui-form-item layui-form-text">
+        <div class="layui-input-block" style="width: 80%">
+            <textarea placeholder="备注(不超过200字)" name="remarks" th:text="${inventory.remarks}" class="layui-textarea"></textarea>
+        </div>
+    </div>
+    <shiro:hasPermission name="warehouse:inventory:edit">
+    <div th:if="${inventory.status==1}" class="layui-form-item" style="padding-left: 30%;">
+            <button class="layui-btn" lay-submit="" lay-filter="editinventory">确认修改</button>
+            <button class="layui-btn layui-btn-primary">放弃修改</button>
+    </div>
+    </shiro:hasPermission>
+</form>
+
+<script type="text/javascript" th:inline="javascript">
+
+</script>
+
+<script type="text/javascript" th:src="@{/static/layui/layui.js}"></script>
+<script type="text/javascript" th:src="@{/static/warehouse/js/inventory/inventoryEdit.js}"></script>
+
+</body>
+</html>

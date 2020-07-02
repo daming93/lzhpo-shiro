@@ -59,7 +59,7 @@
         <div class="layui-inline">
             <label class="layui-form-label">转品类型</label>
             <div class="layui-input-block">
-                <select name="status" id="adjustment" class="form-control1" lay-verify="required" >
+                <select name="status" id="adjustment" disabled class="form-control1" lay-verify="required" >
                     <option value="2" th:selected="${mode eq 1}">转不良</option>
                     <option value="1" th:selected="${mode eq 2}">转良</option>
                 </select>
@@ -90,7 +90,6 @@
         </div>
     </div>
      <div class="layui-form-item">
-         
         <div class="layui-inline">
              <label class="layui-form-label">提示:</label>
             <div class="layui-form-mid layui-word-aux">在数量处回车添加一行，ctrl+enter提交</div>

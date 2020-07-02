@@ -125,10 +125,10 @@ public class TakeoutController {
 			String startTime =(String) map.get("startTime");
 			String overTime =(String) map.get("overTime");
 			if (StringUtils.isNotBlank(startTime)) {
-				takeoutWrapper.ge("create_date", startTime);
+				takeoutWrapper.ge("takeout_time", startTime);
 			}
 			if (StringUtils.isNotBlank(overTime)) {
-				takeoutWrapper.le("create_date", overTime);
+				takeoutWrapper.le("takeout_time", overTime);
 			}
 		}
 		takeoutWrapper.orderByAsc("status");

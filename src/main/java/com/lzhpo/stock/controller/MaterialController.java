@@ -23,6 +23,8 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.lzhpo.admin.entity.User;
 import com.lzhpo.admin.service.UserService;
+import com.lzhpo.client.entity.Basicdata;
+import com.lzhpo.client.service.IBasicdataService;
 import com.lzhpo.common.annotation.SysLog;
 import com.lzhpo.common.base.PageData;
 import com.lzhpo.common.util.CommomUtil;
@@ -61,8 +63,13 @@ public class MaterialController {
 	@Autowired
 	private IMaterialDepotService materialDepotService;
 
+	@Autowired
+	private IBasicdataService basicdateService;
+	
 	@GetMapping(value = "list")
-	public String list() {
+	public String list(ModelMap modelMap) {
+		List<Basicdata> basicDatas = basicdateService.selectAll();
+		modelMap.put("basicDatas", basicDatas);
 		return "stock/material/listMaterial";
 	}
 
@@ -81,13 +88,15 @@ public class MaterialController {
 		String startTime =null;
 		String overTime =null;
 		String continuity =null;
+		String clientId = null;
 		Integer mode = 1;//正常模式
 		if (!map.isEmpty()) {
 			itemCode = (String) map.get("itemCode");
 			mode = Integer.valueOf((String)map.get("mode"));
 			continuity = (String) map.get("continuity");
+			clientId =  (String) map.get("clientId");
 		}
-		Map<String,Object> mapRes = materialService.selectMaterial(itemCode, startTime, overTime,  (page-1)*limit, limit, mode,continuity);
+		Map<String,Object> mapRes = materialService.selectMaterial(itemCode, startTime, overTime,  (page-1)*limit, limit, mode,continuity,clientId);
 		materialPageData.setCount((Long) mapRes.get("count"));
 		materialPageData.setData(setUserToMaterial((List<Material>) mapRes.get("list"),mode));
 		return materialPageData;

@@ -1,5 +1,6 @@
 package com.lzhpo.stock.mapper;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
@@ -17,13 +18,15 @@ import com.lzhpo.stock.entity.Material;
  */
 public interface MaterialMapper extends BaseMapper<Material> {
 	List<Material> selectMaterial(@Param("itemName") String itemName, @Param("startTime")String startTime, @Param("overTime")String overTime,
-			@Param("start")Integer start,@Param("limit")Integer limit, @Param("type")Integer type,@Param("continuity")String continuity);
+			@Param("start")Integer start,@Param("limit")Integer limit, @Param("type")Integer type,@Param("continuity")String continuity,@Param("clientId")String clientId);
 
 	Long selectMaterialCount(@Param("itemName") String itemName, @Param("startTime")String startTime, @Param("overTime")String overTime,
-			@Param("start")Integer start,@Param("limit")Integer limit, @Param("type")Integer type,@Param("continuity")String continuity);
+			@Param("start")Integer start,@Param("limit")Integer limit, @Param("type")Integer type,@Param("continuity")String continuity,@Param("clientId")String clientId);
 	
 	
 	List<Material> selectMaterialByDepot(@Param("start")Integer start,@Param("limit")Integer limit, @Param("depotCode")String depotCode,  @Param("itemId")String itemId, @Param("batch")String batch, @Param("depotMaterilId")String depotMaterilId);
 	
 	Long selectMaterialByDepotCount(@Param("depotCode")String depotCode, @Param("itemId")String itemId, @Param("batch")String batch);
+	
+	List<Material> selectListByClientAndTiem(@Param("startTime")LocalDate startTime, @Param("endTime")LocalDate endTime, @Param("clientId")String clientId);
 }

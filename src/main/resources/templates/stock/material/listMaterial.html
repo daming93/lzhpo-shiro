@@ -19,6 +19,12 @@
     <div class="layui-field-box">
         <form class="layui-form">
             <div class="layui-inline">
+                <select name="s_clientId" id="clientId" class="form-control1" lay-verify="" lay-filter="clientId" lay-search>
+                    <option value="">请选择客户</option>
+                    <option th:each="basic:${basicDatas}" th:value="${basic.id}" lay-verify="required" th:text="${basic.clientShortName}"></option>
+                </select>
+            </div>
+            <div class="layui-inline">
                 <input type="text" value="" name="s_itemCode" placeholder="物料编号" class="layui-input search_input">
             </div>
              <div class="layui-inline">

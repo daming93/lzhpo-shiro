@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -129,9 +130,9 @@ public class MaterialServiceImpl extends ServiceImpl<MaterialMapper, Material> i
 
 	@Override
 	public Map<String, Object> selectMaterial(String itemName, String startTime, String endTime, Integer start,
-			Integer limit, Integer type,String continuity) {
-		List<Material> list =baseMapper.selectMaterial(itemName, startTime, endTime, start, limit, type,continuity);
-		Long count = baseMapper.selectMaterialCount(itemName, startTime, endTime, start, limit, type,continuity);
+			Integer limit, Integer type,String continuity,String clientId) {
+		List<Material> list =baseMapper.selectMaterial(itemName, startTime, endTime, start, limit, type,continuity,clientId);
+		Long count = baseMapper.selectMaterialCount(itemName, startTime, endTime, start, limit, type,continuity,clientId);
 		Map<String,Object> map = new HashMap<>();
 		map.put("list", list);
 		map.put("count", count);
@@ -159,4 +160,10 @@ public class MaterialServiceImpl extends ServiceImpl<MaterialMapper, Material> i
 		return map;
 	}
 
+	@Override
+	public List<Material> selectListByClientAndTiem(LocalDate startTime, LocalDate endTime, String clientId) {
+		return baseMapper.selectListByClientAndTiem( startTime,  endTime,  clientId);
+	}
+
+	
 }

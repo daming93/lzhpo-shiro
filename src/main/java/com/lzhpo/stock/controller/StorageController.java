@@ -115,10 +115,10 @@ public class StorageController {
 			String startTime =(String) map.get("startTime");
 			String overTime =(String) map.get("overTime");
 			if (StringUtils.isNotBlank(startTime)) {
-				storageWrapper.ge("create_date", startTime);
+				storageWrapper.ge("storage_time", startTime);
 			}
 			if (StringUtils.isNotBlank(overTime)) {
-				storageWrapper.le("create_date", overTime);
+				storageWrapper.le("storage_time", overTime);
 			}
 		}
 		storageWrapper.orderByAsc("status");

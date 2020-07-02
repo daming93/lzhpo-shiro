@@ -241,7 +241,7 @@ window.viewObj = {
         //select 联动
         form.on('select(clientId)', function(data){
              //data.value 得到被选中的值
-             var url = '/item/clientitem/getByClientId?clientId=' + data.value;
+             var url = '/item/clientitem/getByClientIdAll?clientId=' + data.value;
              $.get(url,function(data){
                 $("#itemId").empty();
                 $("#itemId").append(new Option("请选择",""));

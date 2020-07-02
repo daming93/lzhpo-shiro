@@ -64,7 +64,7 @@
         <div class="layui-inline">
             <label class="layui-form-label">出库类型</label>
             <div class="layui-input-block">
-                   <select name="status" id="status" class="form-control1" lay-verify="required" >
+                   <select name="status" id="status" disabled class="form-control1" lay-verify="required" >
                     <option value="2" th:selected="${status eq 1}">转不良</option>
                     <option value="1" th:selected="${status eq 2}">转良</option>
                 </select>

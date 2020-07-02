@@ -34,8 +34,12 @@
 			remarks
 		FROM
 			stock_material
+		where 1= 1	
 		<if test="continuity == 'on'" >	
-			where available_num!=0
+			and available_num!=0
+		</if>
+		<if test="clientId != null" >	
+			and client_id = #{clientId}
 		</if>
 		<if test="type == 2" >
 			GROUP BY
@@ -89,8 +93,12 @@
 			remarks
 		FROM
 			stock_material
+			where 1= 1	
 		<if test="continuity == 'on'" >	
-			where available_num!=0
+			and available_num!=0
+		</if>
+		<if test="clientId != null" >	
+			and client_id = #{clientId}
 		</if>
 		<if test="type == 2" >
 			GROUP BY
@@ -174,4 +182,28 @@
 		) temp 
 	</select>
 	
+		<select id="selectListByClientAndTiem" resultType="com.lzhpo.stock.entity.Material" parameterType="map">
+		SELECT
+			*
+		FROM
+			stock_material
+		WHERE
+			id IN (
+				SELECT DISTINCT
+					material_id
+				FROM
+					stock_material_operations o
+				LEFT JOIN stock_material m ON o.material_id = m.id
+					WHERE
+			1=1
+			<if test="clientId != null" >
+				and m.client_id =  #{clientId,jdbcType=VARCHAR}
+			</if>
+			<if test="startTime != null and endTime !=null" >
+				and o.create_date between  #{startTime} and  #{endTime}
+			</if>
+			
+			)
+	
+	</select>
 </mapper>
