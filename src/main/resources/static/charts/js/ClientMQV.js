@@ -72,7 +72,7 @@ layui.use(['layer','form','table'], function() {
         count : function(){
             var mode = $('input:radio:checked').val();
             addIndex = layer.open({
-                title : "总方重",
+                title : "总方重 ",
                 type : 2,
                 content : "/charts/count/showclientCountByTime?mode="+mode,
                 success : function(layero, addIndex){

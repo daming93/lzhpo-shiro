@@ -29,7 +29,7 @@ public class ContractOptionServiceImpl extends ServiceImpl<ContractOptionMapper,
         QueryWrapper<ContractOption> wrapper = new QueryWrapper<>();
 	// 下行编辑条件
         wrapper.eq("del_flag",false); 
-       // wrapper.eq("name",name);
+        wrapper.eq("name",name);
         return baseMapper.selectCount(wrapper);
     }
 

@@ -1478,7 +1478,7 @@
             </choose>
             ,item_id
 		) s ON d.time = s.time
-		
+		order by date
   </select>
   
   <select id="showTakeoutCountItem" resultMap="StorageCount" parameterType="java.util.Map">
@@ -1593,7 +1593,7 @@
             </choose>
             ,item_id
 		) s ON d.time = s.time
-		
+		order by date
   </select>
   
     <select id="showReturnCountItem" resultMap="StorageCount" parameterType="java.util.Map">
@@ -1708,6 +1708,6 @@
             </choose>
             ,item_id
 		) s ON d.time = s.time
-		
+		order by date
   </select>
 </mapper>
