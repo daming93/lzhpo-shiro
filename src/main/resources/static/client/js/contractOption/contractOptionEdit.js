@@ -11,7 +11,7 @@ layui.use(['form','jquery','layer'],function(){
         layer = layui.layer;
     form.on("submit(editcontractOption)",function(data){
         if(data.field.id == null){
-            layer.msg("角色ID不存在");
+            layer.msg("选项ID不存在");
             return false;
         }
         var menus = [];
@@ -36,7 +36,7 @@ layui.use(['form','jquery','layer'],function(){
             success:function(res){
                 layer.close(loadIndex);
                 if(res.success){
-                    parent.layer.msg("角色编辑成功！",{time:1000},function(){
+                    parent.layer.msg("选项编辑成功！",{time:1000},function(){
                         //刷新父页面
                         parent.location.reload();
                     });
