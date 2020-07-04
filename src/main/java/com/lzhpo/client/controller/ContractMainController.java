@@ -257,10 +257,9 @@ public class ContractMainController {
 	@ResponseBody
 	@SysLog("保存编辑数据")
 	public ResponseEntity edit(@RequestBody ContractMain contractMain) {
-		System.out.println("进入编辑方法");
 		if (StringUtils.isBlank(contractMain.getId())) 
 			return ResponseEntity.failure("不能为空");
-		ContractMain oldContractMain = contractMainService.getContractMainById(contractMain.getId());
+	//	ContractMain oldContractMain = contractMainService.getContractMainById(contractMain.getId());
 		contractMainService.updateContractMain(contractMain);
 		return ResponseEntity.success("操作成功");
 	}

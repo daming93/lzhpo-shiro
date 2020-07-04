@@ -71,7 +71,7 @@ public class ContractOptionServiceImpl extends ServiceImpl<ContractOptionMapper,
     @Cacheable("contractOptions")
     public List<ContractOption> selectAll() {
         QueryWrapper<ContractOption> wrapper = new QueryWrapper<>();
-        //wrapper.eq("del_flag",false);
+        wrapper.eq("del_flag",false);
         return baseMapper.selectList(wrapper);
     }
 }
