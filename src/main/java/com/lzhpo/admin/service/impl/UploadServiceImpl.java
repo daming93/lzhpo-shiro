@@ -54,7 +54,7 @@ public class UploadServiceImpl extends ServiceImpl<RescourceMapper, Rescource> i
         out.write(data);
         out.flush();
         out.close();
-        String webUrl = "/static/upload/"+fileName;
+        String webUrl = url+fileName;
         rescource = new Rescource();
         rescource.setFileName(fileName);
         rescource.setFileSize(new java.text.DecimalFormat("#.##").format(file.getSize()/1024)+"kb");
