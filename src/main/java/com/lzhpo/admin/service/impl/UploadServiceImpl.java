@@ -44,13 +44,13 @@ public class UploadServiceImpl extends ServiceImpl<RescourceMapper, Rescource> i
                 file.getOriginalFilename().lastIndexOf("."));
         String fileName = UUID.randomUUID() + extName;
         String contentType = file.getContentType();
-        StringBuffer sb = new StringBuffer(ResourceUtils.getURL("classpath:").getPath());
-        String filePath = sb.append("static/upload/").toString();
-        File targetFile = new File(filePath);
+    	String url = File.separator+"usr"+File.separator+"local"+File.separator+"upload"+File.separator+"person"+File.separator+ new SimpleDateFormat("yyyyMMdd").format(new Date())+
+				File.separator;
+        File targetFile = new File(url);
         if(!targetFile.exists()){
             targetFile.mkdirs();
         }
-        FileOutputStream out = new FileOutputStream(filePath+fileName);
+        FileOutputStream out = new FileOutputStream(url+fileName);
         out.write(data);
         out.flush();
         out.close();

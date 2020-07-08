@@ -325,7 +325,7 @@ public class UserController {
         String url = null;
         Map map = new HashMap();
         try {
-            url = uploadService.upload(file,"person");
+            url = uploadService.upload(file);
             map.put("url", url);
             map.put("name", file.getOriginalFilename());
         } catch (Exception e) {
