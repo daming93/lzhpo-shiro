@@ -75,7 +75,7 @@ window.viewObj = {
                 }else{
                     layer.msg("上传成功",{time:1000},function () {
                         $("input[name='fileId']").val(res.data.fileId);
-                        $("input[name='fileName']").val(res.data.fileName);
+                        $("input[name='fileName']").val(res.data.name);
                         $("#uploadText").html(res.data.name+"上传成功");
                     })
                 }
