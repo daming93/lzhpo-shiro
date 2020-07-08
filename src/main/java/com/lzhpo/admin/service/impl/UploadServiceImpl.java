@@ -83,11 +83,11 @@ public class UploadServiceImpl extends ServiceImpl<RescourceMapper, Rescource> i
         String fileName = UUID.randomUUID() + extName;
         String contentType = file.getContentType();
         
-        String url = "D:"+File.separator+"upload"+File.separator+from+File.separator+ new SimpleDateFormat("yyyyMMdd").format(new Date())+
-				File.separator;
-		
-//		String url = File.separator+"usr"+File.separator+"local"+File.separator+"upload"+File.separator+from+File.separator+ new SimpleDateFormat("yyyyMMdd").format(new Date())+
+//        String url = "D:"+File.separator+"upload"+File.separator+from+File.separator+ new SimpleDateFormat("yyyyMMdd").format(new Date())+
 //				File.separator;
+		
+		String url = File.separator+"usr"+File.separator+"local"+File.separator+"upload"+File.separator+from+File.separator+ new SimpleDateFormat("yyyyMMdd").format(new Date())+
+				File.separator;
         File targetFile = new File(url);
         if(!targetFile.exists()){
             targetFile.mkdirs();
