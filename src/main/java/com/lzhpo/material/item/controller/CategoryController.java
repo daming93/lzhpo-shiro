@@ -112,7 +112,7 @@ public class CategoryController {
         /**
 	*自定义传入add页面的数据
 	*/
-        return "material/item/Category/addCategory";
+        return "material/item/category/addCategory";
     }
 
     @RequiresPermissions("item:category:add")

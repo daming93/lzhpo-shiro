@@ -48,7 +48,7 @@ public class ClientitemServiceImpl extends ServiceImpl<ClientitemMapper, Clienti
 		// 算下体积
 		clientitem.setItemVolume(NumberUtil.div(
 				NumberUtil.mul(clientitem.getItemLength(), clientitem.getItemWidth(), clientitem.getItemHeight()),
-				1000000));
+				1000000000));
 		baseMapper.insert(clientitem);
 		/**
 		 * 预留编辑代码
@@ -67,7 +67,7 @@ public class ClientitemServiceImpl extends ServiceImpl<ClientitemMapper, Clienti
 	public void updateClientitem(Clientitem clientitem) {
 		clientitem.setItemVolume(NumberUtil.div(
 				NumberUtil.mul(clientitem.getItemLength(), clientitem.getItemWidth(), clientitem.getItemHeight()),
-				1000000));
+				1000000000));
 		baseMapper.updateById(clientitem);
 		/**
 		 * 预留编辑代码
