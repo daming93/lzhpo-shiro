@@ -5,6 +5,7 @@
 		SELECT
 			o.returnId,
 			o. NAME name,
+			sum(o.scattered_num) scatteredNum,
 			sum(o.sum) numZ,
 			sum(o.number) number,
 			sum(o.weight) weightSum,
@@ -17,7 +18,8 @@
 					s. system_code,
 					d.item_id item_id,
 					i. NAME,
-					CEILING(sum(d.number) / i.unit_rate) sum,
+					sum(d.whole_num) sum,
+					sum(d.scattered_num) scattered_num,
 					sum(d.number) number,
 					CEILING(sum(d.number) / i.unit_rate) * i.item_weight weight,
 					CEILING(sum(d.number) / i.unit_rate) * i.item_volume volume,

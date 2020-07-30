@@ -75,6 +75,33 @@ public class MaterialOperations extends DataEntity<MaterialOperations> implement
     @TableField(exist=false)
     private String fromTypeStr;
     
+    /**
+     * 整数量
+     */
+    @TableField("whole_num")
+    private Integer wholeNum;
+    /**
+     * 散数量
+     */
+    @TableField("scattered_num")
+    private Integer scatteredNum;
+    
+    
+	public Integer getWholeNum() {
+		return wholeNum;
+	}
+
+	public void setWholeNum(Integer wholeNum) {
+		this.wholeNum = wholeNum;
+	}
+
+	public Integer getScatteredNum() {
+		return scatteredNum;
+	}
+
+	public void setScatteredNum(Integer scatteredNum) {
+		this.scatteredNum = scatteredNum;
+	}
 	public String getFromTypeStr() {
 		return fromTypeStr;
 	}

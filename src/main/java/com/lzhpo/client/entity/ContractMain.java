@@ -68,6 +68,13 @@ public class ContractMain  extends DataEntity<ContractMain> implements Serializa
     private Integer isAudit;
 
     /**
+     * 是否整进整出客户 0 是 1不是
+     */
+    @TableField("is_whole")
+    private Integer isWhole;
+
+    
+    /**
      * 合同开始日期
      */
     @TableField("start_time")
@@ -103,7 +110,8 @@ public class ContractMain  extends DataEntity<ContractMain> implements Serializa
 	@TableField(exist = false)
     private boolean isUse;
 	
-	
+
+
 	public boolean getIsUse() {
 		return isUse;
 	}
@@ -209,6 +217,15 @@ public class ContractMain  extends DataEntity<ContractMain> implements Serializa
 
 	public void setFileName(String fileName) {
 		this.fileName = fileName;
+	}
+
+
+	public Integer getIsWhole() {
+		return isWhole;
+	}
+
+	public void setIsWhole(Integer isWhole) {
+		this.isWhole = isWhole;
 	}
 
 

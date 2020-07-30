@@ -314,6 +314,8 @@ public class TakeoutController {
 				MaterialDepot mDepot = materialDepotService.getMaterialDepotByMaterialIdAndDepotCode(r.getMaterial(), r.getDepot());
 				if(mDepot!=null){
 					r.setMaxNumber(mDepot.getNumber());
+					r.setMaxWholeNumber(mDepot.getWholeNum());
+					r.setMaxScatteredNumber(mDepot.getScatteredNum());
 				}else{
 					r.setMaxNumber(0);
 				}

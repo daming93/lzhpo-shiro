@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletRequest;
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.WebUtils;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -29,7 +31,8 @@ import com.lzhpo.client.service.IBasicdataService;
 import com.lzhpo.common.annotation.SysLog;
 import com.lzhpo.common.base.PageData;
 import com.lzhpo.common.util.ResponseEntity;
-import com.lzhpo.material.item.entity.Clientitem;
+import com.lzhpo.stock.service.IMaterialDepotService;
+import com.lzhpo.stock.service.impl.MaterialDepotServiceImpl;
 import com.lzhpo.warehouse.entity.Depot;
 import com.lzhpo.warehouse.service.IDepotService;
 
@@ -50,6 +53,8 @@ public class DepotController {
 	@Autowired
 	private IDepotService depotService;
 
+	@Autowired
+	private IMaterialDepotService materialDepotService ;
 	@Autowired
 	UserService userService;
 
@@ -72,9 +77,9 @@ public class DepotController {
 		// 相当于del_flag = 0;
 		depotWrapper.eq("del_flag", false);
 		if (!map.isEmpty()) {
-			String keys = (String) map.get("name");
+			String keys = (String) map.get("code");
 			if (StringUtils.isNotBlank(keys)) {
-				depotWrapper.like("name", keys);
+				depotWrapper.like("code", keys);
 			}
 		}
 		IPage<Depot> depotPage = depotService.page(new Page<>(page, limit), depotWrapper);
@@ -99,6 +104,14 @@ public class DepotController {
 					u.setNickName(u.getLoginName());
 				}
 				r.setUpdateUser(u);
+			}
+			if(StringUtils.isNotBlank(r.getClientIds())){
+				String[] ids = r.getClientIds().split(",");
+				for (int i = 0; i < ids.length; i++) {
+					String string = ids[i];
+					ids[i] = basicdateService.getBasicdataById(string).getClientShortName();
+				}
+				r.setClientNames(StringUtils.join(ids, ","));
 			}
 		});
 
@@ -148,6 +161,9 @@ public class DepotController {
 			return ResponseEntity.failure("储位ID不能为空");
 		}
 		Depot depot = depotService.getDepotById(id);
+		if (materialDepotService.hasNumberInDepot(depot.getCode())) {
+			return ResponseEntity.success("该储位有物料,无法删除");
+		}
 		depotService.deleteDepot(depot);
 		return ResponseEntity.success("操作成功");
 	}
@@ -160,10 +176,16 @@ public class DepotController {
 		if (depots == null || depots.size() == 0) {
 			return ResponseEntity.failure("请选择需要删除的储位");
 		}
+		StringBuffer bf = new StringBuffer();
 		for (Depot r : depots) {
-			depotService.deleteDepot(r);
+			
+			if(materialDepotService.hasNumberInDepot(r.getCode())){
+				bf.append(r.getCode()+"上有物资");
+			}else{
+				depotService.deleteDepot(r);
+			}
 		}
-		return ResponseEntity.success("操作成功");
+		return ResponseEntity.success("操作成功"+bf);
 	}
 
 	@GetMapping("edit")
@@ -189,5 +211,18 @@ public class DepotController {
 		}
 		depotService.updateDepot(depot);
 		return ResponseEntity.success("操作成功");
+	}
+	
+	@SysLog("上传文件")
+	@PostMapping("upload")
+	@ResponseBody
+	public ResponseEntity uploadFile(@RequestParam("file") MultipartFile file, HttpServletRequest httpServletRequest) {
+		if (file == null) {
+			return ResponseEntity.failure("上传文件为空 ");
+		}
+		Map map = new HashMap();
+		List<Basicdata> basicDatas = basicdateService.selectAll();
+		String message = depotService.upload(file, basicDatas);
+		return ResponseEntity.success(message).setAny("data", map);
 	}
 }

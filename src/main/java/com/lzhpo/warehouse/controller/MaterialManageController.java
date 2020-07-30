@@ -265,8 +265,12 @@ public class MaterialManageController {
 				MaterialDepot mDepot = materialDepotService.getMaterialDepotByMaterialIdAndDepotCode(r.getMaterial(), r.getDepot());
 				if(mDepot!=null){
 					r.setMaxNumber(mDepot.getNumber());
+					r.setMaxWholeNumber(mDepot.getWholeNum());
+					r.setMaxScatteredNumber(mDepot.getScatteredNum());
 				}else{
 					r.setMaxNumber(0);
+					r.setMaxWholeNumber(0);
+					r.setMaxScatteredNumber(0);
 				}
 			}
 		});

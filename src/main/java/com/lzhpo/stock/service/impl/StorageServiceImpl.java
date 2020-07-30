@@ -122,6 +122,9 @@ public class StorageServiceImpl extends ServiceImpl<StorageMapper, Storage> impl
 		
 		//良品
 		Integer material_type_good = CacheUtils.keyDict.get("material_type_good").getValue();
+		
+		//调账
+		Integer transportation_type_adjustment =  CacheUtils.keyDict.get("transportation_type_adjustment").getValue();
 		storage.setStatus(modify_status_revocation);
 		// 删除有关子表
 		detailService.deleteStorageDetailById(storage.getId());
@@ -136,12 +139,16 @@ public class StorageServiceImpl extends ServiceImpl<StorageMapper, Storage> impl
 				material.setDelFlag(false);
 				material.setAvailableNum(material.getAvailableNum() + storageDetail.getNumber());// 增加可用库存
 				material.setDepotCode(material.getDepotCode() + storageDetail.getNumber());// 增加库存
+				material.setWholeNum(material.getWholeNum() + storageDetail.getWholeNum());//增加整库存
+				material.setScatteredNum(material.getScatteredNum() + storageDetail.getScatteredNum());//增加零库存
 				materialService.updateById(material);
 			} else {
 				material = new Material();
 				material.setDelFlag(false);
 				material.setAvailableNum(storageDetail.getNumber());// 增加可用库存
 				material.setDepotCode(storageDetail.getNumber());// 增加库存
+				material.setWholeNum(storageDetail.getWholeNum());//增加整库存
+				material.setScatteredNum(storageDetail.getScatteredNum());//增加零库存
 				material.setItemId(storageDetail.getItemId());
 				material.setBatchNumber(storageDetail.getBatch());
 				material.setClientId(storage.getClientId());
@@ -152,7 +159,7 @@ public class StorageServiceImpl extends ServiceImpl<StorageMapper, Storage> impl
 
 			// 托盘储位分配数量
 			materialDepotService.mathNumberBymaterialIdAndDepotId(material.getId(), storageDetail.getDepot(),
-					storageDetail.getNumber(), true);
+					storageDetail.getNumber(),storageDetail.getWholeNum(),storageDetail.getScatteredNum(), true);
 			if (StringUtils.checkValNotNull(storageDetail.getTray())) {
 				materialTrayService.mathNumberBymaterialIdAndTrayId(material.getId(), storageDetail.getTray(),
 						storageDetail.getNumber(), true);
@@ -163,6 +170,9 @@ public class StorageServiceImpl extends ServiceImpl<StorageMapper, Storage> impl
 			materialOperations.setFromType(trunover_type_storage_new);// 入库
 			materialOperations.setMaterialId(material.getId());
 			materialOperations.setNumber(storageDetail.getNumber());
+			materialOperations.setWholeNum(storageDetail.getWholeNum());//增加整库存
+			materialOperations.setScatteredNum(storageDetail.getScatteredNum());//增加零库存
+			
 			materialOperations.setType(1);// 入库为＋
 			materialOperationsService.save(materialOperations);
 			storageDetail.setMaterialId(material.getId());
@@ -185,10 +195,13 @@ public class StorageServiceImpl extends ServiceImpl<StorageMapper, Storage> impl
 		storage.setTotal(math.getNumZ());
 		storage.setTrayNum(math.getTray());
 		storage.setNumber(math.getNumber());
+		storage.setScatteredNum(math.getScatteredNum());
 		storage.setIncomeId(getById(storage.getId()).getIncomeId());
 		// 还有计算入库装卸费 
 		try {
-			incomeService.storageIncomeMath(storage);
+			if(!transportation_type_adjustment.equals(storage.getAdjustment())){//不是调账就计算费用
+				incomeService.storageIncomeMath(storage);
+			}
 		} catch (RuntimeJsonMappingException e) {
 			throw new RuntimeJsonMappingException(e.getMessage());
 		}catch (Exception e) {
@@ -221,11 +234,13 @@ public class StorageServiceImpl extends ServiceImpl<StorageMapper, Storage> impl
 				material.setDelFlag(false);
 				material.setAvailableNum(material.getAvailableNum() - storageDetail.getNumber());// 减去可用库存
 				material.setDepotCode(material.getDepotCode() - storageDetail.getNumber());// 减去库存
+				material.setWholeNum(material.getWholeNum() - storageDetail.getWholeNum());//减去整库存
+				material.setScatteredNum(material.getScatteredNum() - storageDetail.getScatteredNum());//减去零库存
 				materialService.updateById(material);
 			}
 			// 托盘储位分配数量
 			materialDepotService.mathNumberBymaterialIdAndDepotId(material.getId(), storageDetail.getDepot(),
-					storageDetail.getNumber(), false);
+					storageDetail.getNumber(), storageDetail.getWholeNum(),storageDetail.getScatteredNum(),false);
 			if (StringUtils.checkValNotNull(storageDetail.getTray())) {
 				materialTrayService.mathNumberBymaterialIdAndTrayId(material.getId(), storageDetail.getTray(),
 						storageDetail.getNumber(), false);
@@ -237,6 +252,8 @@ public class StorageServiceImpl extends ServiceImpl<StorageMapper, Storage> impl
 			materialOperations.setFromType(trunover_type_storage_back);// 入库
 			materialOperations.setMaterialId(material.getId());
 			materialOperations.setNumber(storageDetail.getNumber());
+			materialOperations.setWholeNum(storageDetail.getWholeNum());//增加整库存
+			materialOperations.setScatteredNum(storageDetail.getScatteredNum());//增加零库存
 			materialOperations.setType(2);// 入库撤销为-
 			materialOperationsService.save(materialOperations);
 		}

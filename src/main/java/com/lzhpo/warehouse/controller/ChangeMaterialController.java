@@ -1,5 +1,6 @@
 package com.lzhpo.warehouse.controller;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -84,9 +85,19 @@ public class ChangeMaterialController {
 	    //相当于del_flag = 0;
         changeMaterialWrapper.eq("del_flag",false);
         if(!map.isEmpty()){
-            String keys = (String) map.get("name");
+            String keys = (String) map.get("code");
             if(StringUtils.isNotBlank(keys)) {
-                changeMaterialWrapper.like("name", keys);
+            	List<String> strs = new ArrayList<String>();
+            	List<Clientitem> lists = clientitemService.selectByItemCode(keys);
+            	for (Clientitem clientitem : lists) {
+            		strs.add(clientitem.getId());
+				}
+            	if(strs.isEmpty()){
+            		changeMaterialWrapper.eq("item_id", 1);
+            	}else{
+            		changeMaterialWrapper.in("item_id", strs);
+            	}
+                
             }
         }
         IPage<ChangeMaterial> changeMaterialPage = changeMaterialService.page(new Page<>(page,limit),changeMaterialWrapper);
@@ -151,12 +162,15 @@ public class ChangeMaterialController {
     @ResponseBody
     @SysLog("保存新增数据")
     public ResponseEntity add(@RequestBody ChangeMaterial changeMaterial){
-    	if(changeMaterial == null || changeMaterial.getNownum()>changeMaterial.getOldnum()){
+    	if(changeMaterial == null || changeMaterial.getNewWholeNum()>changeMaterial.getOldWholeNum()
+    			||  changeMaterial.getNewScatteredNum()>changeMaterial.getOldScatteredNum()){
             return ResponseEntity.failure("新数量不能大于老数量");
         }
-    	if(changeMaterial.getNownum()<0){
+    	if(changeMaterial.getNewScatteredNum()<0|| changeMaterial.getNewWholeNum() < 0){
     		 return ResponseEntity.failure("调整数量不能为负数");
     	}
+    	Integer sku =clientitemService.getById( materialService.getById(changeMaterial.getMaterialId()).getItemId()).getUnitRate();
+    	changeMaterial.setNownum(changeMaterial.getNewWholeNum()*sku+changeMaterial.getNewScatteredNum());
         changeMaterialService.saveChangeMaterial(changeMaterial);
         return ResponseEntity.success("操作成功");
     }

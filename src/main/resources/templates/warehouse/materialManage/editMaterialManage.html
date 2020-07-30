@@ -50,9 +50,9 @@
             </div>  
         </div>
         <div class="layui-inline">
-             <label class="layui-form-label">出库时间</label>
+             <label class="layui-form-label">转品时间</label>
             <div class="layui-input-block">
-                <input type="text" class="layui-input layTime" th:value="${materialManage.time}" id="materialManageTime" name="materialManageTime" lay-verify="required" placeholder="请输入出库时间">
+                <input type="text" class="layui-input layTime" th:value="${materialManage.time}" id="materialManageTime" name="materialManageTime" lay-verify="required" placeholder="请输入转品时间">
             </div>
         </div>
         <div  class="layui-inline">
@@ -62,7 +62,7 @@
             </div>
         </div>
         <div class="layui-inline">
-            <label class="layui-form-label">出库类型</label>
+            <label class="layui-form-label">转品类型</label>
             <div class="layui-input-block">
                    <select name="status" id="status" disabled class="form-control1" lay-verify="required" >
                     <option value="2" th:selected="${status eq 1}">转不良</option>

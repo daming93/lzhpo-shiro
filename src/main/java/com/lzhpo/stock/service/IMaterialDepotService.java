@@ -40,9 +40,12 @@ public interface IMaterialDepotService extends IService<MaterialDepot> {
 	 * @param number
 	 * @param math true ＋ 
 	 */
-	void mathNumberBymaterialIdAndDepotId(String materialId,String depotId,Integer number,boolean math);
+	void mathNumberBymaterialIdAndDepotId(String materialId,String depotId,Integer number,Integer wholeNum,Integer satterNum ,boolean math);
 
-	List<MaterialDepot> getListByMaterialAndNumber(String materialId,Integer number,String depot) throws Exception;
+	List<MaterialDepot> getListByMaterialAndNumber(String materialId,Integer number,Integer wholeNum,Integer scatteredNum,String depot,Integer rate) throws Exception;
 	
 	MaterialDepot getMaterialDepotByMaterialIdAndDepotCode(String materialId,String depotCode);
+	
+	//写一个接口查询当前储位有没有存东西，放东西的储位不能删除
+	boolean hasNumberInDepot(String depotCode);
 }

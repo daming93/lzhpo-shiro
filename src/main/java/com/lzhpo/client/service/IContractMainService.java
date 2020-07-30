@@ -31,7 +31,7 @@ public interface IContractMainService extends IService<ContractMain> {
 	//选取所有记录
 	List<ContractMain> selectAll();
 
-	//分页查询数据在父类
+	//得到客户正在使用的合同
 	String getUsingContractId(String clientId);
 	
 	//审核 改变审核状态

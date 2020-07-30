@@ -15,11 +15,11 @@
 </head>
 <body class="childrenBody">
 <fieldset class="layui-elem-field">
-    <legend>流水检索</legend>
+    <legend>检索</legend>
     <div class="layui-field-box">
         <form class="layui-form">
             <div class="layui-inline">
-                <input type="text" value="" name="s_like_name" placeholder="" class="layui-input search_input">
+                <input type="text" value="" name="s_code" placeholder="输入品项编码" class="layui-input search_input">
             </div>
             <div class="layui-input-inline">
                 <a class="layui-btn" lay-submit="" lay-filter="searchForm">查询</a>
@@ -29,8 +29,12 @@
     </div>
 </fieldset>
 
+
 <script type="text/html" id="toolbarDemo">
-            <div class="layui-input-block">
+            <div class="layui-col-md2 layui-col-sm3 layui-col-xs6" style="text-align: left;padding-left: 10px;">
+                <div class="layui-input-inline yutons-btn-margin-right">
+                   <span class="layui-btn yutons layui-btn-sm yutons-color-detail" lay-event="table_export">导出全部</span>
+                </div>
             </div>
 </script>
     <table class="layui-table" id="changeMaterial-table" lay-filter="changeMaterialList"></table>

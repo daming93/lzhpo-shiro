@@ -1,10 +1,76 @@
-layui.use(['layer','form','table' ,'upload'], function() {
+layui.config({
+                base:"/static/layui/layui_exts/"
+            }).use(['layer','form','table' ,'upload', 'excel'], function() {
     var layer = layui.layer,
         $ = layui.jquery,
         form = layui.form,
         table = layui.table,
         upload = layui.upload,
+        excel = layui.excel,
         t; //表格变量
+      
+    //监听头工具栏事件
+    table.on('toolbar(trayList)', function(obj) {
+        var checkStatus = table.checkStatus(obj.config.id),
+            data = checkStatus.data; //获取选中的数据
+            switch (obj.event) {
+                case 'table_export':
+                    exportFile('tray-table')
+                    break;
+                };
+            });
+    /**
+                 * by yutons
+                 * Array.from() 非常方便的将一个类数组的集合 ==》 数组，直接使用数组身上的方法。例如：常用的map，foreach… 
+                 * 但是，问题来了，IE不识别Array.from这个方法。所以写了它兼容IE的写法。
+                 */
+                if (!Array.from) {
+                    Array.from = function(el) {
+                        return Array.apply(this, el);
+                    }
+                }
+                
+//表格导出
+                function exportFile(id) {
+                    //根据传入tableID获取表头
+                    var headers = $("div[lay-id=" + id + "] .layui-table-box table").get(0);
+                    var htrs = Array.from(headers.querySelectorAll('tr'));
+                    var titles = {};
+                    var fiterArr = [];
+                    for (var j = 0; j < htrs.length; j++) {
+                        var hths = Array.from(htrs[j].querySelectorAll("th"));
+                        for (var i = 0; i < hths.length; i++) {
+
+                            var clazz = hths[i].getAttributeNode('class').value;
+                            fiterArr[i] = hths[i].getAttributeNode('data-field').value;
+                            if (clazz != ' layui-table-col-special' && clazz != 'layui-hide') {
+                                //排除居左、具有、隐藏字段
+                                //修改:默认字段data-field+i,兼容部分数据表格中不存在data-field值的问题
+                                titles[hths[i].getAttributeNode('data-field').value] = hths[i].innerText;
+                            }
+                        }
+                    }
+                    var s_code = $("#s_code").val();
+                    $.ajax({
+                            type:"POST",
+                            url:"/warehouse/tray/list?limit=999999",
+                            dataType:"json",
+                            contentType:'application/x-www-form-urlencoded; charset=UTF-8',
+                            data:$('.layui-form').serialize(),
+                            success:function(res){
+                                  // 假如返回的 res.data 是需要导出的列表数据
+                                // 1. 数组头部新增表头
+                                res.data.unshift(titles);
+                              //  2. 如果需要调整顺序，请执行梳理函数
+                                var data = excel.filterExportData(res.data, fiterArr);
+                                 //导出excel
+                                excel.exportExcel({
+                                    sheet1: data
+                                }, '托盘表' + new Date().toLocaleString() + '.xlsx', 'xlsx');
+
+                            }
+                    });
+    }
       
 
         upload.render({

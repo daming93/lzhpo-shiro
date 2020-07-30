@@ -67,7 +67,18 @@ public class Depot extends DataEntity<Depot> implements Serializable {
     
     private String code;
     
+    @TableField(exist=false)
+    private String clientNames;
     
+    
+	public String getClientNames() {
+		return clientNames;
+	}
+
+	public void setClientNames(String clientNames) {
+		this.clientNames = clientNames;
+	}
+
 	public String getClientIds() {
 		return clientIds;
 	}

@@ -7,12 +7,16 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.lzhpo.warehouse.entity.Tray;
 import com.lzhpo.warehouse.mapper.TrayMapper;
 import com.lzhpo.warehouse.service.ITrayService;
+
+import cn.hutool.poi.excel.ExcelReader;
+import cn.hutool.poi.excel.ExcelUtil;
 
 /**
  * <p>
@@ -124,6 +128,39 @@ public class TrayServiceImpl extends ServiceImpl<TrayMapper, Tray> implements IT
 		wrapper.eq("del_flag", false);
 	//	wrapper.like("client_ids", clientId);
 		return baseMapper.selectList(wrapper);
+	}
+
+	@Override
+	public String upload(MultipartFile file) {
+		StringBuffer buffer = new StringBuffer();
+		try {
+			ExcelReader reader = ExcelUtil.getReader(file.getInputStream());
+			reader
+			.addHeaderAlias("编号", "code")
+			.addHeaderAlias("分段A", "subsectionA")
+			.addHeaderAlias("分段B", "subsectionB")
+			.addHeaderAlias("分段C", "subsectionC")
+			.addHeaderAlias("分段D", "subsectionD")
+			.addHeaderAlias("分段E", "subsectionE")
+			.addHeaderAlias("分段F", "subsectionF")
+			.addHeaderAlias("分段G", "subsectionG");
+			List<Tray> Trays = reader.readAll(Tray.class);
+			int i = 1;
+			for (Tray Tray : Trays) {
+				if (getTrayCount(Tray) > 0) {
+					buffer.append("第"+i+"条重复名称<br>");
+				}else{
+					saveTray(Tray);
+				}
+				i++;
+			}
+			buffer.append("文件上传成功<br>");
+		} catch (Exception e) {
+			e.printStackTrace();
+			buffer.append("文件格式有误(使用导出模板,另存为xls[excel2003-2007]格式)");
+			return buffer.toString();
+		}
+		return buffer.toString();
 	}
 
 }

@@ -88,7 +88,7 @@ public class MaterialManageDetailServiceImpl extends ServiceImpl<MaterialManageD
 		// 防止前台传来得数量是修改过得
 		MaterialManageDetail entity = baseMapper.selectById(materialManageDetail.getId());
 		// 解锁
-		materialSerivice.unlockMaterial(entity.getMaterial(), entity.getNumber());
+		materialSerivice.unlockMaterial(entity.getMaterial(), entity.getWholeNum(),entity.getScatteredNum(),clientitemService.getById(entity.getItemId()).getUnitRate());
 		// 记录流水
 		MaterialOperations materialOperations = new MaterialOperations();
 		materialOperations.setFromCode(code);
@@ -102,7 +102,9 @@ public class MaterialManageDetailServiceImpl extends ServiceImpl<MaterialManageD
 			break;
 		}
 		materialOperations.setMaterialId(materialManageDetail.getMaterial());
-		materialOperations.setNumber(0 - entity.getNumber());
+		materialOperations.setNumber(entity.getNumber());
+		materialOperations.setWholeNum(entity.getWholeNum());
+		materialOperations.setScatteredNum(entity.getScatteredNum());
 		materialOperations.setType(2);// 撤销出库为+
 		materialOperationsService.save(materialOperations);
 		materialManageDetail.setDelFlag(true);
@@ -126,11 +128,12 @@ public class MaterialManageDetailServiceImpl extends ServiceImpl<MaterialManageD
 		// 防止前台传来得数量是修改过得
 		MaterialManageDetail entity = baseMapper.selectById(detail.getId());
 		Clientitem item = clientitemService.getById(entity.getItemId());
-		if (detail.getNumZ() != null) {
-			detail.setNumber(CommomUtil.AllToOne(detail.getNumZ(), item.getUnitRate()));
+		if (detail.getWholeNum() != null&&detail.getScatteredNum()!=null) {
+			detail.setNumber(detail.getWholeNum()* item.getUnitRate()+detail.getScatteredNum());
 		}
 		// 然后在锁住修改过的数量 传的数字就是变更的数字
-		materialSerivice.lockMaterial(detail.getMaterial(), detail.getNumber() - entity.getNumber(),entity.getDepot());
+		materialSerivice.lockMaterial(detail.getMaterial(), detail.getNumber() - entity.getNumber(),
+				detail.getWholeNum() - entity.getWholeNum(),detail.getScatteredNum() - entity.getScatteredNum(),entity.getDepot());
 		// 记录流水
 		MaterialOperations materialOperations = new MaterialOperations();
 		materialOperations.setFromCode(code);
@@ -143,7 +146,8 @@ public class MaterialManageDetailServiceImpl extends ServiceImpl<MaterialManageD
 			materialOperations.setFromType(trunover_type_manage_bad_edit);// 转不良编辑
 			break;
 		}
-	
+		materialOperations.setWholeNum(detail.getWholeNum()-entity.getWholeNum());
+		materialOperations.setScatteredNum(detail.getScatteredNum()-entity.getScatteredNum());
 		materialOperations.setMaterialId(detail.getMaterial());
 		materialOperations.setNumber(detail.getNumber() - entity.getNumber());
 		materialOperations.setType(2);// 出库为-

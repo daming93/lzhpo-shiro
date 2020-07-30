@@ -16,13 +16,78 @@ layui.use('laydate', function(){
 
 
 
-layui.use(['layer','form','table'], function() {
+layui.config({
+                base:"/static/layui/layui_exts/"
+            }).use(['layer','form','table' ,'upload', 'excel'], function() {
     var layer = layui.layer,
         $ = layui.jquery,
         form = layui.form,
         table = layui.table,
+        upload = layui.upload,
+        excel = layui.excel,
         t; //表格变量
+      
+    //监听头工具栏事件
+    table.on('toolbar(materialManageList)', function(obj) {
+        var checkStatus = table.checkStatus(obj.config.id),
+            data = checkStatus.data; //获取选中的数据
+            switch (obj.event) {
+                case 'table_export':
+                    exportFile('materialManage-table')
+                    break;
+                };
+            });
+    /**
+                 * by yutons
+                 * Array.from() 非常方便的将一个类数组的集合 ==》 数组，直接使用数组身上的方法。例如：常用的map，foreach… 
+                 * 但是，问题来了，IE不识别Array.from这个方法。所以写了它兼容IE的写法。
+                 */
+                if (!Array.from) {
+                    Array.from = function(el) {
+                        return Array.apply(this, el);
+                    }
+                }
+                
+//表格导出
+                function exportFile(id) {
+                    //根据传入tableID获取表头
+                    var headers = $("div[lay-id=" + id + "] .layui-table-box table").get(0);
+                    var htrs = Array.from(headers.querySelectorAll('tr'));
+                    var titles = {};
+                    var fiterArr = [];
+                    for (var j = 0; j < htrs.length; j++) {
+                        var hths = Array.from(htrs[j].querySelectorAll("th"));
+                        for (var i = 0; i < hths.length; i++) {
 
+                            var clazz = hths[i].getAttributeNode('class').value;
+                            fiterArr[i] = hths[i].getAttributeNode('data-field').value;
+                            if (clazz != ' layui-table-col-special' && clazz != 'layui-hide') {
+                                //排除居左、具有、隐藏字段
+                                //修改:默认字段data-field+i,兼容部分数据表格中不存在data-field值的问题
+                                titles[hths[i].getAttributeNode('data-field').value] = hths[i].innerText;
+                            }
+                        }
+                    }
+                    $.ajax({
+                            type:"POST",
+                            url:"/warehouse/materialManage/list?limit=999999",
+                            dataType:"json",
+                            contentType:'application/x-www-form-urlencoded; charset=UTF-8',
+                            data:$('.layui-form').serialize(),
+                            success:function(res){
+                                  // 假如返回的 res.data 是需要导出的列表数据
+                                // 1. 数组头部新增表头
+                                res.data.unshift(titles);
+                              //  2. 如果需要调整顺序，请执行梳理函数
+                                var data = excel.filterExportData(res.data, fiterArr);
+                                 //导出excel
+                                excel.exportExcel({
+                                    sheet1: data
+                                }, '物料调品' + new Date().toLocaleString() + '.xlsx', 'xlsx');
+
+                            }
+                    });
+    }
 
     $("body").keypress(function(e) {
         if(e.keyCode==10&&e.ctrlKey) {
@@ -130,7 +195,8 @@ layui.use(['layer','form','table'], function() {
         even: true,
         url:'/warehouse/materialManage/list',
         method:'post',
-        toolbar: true ,
+        toolbar: "#toolbarDemo" ,
+        defaultToolbar: ['filter', 'exports', 'print'],
         page: { //支持传入 laypage 组件的所有参数（某些参数除外，如：jump/elem） - 详见文档
             layout: ['limit', 'count', 'prev', 'page', 'next', 'skip'], //自定义分页布局
             //,curr: 5 //设定初始在第 5 页
@@ -147,7 +213,7 @@ layui.use(['layer','form','table'], function() {
             {field:'clientName',        title: '客户名称'   },
             {field:'clientCode',        title: '客户单号' ,    width:'12%'  },
             {field:'systemCode',        title: '系统单号' ,    width:'13%'   },
-         //   {field:'trayNumber',        title: '件/托(kg)'   },
+         //   {field:'materialManageNumber',        title: '件/托(kg)'   },
             {field:'statusStr',        title: '类型'   },
              {field:'modifyStatusStr',        title: '状态'   },
             {field:'remarks',        title: '备注'   },

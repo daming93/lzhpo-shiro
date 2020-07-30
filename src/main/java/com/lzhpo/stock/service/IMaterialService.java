@@ -44,10 +44,10 @@ public interface IMaterialService extends IService<Material> {
 	Material getMaterialByItemId(String itemid,LocalDate batch ,Integer MaterialStatus);
 	
 	
-	List<MaterialDepot> lockMaterial (String materialId,Integer number,String depotCode)  throws Exception;
+	List<MaterialDepot> lockMaterial (String materialId,Integer number,Integer wholeNum,Integer scatteredNum,String depotCode)  throws Exception;
 	
 	
-	void unlockMaterial (String materialId,Integer number);
+	void unlockMaterial (String materialId,Integer wholeNumber,Integer scatteredNum,Integer rate);
 	
 	/**
 	 * type 1 正常 2忽略批次 3忽略物料状态 continuity on 全部 其他 为非0

@@ -99,7 +99,7 @@ window.viewObj = {
                     var options = viewObj.renderSelectOptions(viewObj.itemsData, {valueField: "id", textField: "code", selectedValue: d.itemId});
                     return '<a lay-event="itemId"></a><select name="itemId"  lay-filter="itemId"><option  value="">请选择</option>' + options + '</select>';
                 }},
-                { field:'itemName',title:'品牌系列',align:'center',width:200},
+                { field:'itemName',title:'品项名称',align:'center',width:200},
                 { field:'depot',title:'储位',align:'center',width:130,templet: function(d){
                     var options = viewObj.renderSelectOptions(viewObj.depotsData, {valueField: "code", textField: "code", selectedValue: d.depot});
                     return '<a lay-event="depot"></a><select name="depot" lay-filter="depot"><option  value="">请选择</option>' + options + '</select>';
@@ -109,9 +109,12 @@ window.viewObj = {
                     return '<a lay-event="tray"></a><select name="tray" lay-filter="tray"><option  value="">请选择</option>' + options + '</select>';
                 }},
                 { field:'batch',title:'批次',align:'center',width:100,edit: 'select',event:'date',data_field: "dBeginDate"},
-                { field:'numZ',title:'数量(整)',edit: 'select',event:'numZ',align:'center',width:80},
-                { field:'number',title:'数量(零)',align:'center',width:80},
-                { field:'rate',title:'换算率',align:'center',width:100},
+                { field:'wholeNum',title:'数量(整)',edit: 'select',event:'wholeNum',align:'center',width:80},
+                { field:'scatteredNum',title:'数量(零)',edit: 'select',event:'wholeNum',align:'center',width:80},
+                { field:'number',title:'合计',align:'center',width:80},
+                { field:'rate',title:'换算率',align:'center',width:100,templet: function(d){
+                                return '1*'+d.rate;
+                            }},
                 {field: 'id', title: '操作', width:70,templet: function(d){
                     return '<a class="layui-btn layui-btn-xs layui-btn-danger" lay-event="del" lay-id="'+ d.id +'"><i class="layui-icon layui-icon-delete"></i>移除</a>';
                 }}
@@ -135,9 +138,10 @@ window.viewObj = {
             var value = obj.value //得到修改后的值
             ,data = obj.data //得到所在行所有键值
             ,field = obj.field; //得到字段
-            if(obj.field=="numZ"){
+            console.log(data);
+            if(obj.field=="scatteredNum"||obj.field=="wholeNum"){
                  obj.update({
-                      number: zero(value,obj.data.rate)
+                      number:parseInt(data.wholeNum)*parseInt(data.rate)+parseInt(data.scatteredNum)
                  });
             }
          
@@ -154,7 +158,8 @@ window.viewObj = {
                     tray:"",
                     batch:"",
                     number:"",
-                    numL:"",
+                    wholeNum:"",
+                    scatteredNum:"",
                     rate:"",
                     adjustment:""  };
                 oldData.push(newRow);
@@ -230,7 +235,7 @@ window.viewObj = {
             for(i in list){
                 if(list[i].id==id){
                     if(list[i].unitRate){
-                        return "1:"+list[i].unitRate;
+                        return list[i].unitRate;
                     }else{
                         return "";
                     }
@@ -329,15 +334,18 @@ window.viewObj = {
                     $.extend(obj.data, {'batch': stateVal}) 
                     activeByType('updateRow', obj.data);    //更新行记录对象
                     break;  
-                case "numZ":
-                    var stateVal = tr.find("td[data-field='numZ'] .layui-table-cell").html();
+                case "wholeNum":
+                   
+                    var stateVal = tr.find("td[data-field='wholeNum'] .layui-table-cell").html();
+                    var scatteredNum = tr.find("td[data-field='scatteredNum'] .layui-table-cell").html();
                     var number = tr.find("td[data-field='number'] .layui-table-cell");
-                    var rate = tr.find("td[data-field='rate'] .layui-table-cell");
-                    number.html(zero(stateVal,rate.html()));
-                    $.extend(obj.data, {'numZ': stateVal}) ;
-                    $.extend(obj.data, {'number': zero(stateVal,rate.html())}) 
+                    var rate = tr.find("td[data-field='rate'] .layui-table-cell").html().substring(2);
+                    number.html(parseInt(stateVal)*parseInt(rate)+parseInt(scatteredNum));
+                    $.extend(obj.data, {'wholeNum': stateVal}) ;
+                    $.extend(obj.data, {'scatteredNum': scatteredNum}) ;
+                    $.extend(obj.data, {'number': parseInt(stateVal)*parseInt(rate)+parseInt(scatteredNum)}) 
                     activeByType('updateRow', obj.data);    //更新行记录对象
-                    break;                          
+                    break;                           
                 case "del":
                     layer.confirm('真的删除行么？', function(index){
                       obj.del(); //删除对应行（tr）的DOM结构，并更新缓存

@@ -80,6 +80,59 @@ public class MaterialManageDetail extends DataEntity<MaterialManageDetail> imple
     @TableField(exist=false)
     private String itemCode;
     
+	
+    /**
+     * 整数量
+     */
+    @TableField("whole_num")
+    private Integer wholeNum;
+    /**
+     * 散数量
+     */
+    @TableField("scattered_num")
+    private Integer scatteredNum;
+    
+    //现有最大库存 整
+    @TableField(exist=false)
+    private Integer maxWholeNumber;
+     
+    //现有最大库存 零
+    @TableField(exist=false)
+    private Integer maxScatteredNumber;
+    
+    
+    
+	public Integer getMaxWholeNumber() {
+		return maxWholeNumber;
+	}
+
+	public void setMaxWholeNumber(Integer maxWholeNumber) {
+		this.maxWholeNumber = maxWholeNumber;
+	}
+
+	public Integer getMaxScatteredNumber() {
+		return maxScatteredNumber;
+	}
+
+	public void setMaxScatteredNumber(Integer maxScatteredNumber) {
+		this.maxScatteredNumber = maxScatteredNumber;
+	}
+
+	public Integer getWholeNum() {
+		return wholeNum;
+	}
+
+	public void setWholeNum(Integer wholeNum) {
+		this.wholeNum = wholeNum;
+	}
+
+	public Integer getScatteredNum() {
+		return scatteredNum;
+	}
+
+	public void setScatteredNum(Integer scatteredNum) {
+		this.scatteredNum = scatteredNum;
+	}
 
 	public String getItemName() {
 		return itemName;

@@ -5,16 +5,27 @@ Array.prototype.contains = function ( needle ) {
     return false;
 };
 //整转零
-function zero(number,rate){
-    var arr = number.split(".");
-    var a = arr[0]*rate;
-    var b = 0;
-    if(arr.length==2){
-        b = arr[1];
-    }
-    return parseInt(a)+parseInt(b);
+function zero(wholenumber,number,rate){
+
+    return parseInt(wholenumber)*rate+parseInt(number);
 }
 
+//时间格式化
+Date.prototype.format = function (fmt) {
+    var o = {
+        "M+": this.getMonth() + 1, //月份
+        "d+": this.getDate(), //日
+        "h+": this.getHours(), //小时
+        "m+": this.getMinutes(), //分
+        "s+": this.getSeconds(), //秒
+        "q+": Math.floor((this.getMonth() + 3) / 3), //季度
+        "S": this.getMilliseconds() //毫秒
+    };
+    if (/(y+)/.test(fmt)) fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+    for (var k in o)
+        if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+    return fmt;
+}
 //时间控件
 layui.use('laydate', function(){
   var laydate = layui.laydate;
@@ -24,13 +35,7 @@ layui.use('laydate', function(){
     elem: '#saleReturnTime' //指定元素
       ,value: new Date()
   });
-  var laydate2 = layui.laydate;
-  
-  //执行一个laydate实例
-  laydate2.render({
-    elem: '#batch' //指定元素
-      ,value: new Date()
-  });
+
 });
  
 window.viewObj = {
@@ -80,10 +85,24 @@ window.viewObj = {
         //回车操作
         $("#clientCode").keypress(function(e) {
             if (e.which == 13) {
+              $("#batch").focus();
+            }
+        });
+        $("#batch").keypress(function(e) {
+            if (e.which == 13) {
                $("#itemId").parent().find('input:first').click();
                $("#itemId").parent().find('input:first').focus();
             }
         });
+         $("#wholeNumber").keypress(function(e) {
+            if (e.which == 13) {
+                $("#number").focus();
+            }
+        });  
+        //退库批次也默认今天
+        var today = new Date();
+        $("#batch").val(today.format("yyyy-MM-dd"));
+
         $("#number").keypress(function(e) {
             
             if (e.which == 13) {
@@ -93,8 +112,8 @@ window.viewObj = {
                $("#itemId").parent().find('input:first').val("");
                $("#depot").parent().find('input:first').val("");
                $("#tray").parent().find('input:first').val("");
-               $("#itemId").parent().find('input:first').click();
-               $("#itemId").parent().find('input:first').focus();
+               $("#batch").val(today.format("yyyy-MM-dd"));
+               $("#batch").focus();
             }
 
         });
@@ -111,7 +130,7 @@ window.viewObj = {
             elem: '#dataTable',
             id: layTableId,
             data: null,
-            width: tbWidth,
+       //     width: tbWidth,
             page: false,
             loading: true,
             even: false, //不开启隔行背景
@@ -119,15 +138,18 @@ window.viewObj = {
             cols: [[
                     {title: '序号', type: 'numbers'},
                     { field:'systemCode',title:'系统物料编号',align:'center',width:100},
-                    { field:'brand',title:'品牌系列',align:'center',width:100},
-                    { field:'depot',title:'储位',align:'center',width:130},
-                    { field:'tray',title:'托盘',align:'center',width:130},
+                    { field:'name',title:'品名',align:'center',width:200},
+                    { field:'depot',title:'储位',align:'center',width:100},
+                    { field:'tray',title:'托盘',align:'center',width:100},
                     { field:'batch',title:'批次',align:'center',width:100},
-                    { field:'numZ',title:'数量(整)',align:'center',width:100},
-                    { field:'number',title:'数量(零)',align:'center',width:100},
-                    { field:'rate',title:'换算率',align:'center',width:100},
+                    { field:'wholeNum',title:'数量(整)',align:'center',width:100},
+                    { field:'scatteredNum',title:'数量(零)',align:'center',width:100},
+                    { field:'number',title:'数量(零)',align:'center',width:60},
+                    { field:'rate',title:'换算率',align:'center',width:50,templet: function(d){
+                                return '1*'+d.rate;
+                            }},
                     { field:'itemId',title:'品项id',align:'center',hide:true,width:100},
-                    {field: 'tempId', title: '操作', width:100,templet: function(d){
+                    {field: 'tempId', title: '操作', width:150,templet: function(d){
                         return '<a class="layui-btn layui-btn-xs layui-btn-danger" lay-event="del" lay-id="'+ d.tempId +'">移除</a>';
                     }}
             ]],
@@ -146,12 +168,12 @@ window.viewObj = {
                 var _itemCode = $("#itemId").val();
                 var _itemCodeName = $("#itemId").find("option:selected").text();
                 var number = $("#number").val().trim();
+                var wholeNumber = $("#wholeNumber").val().trim();//整数量
                 var batch = $("#batch").val();
                 var depot = $("#depot").find("option:selected").text();
                 var tray = $("#tray").find("option:selected").text();
                 var depot1 = $("#depot").val();
                 var tray1 = $("#tray").val();
-                var adjustment = $("#adjustment").val();
                 //验证
                 if(!(/^(?!0+(\.0*)?$)\d+(.[0-9]{1,19})?$/.test(number))){
                     layer.msg("请输入正确的数量！");
@@ -165,6 +187,11 @@ window.viewObj = {
                     layer.msg("请输入批次号！");
                     return;
                 }
+                if(!(/^(\d{4})\-(\d{2})\-(\d{2})$/.test(batch))){
+                    layer.msg("请输入正确的时间格式(如2020-02-02)");
+                    return;
+                }
+
                 if(!depot1||depot1==-1||depot1==depot){
                     layer.msg("请选择正确的储位号！");
                     return;
@@ -176,15 +203,16 @@ window.viewObj = {
                 $.get(url,function(data){
                    //获取物料信息
                     var newRow = {
-                        systemCode:_itemCodeName,
+                       systemCode:_itemCodeName,
+                        name:data.name,
                         brand:data.brand,
                         depot:depot,
                         tray:tray,
                         batch:batch,
-                        numZ:number,
-                        number:zero(number,data.unitRate),
-                        rate:1+":"+data.unitRate,
-                        adjustment:adjustment,
+                        wholeNum:wholeNumber,
+                        scatteredNum:number,
+                        number:zero(wholeNumber,number,data.unitRate) ,//合计
+                        rate:data.unitRate,
                         tempId:new Date(),
                         itemId:_itemCode
                     };
@@ -309,6 +337,8 @@ window.viewObj = {
         });
         //select 联动
         form.on('select(clientId)', function(data){
+            //清空表单
+            
              //data.value 得到被选中的值
              var url = '/item/clientitem/getByClientIdAll?clientId=' + data.value;
              $.get(url,function(data){
@@ -339,7 +369,7 @@ window.viewObj = {
              $("#tray").parent().find('input:first').focus();
         });
         form.on('select(tray)', function(data){
-             $("#number").focus();
+             $("#wholeNumber").focus();
         });
       
         

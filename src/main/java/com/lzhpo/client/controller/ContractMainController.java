@@ -263,4 +263,22 @@ public class ContractMainController {
 		contractMainService.updateContractMain(contractMain);
 		return ResponseEntity.success("操作成功");
 	}
+	@PostMapping("isWhole")
+	@ResponseBody
+	@SysLog("查询是不是整进整出客户")
+	public ResponseEntity isWhole(@RequestParam(value = "id", required = false) String id) {
+		if (StringUtils.isBlank(id)) {
+			
+		}
+		String contractMainId  = contractMainService.getUsingContractId(id);
+		ContractMain contractMain = contractMainService.getById(contractMainId);
+		if(contractMain==null){
+			return ResponseEntity.failure("该客户暂无使用得合同");
+		}
+		if(contractMain!=null&&contractMain.getIsWhole()!=null&&contractMain.getIsWhole().equals(0)){
+			return ResponseEntity.success("整进整出客户");
+		}else{
+			return ResponseEntity.failure("非整进整出客户");
+		}
+	}
 }

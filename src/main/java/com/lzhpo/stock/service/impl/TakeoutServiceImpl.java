@@ -14,6 +14,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.fasterxml.jackson.databind.RuntimeJsonMappingException;
 import com.lzhpo.common.init.CacheUtils;
 import com.lzhpo.finance.service.IIncomeService;
+import com.lzhpo.material.item.service.IClientitemService;
 import com.lzhpo.stock.entity.MaterialDepot;
 import com.lzhpo.stock.entity.MaterialOperations;
 import com.lzhpo.stock.entity.MathStockNumber;
@@ -58,6 +59,8 @@ public class TakeoutServiceImpl extends ServiceImpl<TakeoutMapper, Takeout> impl
 	private IIncomeService incomeService;
 	@Autowired
 	private IMaterialDepotService materialDepotService;
+	@Autowired
+	private IClientitemService clientitemService;
 	
 	@Override
 	public long getTakeoutCount(String name) {
@@ -97,15 +100,20 @@ public class TakeoutServiceImpl extends ServiceImpl<TakeoutMapper, Takeout> impl
 			materialOperations.setFromType(trunover_type_takeout_new);// 新建出库
 			materialOperations.setMaterialId(takeoutDetail.getMaterial());
 			materialOperations.setNumber(takeoutDetail.getNumber());
+			materialOperations.setWholeNum(takeoutDetail.getWholeNum());//整库存
+			materialOperations.setScatteredNum(takeoutDetail.getScatteredNum());//零库存
 			materialOperations.setType(2);// 出库为-
 			materialOperationsService.save(materialOperations);
 			// 应该在这里把可用库存改成锁定库存 这里也是做库存得二次认证
 			// 有materialId使用
 			try {
-				List<MaterialDepot> mdepotList =  materialSerivice.lockMaterial(takeoutDetail.getMaterial(), takeoutDetail.getNumber(),null);
+				//锁定物料这个接口也要改 20200722 xudm//
+				List<MaterialDepot> mdepotList =  materialSerivice.lockMaterial(takeoutDetail.getMaterial(), takeoutDetail.getNumber(),takeoutDetail.getWholeNum(),takeoutDetail.getScatteredNum(),null);
 				for (MaterialDepot materialDepot : mdepotList) {
 					takeoutDetail.setDepot(materialDepot.getDepotId());	
 					takeoutDetail.setNumber(materialDepot.getNumber());
+					takeoutDetail.setWholeNum(materialDepot.getWholeNum());
+					takeoutDetail.setScatteredNum(materialDepot.getScatteredNum());
 					takeoutDetail.setId(UUID.randomUUID().toString());
 					takeoutDetailService.save(takeoutDetail);
 				}
@@ -151,6 +159,7 @@ public class TakeoutServiceImpl extends ServiceImpl<TakeoutMapper, Takeout> impl
 		takeout.setTotal(math.getNumZ());
 		takeout.setTrayNumber(math.getTray());
 		takeout.setNumber(math.getNumber());
+		takeout.setScatteredNum(math.getScatteredNum());
 		takeout.setPickingStatus(is_exsit_pick_no);
 		TakeoutOperations operations = new TakeoutOperations();
 		operations.setTakeoutId(takeout.getId());
@@ -176,16 +185,19 @@ public class TakeoutServiceImpl extends ServiceImpl<TakeoutMapper, Takeout> impl
 		List<TakeoutDetail> detailSet = takeoutDetailService.selecttakeoutDetailBytakeoutId(takeoutWeb.getId());
 		for (TakeoutDetail takeoutDetail : detailSet) {
 			// 先加出库存
-			materialSerivice.unlockMaterial(takeoutDetail.getMaterial(), takeoutDetail.getNumber());
+			materialSerivice.unlockMaterial(takeoutDetail.getMaterial(), takeoutDetail.getWholeNum(),takeoutDetail.getScatteredNum(),
+					clientitemService.getById(takeoutDetail.getItemId()).getUnitRate());
 			// 储位的库存对应关系表也要处理
 			materialDepotService.mathNumberBymaterialIdAndDepotId(takeoutDetail.getMaterial(), takeoutDetail.getDepot(),
-					takeoutDetail.getNumber(), true);
+					takeoutDetail.getNumber(),takeoutDetail.getWholeNum(),takeoutDetail.getScatteredNum(), true);
 			// 记录流水
 			MaterialOperations materialOperations = new MaterialOperations();
 			materialOperations.setFromCode(takeout.getCode());
 			materialOperations.setFromType(trunover_type_takeout_back);// 出库
 			materialOperations.setMaterialId(takeoutDetail.getMaterial());
 			materialOperations.setNumber(takeoutDetail.getNumber());
+			materialOperations.setWholeNum(takeoutDetail.getWholeNum());//整库存
+			materialOperations.setScatteredNum(takeoutDetail.getScatteredNum());//零库存
 			materialOperations.setType(1);// 出库撤销为+
 			materialOperationsService.save(materialOperations);
 		}

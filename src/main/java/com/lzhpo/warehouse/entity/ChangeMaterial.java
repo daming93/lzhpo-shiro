@@ -82,9 +82,64 @@ public class ChangeMaterial extends DataEntity<ChangeMaterial> implements Serial
     @TableField(exist=false)
     private String clientName;
     
+	
+    /**
+     * 原整数量
+     */
+    @TableField("old_whole_num")
+    private Integer oldWholeNum;
+    /**
+     * 原散数量
+     */
+    @TableField("old_scattered_num")
+    private Integer oldScatteredNum;
+    
+    /**
+     * 新整数量
+     */
+    @TableField("new_whole_num")
+    private Integer newWholeNum;
+    /**
+     * 新散数量
+     */
+    @TableField("new_scattered_num")
+    private Integer newScatteredNum;
+
+	
     
     
-    
+	public Integer getOldWholeNum() {
+		return oldWholeNum;
+	}
+
+	public void setOldWholeNum(Integer oldWholeNum) {
+		this.oldWholeNum = oldWholeNum;
+	}
+
+	public Integer getOldScatteredNum() {
+		return oldScatteredNum;
+	}
+
+	public void setOldScatteredNum(Integer oldScatteredNum) {
+		this.oldScatteredNum = oldScatteredNum;
+	}
+
+	public Integer getNewWholeNum() {
+		return newWholeNum;
+	}
+
+	public void setNewWholeNum(Integer newWholeNum) {
+		this.newWholeNum = newWholeNum;
+	}
+
+	public Integer getNewScatteredNum() {
+		return newScatteredNum;
+	}
+
+	public void setNewScatteredNum(Integer newScatteredNum) {
+		this.newScatteredNum = newScatteredNum;
+	}
+
 	public String getItemCode() {
 		return itemCode;
 	}

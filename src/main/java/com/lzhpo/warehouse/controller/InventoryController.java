@@ -38,6 +38,8 @@ import com.lzhpo.warehouse.entity.Inventory;
 import com.lzhpo.warehouse.entity.InventoryMaterial;
 import com.lzhpo.warehouse.service.IInventoryMaterialService;
 import com.lzhpo.warehouse.service.IInventoryService;
+
+import cn.hutool.core.util.NumberUtil;
 /**
  * <p>
  * 盘点表 前端控制器
@@ -162,9 +164,13 @@ public class InventoryController {
 //        if(inventoryService.getInventoryCount(inventory.getName())>0){
 //             return ResponseEntity.failure("修改提示信息（不能重复)");
 //        }
-    	Inventory inventory   = new Inventory(); 	
-    	inventory.setStartTime(LocalDate.parse(startTime, DateTimeFormatter.ofPattern("yyyy-MM-dd")));
-    	inventory.setEndTime(LocalDate.parse(endTime, DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+    	Inventory inventory   = new Inventory(); 
+    	if(!StringUtils.isBlank(startTime)){
+    		inventory.setStartTime(LocalDate.parse(startTime, DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+    	}
+    	if(!StringUtils.isBlank(endTime)){
+    		inventory.setEndTime(LocalDate.parse(endTime, DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+    	}
     	inventory.setBatchStatus(batchStatus);
     	inventory.setClientId(clientId);
     	inventory.setAuditorType(continuity);
@@ -277,6 +283,9 @@ public class InventoryController {
 			}else{
 				r.setCheckTypeStr("待定");
 			}
+			if(r.getType()!=null){
+				r.setTypeStr(CommomUtil.valueToNameInDict(r.getType(), "material_type"));
+			}
 		});
 		return details;
 	}
@@ -295,6 +304,14 @@ public class InventoryController {
 			return ResponseEntity.failure("该单据不在待确认状态无法修改");
 		}
 		try {
+			if(detail.getInventoryWholeNum()==null){
+				detail.setInventoryWholeNum(0);
+			}
+			if(detail.getInventoryScatteredNum()==null){
+				detail.setInventoryScatteredNum(0);
+			}
+			detail.setInventoryNum((long) (detail.getInventoryWholeNum()*detail.getUnitRate()+detail.getInventoryScatteredNum()));
+			detail.setDifference(detail.getInventoryNum()-detail.getDepotNum());
 			inventoryMaterialService.updateById(detail);
 		} catch (Exception e) {
 			e.printStackTrace();

@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletRequest;
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.WebUtils;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -66,9 +68,9 @@ public class TrayController {
 	    //相当于del_flag = 0;
         trayWrapper.eq("del_flag",false);
         if(!map.isEmpty()){
-            String keys = (String) map.get("name");
+            String keys = (String) map.get("code");
             if(StringUtils.isNotBlank(keys)) {
-                trayWrapper.like("name", keys);
+                trayWrapper.like("code", keys);
             }
         }
         IPage<Tray> trayPage = trayService.page(new Page<>(page,limit),trayWrapper);
@@ -176,4 +178,17 @@ public class TrayController {
         trayService.updateTray(tray);
         return ResponseEntity.success("操作成功");
     }
+    
+	
+	@SysLog("上传文件")
+	@PostMapping("upload")
+	@ResponseBody
+	public ResponseEntity uploadFile(@RequestParam("file") MultipartFile file, HttpServletRequest httpServletRequest) {
+		if (file == null) {
+			return ResponseEntity.failure("上传文件为空 ");
+		}
+		Map map = new HashMap();
+		String message = trayService.upload(file);
+		return ResponseEntity.success(message).setAny("data", map);
+	}
 }

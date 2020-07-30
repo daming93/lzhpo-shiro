@@ -8,6 +8,8 @@
 			item_id,
 			from_code,
 			sum(number) number,
+			sum(whole_num) AS wholeNum,
+			sum(scattered_num) AS scatteredNum,
 		from_type,
 		create_date
 		FROM
@@ -20,6 +22,14 @@
 					o.type = 1,
 					o.number ,- o.number
 				) number,
+				IF (
+					o.type = 1,
+					o.whole_num ,- o.whole_num
+				) whole_num,
+				IF (
+					o.type = 1,
+					o.scattered_num ,- o.scattered_num
+				) scattered_num,
 				i.id item_id,
 				o.from_code,
 			o.from_type,
@@ -67,6 +77,7 @@
 			item_id,
 			from_code,
 			sum(number) number,
+			
 		CASE from_type
 		when 0 then 0
 		when 1 then 0

@@ -74,6 +74,11 @@ public class Takeout extends DataEntity<Takeout> implements Serializable {
      * 发货总数(整)
      */
     private Integer total;
+    /**
+     * 散数量
+     */
+    @TableField("scattered_num")
+    private Integer scatteredNum;
 
     /**
      * 发货总数(零)
@@ -190,6 +195,14 @@ public class Takeout extends DataEntity<Takeout> implements Serializable {
     
     
     
+	public Integer getScatteredNum() {
+		return scatteredNum;
+	}
+
+	public void setScatteredNum(Integer scatteredNum) {
+		this.scatteredNum = scatteredNum;
+	}
+
 	public String getPickStatusStr() {
 		return pickStatusStr;
 	}

@@ -90,6 +90,8 @@ public class InventoryServiceImpl extends ServiceImpl<InventoryMapper, Inventory
 			im.setBatchNumber(material.getBatchNumber().toString());
 			im.setType(material.getType());
 			im.setDepotNum(Long.valueOf(material.getAvailableNum()));// 系统库存
+			im.setWholeNum(material.getWholeNum());
+			im.setScatteredNum(material.getScatteredNum());
 			// 但是盘点的是当时的记录 应该记录下当时的品项名称 如果之后名称改了 不影响此间记录
 			Clientitem item = clientitemService.getById(material.getItemId());
 			im.setCode(item.getCode());

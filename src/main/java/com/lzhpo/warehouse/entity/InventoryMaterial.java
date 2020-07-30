@@ -114,7 +114,74 @@ public class InventoryMaterial extends DataEntity<InventoryMaterial> implements 
     @TableField(exist=false)
     private String checkTypeStr;
 
+    @TableField(exist=false)
+    private String typeStr;
     
+
+    /**
+     * 整数量
+     */
+    @TableField("whole_num")
+    private Integer wholeNum;
+    /**
+     * 散数量
+     */
+    @TableField("scattered_num")
+    private Integer scatteredNum;
+    
+    /**
+     * 盘点整数量
+     */
+    @TableField("inventory_whole_num")
+    private Integer inventoryWholeNum;
+    /**
+     *盘点散数量
+     */
+    @TableField("inventory_scattered_num")
+    private Integer inventoryScatteredNum;
+    
+    
+    
+	public Integer getInventoryWholeNum() {
+		return inventoryWholeNum;
+	}
+
+	public void setInventoryWholeNum(Integer inventoryWholeNum) {
+		this.inventoryWholeNum = inventoryWholeNum;
+	}
+
+	public Integer getInventoryScatteredNum() {
+		return inventoryScatteredNum;
+	}
+
+	public void setInventoryScatteredNum(Integer inventoryScatteredNum) {
+		this.inventoryScatteredNum = inventoryScatteredNum;
+	}
+
+	public Integer getWholeNum() {
+		return wholeNum;
+	}
+
+	public void setWholeNum(Integer wholeNum) {
+		this.wholeNum = wholeNum;
+	}
+
+	public Integer getScatteredNum() {
+		return scatteredNum;
+	}
+
+	public void setScatteredNum(Integer scatteredNum) {
+		this.scatteredNum = scatteredNum;
+	}
+	
+	public String getTypeStr() {
+		return typeStr;
+	}
+
+	public void setTypeStr(String typeStr) {
+		this.typeStr = typeStr;
+	}
+
 	public String getCheckTypeStr() {
 		return checkTypeStr;
 	}

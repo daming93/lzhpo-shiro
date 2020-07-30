@@ -109,6 +109,7 @@ public class ClientitemServiceImpl extends ServiceImpl<ClientitemMapper, Clienti
 			.addHeaderAlias("宽度(cm)", "itemWidth")
 			.addHeaderAlias("高度(cm)", "itemHeight")
 			.addHeaderAlias("体积", "itemVolume")
+			.addHeaderAlias("重量", "itemWeight")
 			.addHeaderAlias("单位（整）", "unitWhole")
 			.addHeaderAlias("单位（零）", "unitScattered")
 			.addHeaderAlias("件/托", "tray")
@@ -127,6 +128,7 @@ public class ClientitemServiceImpl extends ServiceImpl<ClientitemMapper, Clienti
 				}else{//else就是没有找到改客户简称
 					buffer.append("第"+i+"条无匹配客户<br>");
 				}
+				i++;
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

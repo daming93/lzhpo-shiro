@@ -5,20 +5,66 @@ Array.prototype.contains = function ( needle ) {
     return false;
 };
 //整转零
-function zero(number,rate){
-    var arr = number.split(".");
-    var a = arr[0]*rate;
-    var b = 0;
-    if(arr.length==2){
-        b = arr[1];
-    }
-    return parseInt(a)+parseInt(b);
+function zero(whole,number,rate){
+  
+    return parseInt(whole)*parseInt(rate)+parseInt(number);
 }
+
 //零转整
 function theTurn(number,rate){
     var a = Math.floor(number/rate);
     var b = number%rate;
     return a+"."+b;
+}
+function array_remove_repeat(a) { // 去重
+    var r = [];
+    for(var i = 0; i < a.length; i ++) {
+        var flag = true;
+        var temp = a[i];
+        for(var j = 0; j < r.length; j ++) {
+            if(temp === r[j]) {
+                flag = false;
+                break;
+            }
+        }
+        if(flag) {
+            r.push(temp);
+        }
+    }
+    return r;
+}
+
+function array_intersection(a, b) { // 交集
+    var result = [];
+    for(var i = 0; i < b.length; i ++) {
+        var temp = b[i];
+        for(var j = 0; j < a.length; j ++) {
+            if(temp === a[j]) {
+                result.push(temp);
+                break;
+            }
+        }
+    }
+    return array_remove_repeat(result);
+}
+
+function array_union(a, b) { // 并集
+    return array_remove_repeat(a.concat(b));
+}
+
+function array_difference(a, b) { // 差集 a - b
+    //clone = a
+    var clone = a.slice(0);
+    for(var i = 0; i < b.length; i ++) {
+        var temp = b[i];
+        for(var j = 0; j < clone.length; j ++) {
+            if(temp === clone[j]) {
+                //remove clone[j]
+                clone.splice(j,1);
+            }
+        }
+    }
+    return array_remove_repeat(clone);
 }
 
 //时间控件
@@ -30,13 +76,7 @@ layui.use('laydate', function(){
     elem: '#materialManageTime' //指定元素
       ,value: new Date()
   });
-  var laydate2 = layui.laydate;
-  
-  //执行一个laydate实例
-  laydate2.render({
-    elem: '#batch' //指定元素
-      ,value: new Date()
-  });
+ 
 });
  
 window.viewObj = {
@@ -67,8 +107,9 @@ window.viewObj = {
                             { field:'itemName',title:'物料名称',align:'center',width:250},
                             { field:'depot',title:'储位',align:'center',width:130},
                             { field:'batch',title:'批次',align:'center',width:100},
-                            { field:'numZ',title:'数量(整)',align:'center',width:100},
-                            { field:'number',title:'数量(零)',align:'center',width:100},
+                            { field:'wholeNum',title:'数量(整)',align:'center',width:100},
+                            { field:'scatteredNum',title:'数量(零)',align:'center',width:100},
+                            { field:'number',title:'合计',align:'center',width:100},
                             { field:'rate',title:'换算率',align:'center',width:100},
                             { field:'itemId',title:'品项id',align:'center',hide:true,width:100},
                              {field: 'material', title: '物料id', hide:true,width:100,templet: function(d){
@@ -85,70 +126,229 @@ window.viewObj = {
         var rateTemp = 0;
         $("#clientId").parent().find('input:first').click();
         $("#clientId").parent().find('input:first').focus();  
-
+        $("#wholeNumber").keypress(function(e) {
+            if (e.which == 13) {
+                $("#number").focus();
+            }
+        });
          $("#number").keypress(function(e) {
             
-            if (e.which == 13) {
+             if (e.which == 13) {
               // activeByType('addRow');
                 var oldData = table.cache[layTableId];
                 var sum  = 0;
+                var sumScatteredNum = 0;
+                var sumWholeNum = 0;
                 for(j = 0,len=oldData.length; j < len; j++) {
                     sum += oldData[ j].availableNum;
+                    sumScatteredNum += oldData[ j].scatteredNum;
+                    sumWholeNum += oldData[ j].wholeNum;
                 }
-                var number = $("#number").val();
-                //有数据之后 转整
-                var numZ = zero(number,rateTemp);
-                if(numZ>sum){
-                    layer.msg("请输入正确的数量！(不得大于库存数量)");
+                var number = $("#number").val();// 
+                var wholeNum =  $("#wholeNumber").val();// 整数
+                var clientId =  $("#clientId").val();// 客户Id
+                   //验证
+                if(!(/^[0-9]\d*$/.test(number))){
+                    layer.msg("请输入正确的零数量！");
                     return;
                 }
-                var tempSum = numZ;//已使用数量
-                //        
-                var arr = new Array();
-                for(j = 0,len=oldData.length; j < len; j++) {
-                    var tempNumber = oldData[ j].availableNum;//临时行数量
-                    if(tempSum-tempNumber>=0){//如果大于本行数量
-                        tempSum = tempSum-tempNumber;
-                        var newRow = oldData[ j];
-                        newRow.number = newRow.availableNum;
-                        newRow.batch = newRow.batchNumber;
-                        newRow.material = newRow.id;//编制格式
-                        active.addRow(newRow,'materialManageTable');
-                        arr.push(oldData[j].id);
-                    }else{
-                        if(tempSum<=0){
-                            break;
-                        }
-                        var newRow = {
-                             id : oldData[j].id,
-                             number : tempSum,
-                             systemCode:oldData[j].systemCode,
-                             itemName:oldData[j].itemName,
-                             depot:oldData[j].depot,
-                             batch:oldData[j].batchNumber,
-                             rate:oldData[j].rate,
-                             itemId:oldData[j].itemId,
-                             material:oldData[j].id,
-                             numZ:theTurn(tempSum,oldData[j].rate)
-                        }
-                       
-                        arr.push(oldData[j].id);
-                        active.addRow(newRow,'materialManageTable');
-                        tempSum = -1;
-                        break;
-                    }
-                   
+                 //验证
+                if(!(/^[0-9]\d*$/.test(wholeNum))){
+                    layer.msg("请输入正确的整数量！");
+                    return;
                 }
-                for(j = 0,len=arr.length; j < len; j++) {
-                    active.removeEmptyTableCache(oldData[0].id,'layTable');
-                    $("#tableRes").find("tr").eq(1).remove();
+                if(!clientId){
+                    layer.msg("请选择客户");
+                    return;
+                }
+                var isWhole = false;//默认不是
+                //看是不是整进整出的客户
+                $.ajax({
+                    type:"POST",
+                    url:"/client/contractMain/isWhole?id="+clientId,
+                    dataType:"json",
 
-                    
-                }
-                $("#number").val("");
-                $("#itemId").parent().find('input:first').val("");
-                $("#itemId").parent().find('input:first').click();
-                $("#itemId").parent().find('input:first').focus();
+                    contentType:"application/json",
+                    success:function(res){
+                        if(res.success){
+                           isWhole = true;
+                        }else{
+                            if(res.message=="该客户暂无使用得合同"){
+                                layer.msg("该客户暂无使用得合同");
+                                return;
+                            }
+                        }
+                        if(isWhole&&number>sumScatteredNum){
+
+                         //如果零数量超了并且 是 整客户 即 不允许拆箱 就直接返回 
+                            layer.msg("该客户正在使用的合同是整出客户，不允许拆零，先零数量超过库存");
+                            return;
+                        }
+                        if(isWhole){//零数量合适
+                            if(wholeNum>sumWholeNum){
+                                layer.msg("整数量超过库存");
+                                return;
+                            }
+                            //在不拆零得情况下怎么做
+                            //先看怎么出零得
+                            //现在零数量够，应该按批次先出 看 列表中哪些有零数量 记录 其中得下标位置
+                            var tempScatteredNum = number; //剩余零数量
+                            var tempwholeNumber = wholeNum;
+                            var scatteredArr =  new Array();
+                            var wholeArr =  new Array();
+                            var wholeDataArr =  new Array();
+                            var scatteredDataArr =  new Array();
+                            // 然后按此法找到 整数量
+                            for(j = 0,len=oldData.length; j < len; j++) {
+                                var tempNumber = oldData[ j].scatteredNum;//临时行数量
+                                
+                                if(tempNumber>0){
+                                   if(tempScatteredNum-tempNumber>=0){//如果大于本行数量
+                                        var arrScattereStr = {index:j,scatteredNum:tempNumber};
+                                        scatteredArr.push(j);
+                                        scatteredDataArr.push(arrScattereStr);
+                                        tempScatteredNum = tempScatteredNum - tempNumber;
+                                    }else{
+                                        if(tempScatteredNum<=0){
+                                            break;
+                                        }else{
+                                            var arrScattereStr = {index:j,scatteredNum:tempScatteredNum};
+                                            scatteredArr.push(j);
+                                            scatteredDataArr.push(arrScattereStr);
+                                            break;
+                                        } 
+                                    }
+                                    //这个时候得零数量 得数组已经处理完成
+                                }else{
+                                   // break;
+                                }
+                            }
+                            for(j = 0,len=oldData.length; j < len; j++) {    
+                                var tempWholeArrNumber = oldData[ j].wholeNum;//临时行数量
+
+                                if(tempWholeArrNumber>0){
+                                    if(tempwholeNumber-tempWholeArrNumber>=0){//如果大于本行数量
+                                        var arrWholeStr = {index:j,wholeNum:tempWholeArrNumber};
+                                        wholeArr.push(j);
+                                        wholeDataArr.push(arrWholeStr);
+                                        tempwholeNumber = tempwholeNumber - tempWholeArrNumber;
+                                    }else{
+                                        if(tempwholeNumber<=0){
+                                            break;
+                                        }else{
+                                            var arrWholeStr = {index:j,wholeNum:tempwholeNumber};
+                                            wholeArr.push(j);
+                                            wholeDataArr.push(arrWholeStr);
+                                            break;
+                                        } 
+                                    }
+                                    //这个时候得整数量 得数组已经处理完成
+                                }else{
+                                    //break;
+                                }
+                            }
+                             var tempAllArr =  array_union(wholeArr, scatteredArr);//组合数组
+                             var allArr = new Array();
+                                                          //把这两个数组进行一个组合
+                             for(j = 0,len=tempAllArr.length; j < len; j++) {
+                                var arrTemp  ={};
+                                arrTemp.index = tempAllArr[j];
+                                for(k = 0,lensc=scatteredDataArr.length; k < lensc; k++) {
+                                    if(tempAllArr[j]==scatteredDataArr[k].index){
+                                        arrTemp.scatteredNum=scatteredDataArr[k].scatteredNum
+                                        arrTemp.wholeNum=0;
+                                    }
+                                    
+                                }
+                                for(k = 0,lensc=wholeDataArr.length; k < lensc; k++) {
+                                    if(tempAllArr[j]==wholeDataArr[k].index){
+                                        arrTemp.wholeNum=wholeDataArr[k].wholeNum
+                                        if(!arrTemp.scatteredNum){
+                                             arrTemp.scatteredNum = 0;
+                                        }
+                                    }
+                                    
+                                }
+                                allArr.push(arrTemp);
+                             }
+                             for(j = 0,len=oldData.length; j < len; j++) {
+                                for(k = 0,lensc=allArr.length; k < lensc; k++) {
+                                    if(j ==allArr[k].index  ){
+                                        var newRow = oldData[ j];
+                                        newRow.wholeNum = allArr[k].wholeNum;
+                                        newRow.scatteredNum = allArr[k].scatteredNum;
+                                        newRow.number = zero(newRow.wholeNum,newRow.scatteredNum,rateTemp);
+                                        newRow.batch = newRow.batchNumber;
+                                        newRow.material = newRow.id;//编制格式
+                                        active.addRow(newRow,'takeoutTable');
+                                    }    
+                                }
+                             }
+                        }else{
+                            var numZ = zero(wholeNum,number,rateTemp);
+                            if(numZ>sum){
+                                layer.msg("请输入正确的数量！(不得大于库存数量)");
+                                return;
+                            }
+                            var tempSum = numZ;//已使用数量
+                            var tempWhole =    wholeNum;
+                            var tempScattnumber =    number;     
+                            var arr = new Array();
+                            for(j = 0,len=oldData.length; j < len; j++) {
+                                var tempNumber = oldData[ j].availableNum;//临时行数量
+                                if(tempSum-tempNumber>=0){//如果大于本行数量
+                                    tempSum = tempSum-tempNumber;
+                                    tempWhole = tempWhole - oldData[ j].wholeNum;
+                                    tempScattnumber = tempScattnumber - oldData[ j].scatteredNum;
+                                    var newRow = oldData[ j];
+                                    newRow.number = newRow.availableNum;
+                                    newRow.batch = newRow.batchNumber;
+                                    newRow.material = newRow.id;//编制格式
+                                    active.addRow(newRow,'takeoutTable');
+                                    arr.push(oldData[j].id);
+                                }else{
+                                    if(tempSum<=0){
+                                        break;
+                                    }
+                                    var newRow = {
+                                         id : oldData[j].id,
+                                         number : tempSum,
+                                         systemCode:oldData[j].systemCode,
+                                         itemName:oldData[j].itemName,
+                                         depot:oldData[j].depot,
+                                         batch:oldData[j].batchNumber,
+                                         rate:oldData[j].rate,
+                                         itemId:oldData[j].itemId,
+                                         material:oldData[j].id,
+                                         wholeNum:tempWhole,
+                                         scatteredNum:tempScattnumber
+                                    }
+                                   
+                                    arr.push(oldData[j].id);
+                                    active.addRow(newRow,'takeoutTable');
+                                    tempSum = -1;
+                                    break;
+                                }
+                               
+                            }
+                        }
+                        
+                        for(j = 0,len=oldData.length; j < len; j++) {//全部删除 
+                            active.removeEmptyTableCache(oldData[0].id,'layTable');
+                            $("#tableRes").find("tr").eq(1).remove();
+                        }
+                        $("#number").val("");
+                        $("#wholeNumber").val("");
+                        //执行清空
+                        $("#itemId").val("");
+                        //重新渲染
+                        form.render("select");
+                        $("#itemId").parent().find('input:first').val("");
+                        $("#itemId").parent().find('input:first').click();
+                        $("#itemId").parent().find('input:first').focus();
+                    }
+                });
+               
             }
         });
         //定义事件集合
@@ -254,62 +454,68 @@ window.viewObj = {
         });
 
         form.on('select(itemId)', function(data){
-            var itemId =  $("#itemId").val();
+            $("#batch").focus();
+        });
+     
+        $("#batch").keypress(function(e) {
+            if (e.which == 13) {
+                var itemId =  $("#itemId").val();
                 var batch =  $("#batch").val();
                //表格加载
                 var tableData=new Array();  
-
-                var mode = $("#mode").val();
                 //数据表格实例化           
                 var tbWidth = $("#tableRes").width();
                 tableIns = table.render({
                     url:'/stock/material/listByClientIdAndBatch',
-                    where:{itemId:itemId,batch:batch,materialType:mode},//选择良品或者不良品出库
+                    where:{itemId:itemId,batch:batch,materialType:1},//选择良品出库
                     elem: '#dataTable',
                     id: layTableId,
                     method: 'post',
-                    width: tbWidth,
+                   // width: tbWidth,
+                    cellMinWidth:100,
                     page: false,
                     loading: true,
                     even: false, //不开启隔行背景
                     limit: 1000, // 数据表格默认全部显示
                     cols: [[
                             {title: '序号', type: 'numbers'},
-                            { field:'systemCode',title:'系统物料编号',align:'center',width:160},
-                            { field:'itemName',title:'物料名称',align:'center',width:250},
-                            { field:'depot',title:'储位',align:'center',width:130},
-                            { field:'batchNumber',title:'批次',align:'center',width:100},
-                            { field:'numZ',title:'数量(整)',align:'center',width:100},
-                            { field:'number',title:'数量(零)',align:'center',width:100,templet: function(d){
+                            { field:'systemCode',title:'系统物料编号',align:'center'},
+                            { field:'itemName',title:'物料名称',align:'center'},
+                            { field:'depot',title:'储位',align:'center'},
+                            { field:'batchNumber',title:'批次',align:'center'},
+                            { field:'wholeNum',title:'整',align:'center',width:100},
+                            { field:'scatteredNum',title:'零',align:'center',width:100},
+                            { field:'number',title:'合计',align:'center',templet: function(d){
                                 return d.availableNum;
                             }},
-                            { field:'rate',title:'换算率',align:'center',width:100},
-                            { field:'itemId',title:'品项id',align:'center',hide:true,width:100},
-                            {field: 'materialId', title: '物料id', hide:true,width:100,templet: function(d){
+                            { field:'rate',title:'换算率',align:'center',templet: function(d){
+                                return '1*'+d.rate;
+                            }},
+                            { field:'itemId',title:'品项id',align:'center',hide:true},
+                            {field: 'material', title: '物料id', hide:true,width:100,templet: function(d){
                                 return d.id;
                             }}
                     ]],
                     done: function(res, curr, count){
                         if(count>0){
-                        	rateTemp = res.data[0].rate;
+                            rateTemp = res.data[0].rate;
                             var systemCode = res.data[0].systemCode;
-                            var oldData = table.cache['materialManageTable'];  
+                            var oldData = table.cache['takeoutTable'];  
                             for(var i=oldData.length-1, row; i >=0; i--){
                                   row = oldData[i];
                                   if(row.systemCode==systemCode){
                                       oldData.splice(i, 1);    //删除一项
                                   }
                             }
-                            materialManageIns.reload({
+                            takeoutIns.reload({
                                 data : oldData
                             });  
                         }
                     }
                 });
-             $("#number").parent().find('input:first').focus();
+                $("#wholeNumber").focus();
+            }
         });
-     
-      
         
 //提交数据代码
         form.on('submit(addmaterialManage)',function(data){

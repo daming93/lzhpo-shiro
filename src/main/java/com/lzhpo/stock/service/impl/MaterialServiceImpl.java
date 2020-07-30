@@ -16,6 +16,8 @@ import org.springframework.transaction.annotation.Transactional;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.fasterxml.jackson.databind.RuntimeJsonMappingException;
+import com.lzhpo.material.item.entity.Clientitem;
+import com.lzhpo.material.item.service.IClientitemService;
 import com.lzhpo.stock.entity.Material;
 import com.lzhpo.stock.entity.MaterialDepot;
 import com.lzhpo.stock.mapper.MaterialMapper;
@@ -35,7 +37,8 @@ public class MaterialServiceImpl extends ServiceImpl<MaterialMapper, Material> i
 	@Autowired
 	private IMaterialDepotService materialDepotService;
 	
-	
+	@Autowired
+	private IClientitemService itemService;
 	@Override
 	public long getMaterialCount(String name) {
 		QueryWrapper<Material> wrapper = new QueryWrapper<>();
@@ -97,19 +100,22 @@ public class MaterialServiceImpl extends ServiceImpl<MaterialMapper, Material> i
 	}
 
 	@Override
-	public List<MaterialDepot>  lockMaterial (String materialId, Integer number,String depotCode) throws Exception  {
+	public List<MaterialDepot>  lockMaterial (String materialId, Integer number,Integer wholeNum,Integer scatteredNum,String depotCode) throws Exception  {
 		Material material = baseMapper.selectById(materialId);
 		Integer num = material.getAvailableNum()-number;
+		Clientitem item = itemService.getById(material.getItemId());
 		List<MaterialDepot> list = new ArrayList<MaterialDepot>();
 		if(num<0){
 			throw new RuntimeJsonMappingException("库存数量不足");
 		}else{
 			material.setAvailableNum(num);
+			material.setWholeNum(material.getWholeNum()-wholeNum);
+			material.setScatteredNum(material.getScatteredNum()-scatteredNum);
 			material.setLockCode(material.getLockCode()+number);
 			//返回一个List 其中放着 对应的储位code 和 对应 数量
 			//分配从储位中拿走的数量
 			try {
-				list = materialDepotService.getListByMaterialAndNumber(materialId, number,depotCode);
+				list = materialDepotService.getListByMaterialAndNumber(materialId, number,wholeNum,scatteredNum,depotCode,item.getUnitRate());
 			} catch (RuntimeJsonMappingException e) {
 				throw new RuntimeJsonMappingException("库存数量不足");
 			}catch (Exception e) {
@@ -121,10 +127,13 @@ public class MaterialServiceImpl extends ServiceImpl<MaterialMapper, Material> i
 	}
 
 	@Override
-	public void unlockMaterial(String materialId, Integer number) {
+	public void unlockMaterial(String materialId, Integer wholeNumber,Integer scatteredNum,Integer rate) {
+		Integer number = wholeNumber * rate + scatteredNum;
 		Material material = baseMapper.selectById(materialId);
 		material.setAvailableNum(material.getAvailableNum()+number);
 		material.setLockCode(material.getLockCode()-number);
+		material.setWholeNum(material.getWholeNum()+ wholeNumber);
+		material.setScatteredNum(material.getScatteredNum()+scatteredNum);
 		baseMapper.updateById(material);
 	}
 

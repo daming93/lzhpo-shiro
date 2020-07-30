@@ -26,7 +26,7 @@ layui.use(['jquery','layer','form','table'], function() {
             { field:'numZ',title:'数量(整)',align:'center',width:100},
             { field:'availableNum',title:'数量(零)',align:'center',width:100},
             { field:'rate',title:'换算率',align:'center',width:100},
-            {field:'materialStatus',    align:'center'  ,  title: '物料冻结状态'   },
+            // {field:'materialStatus',    align:'center'  ,  title: '物料冻结状态'   },
             {field:'type',   align:'center'   ,  title: '状态'   },
         ]]/*,
         done: function () {

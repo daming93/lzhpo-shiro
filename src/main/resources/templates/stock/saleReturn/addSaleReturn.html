@@ -19,7 +19,16 @@
         /*layui 元素样式改写*/
         .layui-btn-sm{line-height: normal; font-size: 12.5px;}      
         .layui-table-view .layui-table-body{min-height: 256px;}
-        .layui-table-cell .layui-input.layui-unselect{height: 30px; line-height: 30px;}
+        .layui-input.layui-unselect{height: 30px; line-height: 30px;}
+        .layui-table-cell {
+            font-size:14px;
+            padding:0 5px;
+            height:auto;
+            overflow:visible;
+            text-overflow:inherit;
+            white-space:normal;
+            word-break: break-all;
+        }
         
         /*设置 layui 表格中单元格内容溢出可见样式*/
         .table-overlay .layui-table-view,
@@ -62,7 +71,7 @@
          <div class="layui-inline">
             <label class="layui-form-label">批次</label>
             <div class="layui-input-block">
-                <input type="text" class="layui-input layTime" id="batch" name="batch" lay-verify="required" placeholder="请选择批次">
+                <input type="text" class="layui-input layTime" id="batch" name="batch"  placeholder="请选择批次">
             </div>   
          </div>
         <div class="layui-inline">
@@ -93,9 +102,16 @@
     </div>
      <div class="layui-form-item">
          <div class="layui-inline">
-            <label class="layui-form-label">数量</label>
+            <div class="layui-inline">
+            <label class="layui-form-label">整数量</label>
                      <div class="layui-input-block">
-                        <input type="text" class="layui-input layTime" lay-filter="number" id="number"   placeholder="请输入数量">
+                        <input type="text" class="layui-input layTime" lay-filter="number" id="wholeNumber"   placeholder="请输入整数量">
+                    </div> 
+         </div>
+         <div class="layui-inline">
+            <label class="layui-form-label">零数量</label>
+                     <div class="layui-input-block">
+                        <input type="text" class="layui-input layTime" lay-filter="number" id="number"   placeholder="请输入零数量">
                     </div> 
          </div>
         <div class="layui-inline">

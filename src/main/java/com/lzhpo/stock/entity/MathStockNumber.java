@@ -20,6 +20,8 @@ public class MathStockNumber  implements Serializable {
     
     private Integer numZ;
     
+    private Integer scatteredNum;
+    
     private Integer number;
     
     private Integer tray;
@@ -27,6 +29,15 @@ public class MathStockNumber  implements Serializable {
     private String storageId;
     
     private String name;
+
+    
+	public Integer getScatteredNum() {
+		return scatteredNum;
+	}
+
+	public void setScatteredNum(Integer scatteredNum) {
+		this.scatteredNum = scatteredNum;
+	}
 
 	public BigDecimal getWeightSum() {
 		return weightSum;

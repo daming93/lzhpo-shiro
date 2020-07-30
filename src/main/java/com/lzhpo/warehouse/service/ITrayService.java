@@ -2,7 +2,10 @@ package com.lzhpo.warehouse.service;
 
 import java.util.List;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.lzhpo.client.entity.Basicdata;
 import com.lzhpo.warehouse.entity.Tray;
 /**
  * <p>
@@ -37,4 +40,8 @@ public interface ITrayService extends IService<Tray> {
 	String judCode(Tray tray);
 	
 	List<Tray> selectByClientId(String clientId);
+	
+	
+	//上传xls文件 
+	String upload(MultipartFile file);
 }

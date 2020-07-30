@@ -62,13 +62,17 @@ layui.use('laydate', function(){
                 { field:'suppliesSku' ,title:'物料名',width:200},
                 { field:'batchNumber',title:'批次号'},
                 { field:'unitRate',title:'品项规格',
-                  formatter:function(value){
-                    return "1*"+value;
-                  } 
+                  templet: function(d){
+                                return '1*'+d.unitRate;
+                            } 
                 },
-                { field:'type',title:'状态'},
-                { field:'depotNum',title:'库存数量'},
-                { field:'inventoryNum' ,title:'盘点数量', edit: 'text'
+                { field:'typeStr',title:'状态'},
+                { field:'wholeNum',title:'库存整数量'},
+                { field:'scatteredNum',title:'库存散数量'},
+                { field:'depotNum',title:'库存合计'},
+                { field:'inventoryWholeNum',title:'盘点整数量', edit: 'text'},
+                { field:'inventoryScatteredNum',title:'盘点散数量', edit: 'text'},
+                { field:'inventoryNum' ,title:'盘点数量'
                 },
                 { field:'difference' ,title:'差异数量'
                 },
@@ -91,8 +95,22 @@ layui.use('laydate', function(){
             var selector = obj.tr.selector+' td[data-field="'+obj.field+'"] div';
             // 单元格编辑之前的值
             var oldtext = $(selector).text();
+            if(!obj.data.inventoryWholeNum){
+                    obj.update({
+                      inventoryWholeNum: 0
+                    });
+            }
+            if(!obj.data.inventoryScatteredNum){
+                    obj.update({
+                      inventoryScatteredNum: 0
+                    });
+            }
+            var mathNumber = parseInt(obj.data.inventoryWholeNum)*parseInt(obj.data.unitRate) + parseInt(obj.data.inventoryScatteredNum);
+            obj.update({ 
+                      inventoryNum: mathNumber
+                    });
             obj.update({
-                      difference: obj.data.inventoryNum - obj.data.depotNum
+                      difference: mathNumber - obj.data.depotNum
                     });
              $.ajax({
             type:"POST",
@@ -115,7 +133,7 @@ layui.use('laydate', function(){
           var data = obj.data; //获得当前行数据
           var layEvent = obj.event; //获得 lay-event 对应的值（也可以是表头的 event 参数对应的值）
           var tr = obj.tr; //获得当前行 tr 的 DOM 对象（如果有的话）
-         
+         console.log(layEvent);
           if(layEvent === 'del'){ //删除
             layer.confirm('真的删除行么', function(index){
               obj.del(); //删除对应行（tr）的DOM结构，并更新缓存

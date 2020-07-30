@@ -1,11 +1,77 @@
-layui.use(['layer','form','table' ,'upload'], function() {
+layui.config({
+                base:"/static/layui/layui_exts/"
+            }).use(['layer','form','table' ,'upload', 'excel'], function() {
     var layer = layui.layer,
         $ = layui.jquery,
         form = layui.form,
         table = layui.table,
         upload = layui.upload,
+        excel = layui.excel,
         t; //表格变量
       
+    //监听头工具栏事件
+    table.on('toolbar(depotList)', function(obj) {
+        var checkStatus = table.checkStatus(obj.config.id),
+            data = checkStatus.data; //获取选中的数据
+            switch (obj.event) {
+                case 'table_export':
+                    exportFile('depot-table')
+                    break;
+                };
+            });
+    /**
+                 * by yutons
+                 * Array.from() 非常方便的将一个类数组的集合 ==》 数组，直接使用数组身上的方法。例如：常用的map，foreach… 
+                 * 但是，问题来了，IE不识别Array.from这个方法。所以写了它兼容IE的写法。
+                 */
+                if (!Array.from) {
+                    Array.from = function(el) {
+                        return Array.apply(this, el);
+                    }
+                }
+                
+//表格导出
+                function exportFile(id) {
+                    var headers = $("div[lay-id=" + id + "] .layui-table-box table").get(0);
+                    var htrs = Array.from(headers.querySelectorAll('tr'));
+                    var titles = {};
+                    var fiterArr = [];
+                    for (var j = 0; j < htrs.length; j++) {
+                        var hths = Array.from(htrs[j].querySelectorAll("th"));
+                        for (var i = 0; i < hths.length; i++) {
+
+                            var clazz = hths[i].getAttributeNode('class').value;
+                            fiterArr[i] = hths[i].getAttributeNode('data-field').value;
+                            if (clazz != ' layui-table-col-special' && clazz != 'layui-hide') {
+                                //排除居左、具有、隐藏字段
+                                //修改:默认字段data-field+i,兼容部分数据表格中不存在data-field值的问题
+                                titles[hths[i].getAttributeNode('data-field').value] = hths[i].innerText;
+                            }
+                        }
+                    }
+                    var s_code = $("#s_code").val();
+                    $.ajax({
+                            type:"POST",
+                            url:"/warehouse/depot/list?limit=999999",
+                            dataType:"json",
+                            contentType:'application/x-www-form-urlencoded; charset=UTF-8',
+                            data:$('.layui-form').serialize(),
+                            success:function(res){
+                                  // 假如返回的 res.data 是需要导出的列表数据
+                                // 1. 数组头部新增表头
+                                res.data.unshift(titles);
+                              //  2. 如果需要调整顺序，请执行梳理函数
+                                var data = excel.filterExportData(res.data, fiterArr);
+                                 //导出excel
+                                excel.exportExcel({
+                                    sheet1: data
+                                }, '储位表' + new Date().toLocaleString() + '.xlsx', 'xlsx');
+
+                            }
+                    });
+    }
+
+
 
         upload.render({
             elem: '#upload',
@@ -26,8 +92,10 @@ layui.use(['layer','form','table' ,'upload'], function() {
                         ,content: res.message
                      });     
                 }
+                 table.reload('depot-table', t);
             }
-        }); 
+        });
+
     //监听工具条
     table.on('tool(depotList)', function(obj){
         var data = obj.data;
@@ -74,7 +142,7 @@ layui.use(['layer','form','table' ,'upload'], function() {
                 function(){
                     $.post("/warehouse/depot/delete",{"id":data.id},function (res){
                         if(res.success){
-                            layer.msg("删除成功",{time: 1000},function(){
+                            layer.msg(res.message,{time: 1000},function(){
                                 table.reload('depot-table', t);
                             });
                         }else{
@@ -84,6 +152,7 @@ layui.use(['layer','form','table' ,'upload'], function() {
                 }
             )
         }
+       
     });
     t = {
         elem: '#depot-table',
@@ -91,11 +160,7 @@ layui.use(['layer','form','table' ,'upload'], function() {
         url:'/warehouse/depot/list',
         method:'post',
         toolbar: "#toolbarDemo" ,
-        defaultToolbar: ['filter', 'exports', 'print', { //自定义头部工具栏右侧图标。如无需自定义，去除该参数即可
-          title: '提示'
-          ,layEvent: 'LAYTABLE_TIPS'
-          ,icon: 'layui-icon-tips'
-        }],
+        defaultToolbar: ['filter', 'exports', 'print'],
         title:'客户储位表',
         page: { //支持传入 laypage 组件的所有参数（某些参数除外，如：jump/elem） - 详见文档
             layout: ['limit', 'count', 'prev', 'page', 'next', 'skip'], //自定义分页布局
@@ -117,6 +182,7 @@ layui.use(['layer','form','table' ,'upload'], function() {
             {field:'subsectionE',        title: '分段E'   },
             {field:'subsectionF',        title: '分段F'   },
             {field:'subsectionG',        title: '分段G'   },
+            {field:'clientNames',        title: '归属客户'   },
             {title: '操作',fixed: 'right',  width:'15%',    align: 'center',toolbar: '#depotBar'}
         ]]/*,
         done: function () {
@@ -161,7 +227,7 @@ layui.use(['layer','form','table' ,'upload'], function() {
                             success:function(res){
                                 layer.close(deleteindex);
                                 if(res.success){
-                                    layer.msg("删除成功",{time: 1000},function(){
+                                    layer.msg(res.message,{time: 1000},function(){
                                         table.reload('depot-table', t);
                                     });
                                 }else{

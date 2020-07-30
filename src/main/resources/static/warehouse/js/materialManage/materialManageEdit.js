@@ -61,9 +61,11 @@ layui.use('laydate', function(){
                 { field:'itemName',title:'品牌系列',align:'center',width:200},
                 { field:'depot',title:'储位',align:'center',width:130},
                 { field:'batch',title:'批次',align:'center',width:100},
-                { field:'numZ',title:'数量(整)',edit: 'text',event:'numZ',align:'center',width:80},
-                { field:'number',title:'数量(零)',align:'center',width:80},
-                { field:'maxNumber',title:'剩余库存',align:'center',width:80},
+                { field:'wholeNum',title:'整',align:'center',edit: 'select',width:60},
+                { field:'scatteredNum',title:'零',align:'center',edit: 'select',width:60},
+                { field:'number',title:'合计',align:'center',width:80},
+                { field:'maxWholeNumber',title:'剩余整库存',align:'center',width:80},
+                { field:'maxScatteredNumber',title:'剩余零库存',align:'center',width:80},
                 { field:'rate',title:'换算率',align:'center',width:100},
                 {field: 'id', title: '操作', width:70,templet: function(d){
                     return '<a class="layui-btn layui-btn-xs layui-btn-danger" lay-event="del" lay-id="'+ d.id +'"><i class="layui-icon layui-icon-delete"></i>移除</a>';
@@ -82,10 +84,38 @@ layui.use('laydate', function(){
             var selector = obj.tr.selector+' td[data-field="'+obj.field+'"] div';
             // 单元格编辑之前的值
             var oldtext = $(selector).text();
-            obj.update({
-                      number: zero(value,obj.data.rate),
-                      maxNumber:obj.data.maxNumber+parseInt(zero(oldtext,obj.data.rate)-zero(value,obj.data.rate))
+              if(field=="wholeNum"){
+                if(obj.data.maxWholeNumber+parseInt(oldtext-value)<0){
+                  $(obj.tr.selector + ' td[data-field="' + obj.field + '"] input').val(oldtext);
+                     obj.update({
+                      wholeNum:oldtext,
                     });
+                   layer.msg("超过库存数");
+                  
+                   return;
+                }
+                obj.update({
+                      wholeNum:value,
+                      number: parseInt(value)*obj.data.rate+parseInt(obj.data.scatteredNum),
+                      maxWholeNumber:obj.data.maxWholeNumber+parseInt(oldtext-value)
+                    });
+            }
+            if(field=="scatteredNum"){
+               if(obj.data.maxScatteredNumber+parseInt(oldtext-value)<0){
+                $(obj.tr.selector + ' td[data-field="' + obj.field + '"] input').val(oldtext);
+                  obj.update({
+                      scatteredNum:oldtext,
+                    });
+                   layer.msg("超过库存数");
+                      
+                   return;
+                }
+                obj.update({
+                      scatteredNum:value,
+                      number: parseInt(obj.data.wholeNum)*obj.data.rate+parseInt(value),
+                      maxScatteredNumber:obj.data.maxScatteredNumber+parseInt(oldtext-value)
+                    });
+            }
              $.ajax({
             type:"POST",
             url:"/warehouse/materialManage/editDetail?type="+type,
@@ -97,6 +127,7 @@ layui.use('laydate', function(){
                     
                    // layer.msg('[ID: '+ data.itemId +']数量更改为：'+ value);
                 }else{
+                    $(obj.tr.selector + ' td[data-field="' + obj.field + '"] input').val(oldtext);
                     layer.msg(res.message);
                 }
             }

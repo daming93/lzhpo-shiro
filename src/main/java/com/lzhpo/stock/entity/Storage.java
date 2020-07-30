@@ -108,6 +108,13 @@ public class Storage extends DataEntity<Storage> implements Serializable {
     /**
      * 
      */
+    /**
+     * 散数量
+     */
+    @TableField("scattered_num")
+    private Integer scatteredNum;
+    
+    
     @TableField("income_id")
     private String incomeId;
     
@@ -117,6 +124,14 @@ public class Storage extends DataEntity<Storage> implements Serializable {
     @TableField(exist = false)
     private Set<StorageDetail> detailSet;
     
+	public Integer getScatteredNum() {
+		return scatteredNum;
+	}
+
+	public void setScatteredNum(Integer scatteredNum) {
+		this.scatteredNum = scatteredNum;
+	}
+
 	public Set<StorageDetail> getDetailSet() {
 		return detailSet;
 	}

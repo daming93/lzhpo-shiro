@@ -102,6 +102,12 @@ public class InventoryMaterialServiceImpl extends ServiceImpl<InventoryMaterialM
 			if(inventoryMaterial.getDifference()==null){
 				inventoryMaterial.setDifference(0l);
 			}
+			if(inventoryMaterial.getInventoryWholeNum()==null){
+				inventoryMaterial.setInventoryWholeNum(inventoryMaterial.getWholeNum());
+			}
+			if(inventoryMaterial.getInventoryScatteredNum()==null){
+				inventoryMaterial.setInventoryScatteredNum(inventoryMaterial.getScatteredNum());
+			}
 			if(inventoryMaterial.getDifference().equals(0l)){//没有差异的
 				inventoryMaterial.setCheckType(check_type_normal);
 			}else{

@@ -148,7 +148,21 @@ public class SaleReturn extends DataEntity<SaleReturn> implements Serializable {
     @TableField(exist = false)
     private String clientName;
     
+    /**
+     * 散数量
+     */
+    @TableField("scattered_num")
+    private Integer scatteredNum;
     
+    
+
+	public Integer getScatteredNum() {
+		return scatteredNum;
+	}
+
+	public void setScatteredNum(Integer scatteredNum) {
+		this.scatteredNum = scatteredNum;
+	}
 
 	public String getClientName() {
 		return clientName;

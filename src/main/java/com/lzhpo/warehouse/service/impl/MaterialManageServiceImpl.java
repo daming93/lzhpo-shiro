@@ -121,6 +121,8 @@ public class MaterialManageServiceImpl extends ServiceImpl<MaterialManageMapper,
 				materialOperations.setFromType(trunover_type_manage_bad);
 				break;
 			}
+			materialOperations.setWholeNum(materialManageDetail.getWholeNum());//整库存
+			materialOperations.setScatteredNum(materialManageDetail.getScatteredNum());//零库存
 			materialOperations.setMaterialId(materialManageDetail.getMaterial());
 			materialOperations.setNumber(materialManageDetail.getNumber());
 			materialOperations.setType(2);// 出库为-
@@ -130,11 +132,13 @@ public class MaterialManageServiceImpl extends ServiceImpl<MaterialManageMapper,
 			// 在带确认得状态下只减不加，当确认之后 良品数量和不良品数量在开始增减
 			try {
 				List<MaterialDepot> mdepotList = materialSerivice.lockMaterial(materialManageDetail.getMaterial(),
-						materialManageDetail.getNumber(), null);
+						materialManageDetail.getNumber(),materialManageDetail.getWholeNum(),materialManageDetail.getScatteredNum(), null);
 				for (MaterialDepot materialDepot : mdepotList) {
 					materialManageDetail.setDepot(materialDepot.getDepotId());
 					materialManageDetail.setNumber(materialDepot.getNumber());
 					materialManageDetail.setId(UUID.randomUUID().toString());
+					materialManageDetail.setNumber(materialDepot.getNumber());
+					materialManageDetail.setWholeNum(materialDepot.getWholeNum());
 					materialManageDetailService.save(materialManageDetail);
 				}
 			} catch (RuntimeJsonMappingException e) {
@@ -187,12 +191,16 @@ public class MaterialManageServiceImpl extends ServiceImpl<MaterialManageMapper,
 				material.setDelFlag(false);
 				material.setAvailableNum(material.getAvailableNum() + materialManageDetail.getNumber());// 增加可用库存
 				material.setDepotCode(material.getDepotCode() + materialManageDetail.getNumber());// 增加库存
+				material.setWholeNum(material.getWholeNum()+ materialManageDetail.getWholeNum());
+				material.setScatteredNum(material.getScatteredNum()+materialManageDetail.getScatteredNum());
 				materialSerivice.updateById(material);
 			} else {
 				material = new Material();
 				material.setDelFlag(false);
 				material.setAvailableNum(materialManageDetail.getNumber());// 增加可用库存
 				material.setDepotCode(materialManageDetail.getNumber());// 增加库存
+				material.setWholeNum(materialManageDetail.getWholeNum());
+				material.setScatteredNum(materialManageDetail.getScatteredNum());
 				material.setItemId(materialManageDetail.getItemId());
 				material.setBatchNumber(materialManageDetail.getBatch());
 				material.setClientId(materialManage.getClientId());
@@ -227,6 +235,8 @@ public class MaterialManageServiceImpl extends ServiceImpl<MaterialManageMapper,
 				materialOperations.setFromType(trunover_type_manage_bad);// 转不良 物料流水记录
 				break;
 			}
+			materialOperations.setWholeNum(materialManageDetail.getWholeNum());//整库存
+			materialOperations.setScatteredNum(materialManageDetail.getScatteredNum());//零库存
 			materialOperations.setMaterialId(material.getId());
 			materialOperations.setNumber(materialManageDetail.getNumber());
 			materialOperations.setType(1);// 入库为＋
@@ -234,7 +244,7 @@ public class MaterialManageServiceImpl extends ServiceImpl<MaterialManageMapper,
 
 			// 托盘储位分配数量
 			materialDepotService.mathNumberBymaterialIdAndDepotId(material.getId(), materialManageDetail.getDepot(),
-					materialManageDetail.getNumber(), true);
+					materialManageDetail.getNumber(),materialManageDetail.getWholeNum(),materialManageDetail.getScatteredNum(), true);
 		}
 
 		baseMapper.updateById(materialManage);

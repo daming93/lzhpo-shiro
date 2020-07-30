@@ -98,6 +98,7 @@ layui.use(['layer','form','table' ,'upload'], function() {
             {field:'itemWidth',        title: '宽度(cm)'   },
             {field:'itemHeight',        title: '高度(cm)'   },
             {field:'itemVolume',        title: '体积'   },
+            {field:'itemWeight',        title: '重量'   },
             {field:'unitWhole',        title: '单位（整）'   },
             {field:'unitScattered',        title: '单位（零）'   },
             {field:'tray',        title: '件/托'   },

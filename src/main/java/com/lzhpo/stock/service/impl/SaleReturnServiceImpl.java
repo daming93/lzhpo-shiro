@@ -131,12 +131,16 @@ public class SaleReturnServiceImpl extends ServiceImpl<SaleReturnMapper, SaleRet
 				material.setDelFlag(false);
 				material.setAvailableNum(material.getAvailableNum() + saleReturnDetail.getNumber());// 增加可用库存
 				material.setDepotCode(material.getDepotCode() + saleReturnDetail.getNumber());// 增加库存
+				material.setWholeNum(material.getWholeNum() + saleReturnDetail.getWholeNum());//增加整库存
+				material.setScatteredNum(material.getScatteredNum() + saleReturnDetail.getScatteredNum());//增加零库存
 				materialService.updateById(material);
 			} else {
 				material = new Material();
 				material.setDelFlag(false);
 				material.setAvailableNum(saleReturnDetail.getNumber());// 增加可用库存
 				material.setDepotCode(saleReturnDetail.getNumber());// 增加库存
+				material.setWholeNum(saleReturnDetail.getWholeNum());//增加整库存
+				material.setScatteredNum(saleReturnDetail.getScatteredNum());//增加零库存
 				material.setItemId(saleReturnDetail.getItemId());
 				material.setBatchNumber(saleReturnDetail.getBatch());
 				material.setClientId(saleReturn.getClientId());
@@ -147,7 +151,7 @@ public class SaleReturnServiceImpl extends ServiceImpl<SaleReturnMapper, SaleRet
 
 			// 托盘储位分配数量
 			materialDepotService.mathNumberBymaterialIdAndDepotId(material.getId(), saleReturnDetail.getDepot(),
-					saleReturnDetail.getNumber(), true);
+					saleReturnDetail.getNumber(),saleReturnDetail.getWholeNum(),saleReturnDetail.getScatteredNum(), true);
 			if (StringUtils.checkValNotNull(saleReturnDetail.getTray())) {
 				materialTrayService.mathNumberBymaterialIdAndTrayId(material.getId(), saleReturnDetail.getTray(),
 						saleReturnDetail.getNumber(), true);
@@ -158,6 +162,8 @@ public class SaleReturnServiceImpl extends ServiceImpl<SaleReturnMapper, SaleRet
 			materialOperations.setFromType(trunover_type_return_new);// 入库
 			materialOperations.setMaterialId(material.getId());
 			materialOperations.setNumber(saleReturnDetail.getNumber());
+			materialOperations.setWholeNum(saleReturnDetail.getWholeNum());//增加整库存
+			materialOperations.setScatteredNum(saleReturnDetail.getScatteredNum());//增加零库存
 			materialOperations.setType(1);// 入库为＋
 			materialOperationsService.save(materialOperations);
 			saleReturnDetail.setMaterialId(material.getId());
@@ -177,6 +183,7 @@ public class SaleReturnServiceImpl extends ServiceImpl<SaleReturnMapper, SaleRet
 		saleReturn.setVolume(math.getVolumeSum());
 		saleReturn.setWeight(math.getWeightSum());
 		saleReturn.setTotal(math.getNumZ());
+		saleReturn.setScatteredNum(math.getScatteredNum());
 		saleReturn.setNumber(math.getNumber());
 		saleReturn.setIncomeId(getById(saleReturn.getId()).getIncomeId());
 
@@ -228,11 +235,13 @@ public class SaleReturnServiceImpl extends ServiceImpl<SaleReturnMapper, SaleRet
 				material.setDelFlag(false);
 				material.setAvailableNum(material.getAvailableNum() - saleReturnDetail.getNumber());// 减去可用库存
 				material.setDepotCode(material.getDepotCode() - saleReturnDetail.getNumber());// 减去库存
+				material.setWholeNum(material.getWholeNum() - saleReturnDetail.getWholeNum());//减去整库存
+				material.setScatteredNum(material.getScatteredNum() - saleReturnDetail.getScatteredNum());//减去零库存
 				materialService.updateById(material);
 			}
 			// 托盘储位分配数量
 			materialDepotService.mathNumberBymaterialIdAndDepotId(material.getId(), saleReturnDetail.getDepot(),
-					saleReturnDetail.getNumber(), false);
+					saleReturnDetail.getNumber(), saleReturnDetail.getWholeNum(),saleReturnDetail.getScatteredNum(),false);
 			if (StringUtils.checkValNotNull(saleReturnDetail.getTray())) {
 				materialTrayService.mathNumberBymaterialIdAndTrayId(material.getId(), saleReturnDetail.getTray(),
 						saleReturnDetail.getNumber(), false);
@@ -243,6 +252,8 @@ public class SaleReturnServiceImpl extends ServiceImpl<SaleReturnMapper, SaleRet
 			materialOperations.setFromType(trunover_type_return_back);// 销退撤销
 			materialOperations.setMaterialId(material.getId());
 			materialOperations.setNumber(saleReturnDetail.getNumber());
+			materialOperations.setWholeNum(saleReturnDetail.getWholeNum());//增加整库存
+			materialOperations.setScatteredNum(saleReturnDetail.getScatteredNum());//增加零库存
 			materialOperations.setType(2);// 销退撤销为-
 			materialOperationsService.save(materialOperations);
 		}

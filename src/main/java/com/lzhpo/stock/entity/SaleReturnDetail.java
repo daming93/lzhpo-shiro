@@ -1,14 +1,15 @@
 package com.lzhpo.stock.entity;
 
-import com.baomidou.mybatisplus.annotation.TableName;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import com.baomidou.mybatisplus.annotation.TableField;
 import java.io.Serializable;
+import java.time.LocalDate;
+
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableName;
+import com.lzhpo.common.base.DataEntity;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
-import com.lzhpo.common.base.DataEntity;
 /**
  * <p>
  * 退货详情表
@@ -78,8 +79,34 @@ public class SaleReturnDetail extends DataEntity<SaleReturnDetail> implements Se
     @TableField(exist=false)
     private String numZ;
     
+	
+    /**
+     * 整数量
+     */
+    @TableField("whole_num")
+    private Integer wholeNum;
+    /**
+     * 散数量
+     */
+    @TableField("scattered_num")
+    private Integer scatteredNum;
     
     
+	public Integer getWholeNum() {
+		return wholeNum;
+	}
+
+	public void setWholeNum(Integer wholeNum) {
+		this.wholeNum = wholeNum;
+	}
+
+	public Integer getScatteredNum() {
+		return scatteredNum;
+	}
+
+	public void setScatteredNum(Integer scatteredNum) {
+		this.scatteredNum = scatteredNum;
+	}
 	public String getItemName() {
 		return itemName;
 	}

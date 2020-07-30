@@ -168,7 +168,7 @@ public class SaleReturnController {
 		details.forEach(r -> {
 			if (StringUtils.isNotBlank(r.getItemId())) {// 品项
 				Clientitem item = clientitemService.getById(r.getItemId());
-				r.setRate("1:" + item.getUnitRate());
+				r.setRate(item.getUnitRate()+"");
 				r.setItemName(item.getName());
 				r.setNumZ(r.getNumber() / item.getUnitRate() + "." + r.getNumber() % item.getUnitRate());
 			}
@@ -293,4 +293,7 @@ public class SaleReturnController {
 		});
 		return operations;
 	}
+	
+
+
 }

@@ -11,18 +11,26 @@
 			batch_number AS batchNumber,
 			depot_code AS depotCode,
 			lock_code AS lockCode,
+		
 			<if test="type == 1" >
 				available_num AS availableNum,
-				
+				whole_num AS wholeNum,
+				scattered_num AS scatteredNum,
 			</if>
 			<if test="type == 2" >
 				sum(available_num) AS availableNum,
+				sum(whole_num) AS wholeNum,
+				sum(scattered_num) AS scatteredNum,
 			</if>
 			<if test="type == 3" >
 				sum(available_num) AS availableNum,
+				sum(whole_num) AS wholeNum,
+				sum(scattered_num) AS scatteredNum,
 			</if>	
 			<if test="type == 4" >
 				sum(available_num) AS availableNum,
+				sum(whole_num) AS wholeNum,
+				sum(scattered_num) AS scatteredNum,
 			</if>	
 			type,
 			material_status AS materialStatus,
@@ -38,7 +46,7 @@
 		<if test="continuity == 'on'" >	
 			and available_num!=0
 		</if>
-		<if test="clientId != null" >	
+		<if test="clientId != null and clientId != '' " >	
 			and client_id = #{clientId}
 		</if>
 		<if test="type == 2" >
@@ -97,7 +105,7 @@
 		<if test="continuity == 'on'" >	
 			and available_num!=0
 		</if>
-		<if test="clientId != null" >	
+		<if test="clientId != null and clientId != '' " >	
 			and client_id = #{clientId}
 		</if>
 		<if test="type == 2" >
@@ -125,6 +133,8 @@
 			m.item_id AS itemId,
 			m.batch_number AS batchNumber,
 			m.lock_code AS lockCode,
+			d.whole_num AS wholeNum,
+			d.scattered_num AS scatteredNum,
 			d.depot_id as depot,
 			d.number AS availableNum,
 			m.material_status AS materialStatus,
