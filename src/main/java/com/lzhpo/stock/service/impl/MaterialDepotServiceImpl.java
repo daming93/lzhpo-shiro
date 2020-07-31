@@ -160,11 +160,11 @@ public class MaterialDepotServiceImpl extends ServiceImpl<MaterialDepotMapper, M
 				if(wholeNumSum>0&&needScattered!=0){//就是这个储位得库存得整数余量大于1 有拆零得 条件 看需不要要拆零
 					//如果需要拆零 并且有拆零条件 整数够用了
 					mDepot.setWholeNum(wholeNum);
-					mDepot.setScatteredNum(scatteredNum); // 用了这么多 这个数字要拿出去展示
-					materialDepot.setWholeNum(wholeNumSum-1);
+					mDepot.setScatteredNum(needScattered); // 用了这么多 这个数字要拿出去展示
+					materialDepot.setWholeNum(wholeNumSum-1);//拆了一个零
 					materialDepot.setScatteredNum(materialDepot.getScatteredNum()+rate- scatteredNum);
 					wholeNum = 0;//制空
-					scatteredSurplus = 0;//需要拆零 第一个就拆了 
+					scatteredSurplus = -1;//需要拆零 第一个就拆了 
 				}else if(wholeNumSum>=0){
 					mDepot.setWholeNum(wholeNum);
 					materialDepot.setWholeNum(wholeNumSum);
@@ -176,7 +176,9 @@ public class MaterialDepotServiceImpl extends ServiceImpl<MaterialDepotMapper, M
 				}
 				
 				//以下为零数量
-				if (scatteredSurplus >= 0) {// 够用了
+				if(scatteredSurplus==-1){
+					scatteredNum = 0;// 够用把这个数字置为 0 最后这个如果还不够 就抛出 库存不足的异常
+				}else if (scatteredSurplus >= 0) {// 够用了
 					mDepot.setScatteredNum(scatteredNum); // 用了这么多 这个数字要拿出去展示
 					materialDepot.setScatteredNum(scatteredSurplus); // 这个数字用来更新
 					scatteredNum = 0;// 够用把这个数字置为 0 最后这个如果还不够 就抛出 库存不足的异常

@@ -125,6 +125,7 @@ public class MaterialController {
 				r.setItemName(item.getName());
 				r.setNumZ(r.getAvailableNum() / item.getUnitRate() + "." + r.getAvailableNum() % item.getUnitRate());
 				r.setSystemCode(item.getCode());
+				r.setClientName(basicdateService.getById(item.getClientId()).getClientShortName());
 			}
 			
 			if (StringUtils.isNotBlank(r.getType()+"")) {
@@ -218,11 +219,15 @@ public class MaterialController {
 					Clientitem item = clientitemService.getById(material.getItemId());
 					r.setRate(item.getUnitRate() + "");
 					r.setItemName(item.getName());
+					r.setClientName(basicdateService.getById(item.getClientId()).getClientShortName());
 					if(r.getNumber() >=0){
 						r.setNumZ(r.getNumber() / item.getUnitRate() + "." + r.getNumber() % item.getUnitRate());
 					}else{
 						Integer tempNum = -r.getNumber();
 						r.setNumZ("-"+tempNum / item.getUnitRate() + "." + tempNum% item.getUnitRate());
+					}
+					if (StringUtils.isNotBlank(material.getType()+"")) {
+						r.setTypeStr(CommomUtil.valueToNameInDict(material.getType(), "material_type"));
 					}
 					r.setSystemCode(item.getCode());
 					r.setFromTypeStr(CommomUtil.valueToNameInDict(r.getFromType(), "trunover_type"));

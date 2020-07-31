@@ -28,7 +28,12 @@
         </form>
     </div>
 </fieldset>
-
+<div class="layui-form users_list">
+    <table class="layui-table" id="trunover-table"  lay-filter="trunoverList"></table>
+    <script type="text/html" id="trunoverBar">
+         <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="history">历史</a>
+    </script>
+</div>
 <div class="layui-form users_list">
     <table class="layui-table" id="income-table"  lay-filter="incomeList"></table>
     <script type="text/html" id="incomeBar">

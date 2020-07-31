@@ -109,6 +109,10 @@ public class MaterialServiceImpl extends ServiceImpl<MaterialMapper, Material> i
 			throw new RuntimeJsonMappingException("库存数量不足");
 		}else{
 			material.setAvailableNum(num);
+			if(material.getScatteredNum()<scatteredNum){
+				wholeNum+=number/item.getUnitRate()+1;
+				material.setScatteredNum(material.getScatteredNum()+item.getUnitRate());
+			}
 			material.setWholeNum(material.getWholeNum()-wholeNum);
 			material.setScatteredNum(material.getScatteredNum()-scatteredNum);
 			material.setLockCode(material.getLockCode()+number);

@@ -86,7 +86,19 @@ public class MaterialOperations extends DataEntity<MaterialOperations> implement
     @TableField("scattered_num")
     private Integer scatteredNum;
     
+    @TableField(exist=false)
+    private String clientName;
     
+    
+    
+	public String getClientName() {
+		return clientName;
+	}
+
+	public void setClientName(String clientName) {
+		this.clientName = clientName;
+	}
+
 	public Integer getWholeNum() {
 		return wholeNum;
 	}
