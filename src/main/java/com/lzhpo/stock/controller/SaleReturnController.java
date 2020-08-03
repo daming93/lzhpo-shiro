@@ -6,6 +6,7 @@ import java.util.Map;
 import javax.servlet.ServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -191,8 +192,14 @@ public class SaleReturnController {
 	@ResponseBody
 	@SysLog("保存新增数据")
 	public ResponseEntity add(@RequestBody SaleReturn saleReturn) {
-		saleReturnService.saveSaleReturn(saleReturn);
-		return ResponseEntity.success("操作成功");
+		String id = saleReturnService.saveSaleReturn(saleReturn).getId();
+		ResponseEntity entity = new ResponseEntity();
+		boolean flag = SecurityUtils.getSubject().isPermitted("stock:saleReturn:edit");//返回有没有编辑得权限
+		entity.setAny("flag", flag);
+		entity.setAny("id", id);
+		entity.setSuccess(true);
+		entity.setMessage("操作成功");
+		return entity;
 	}
 
 	@RequiresPermissions("stock:saleReturn:delete")

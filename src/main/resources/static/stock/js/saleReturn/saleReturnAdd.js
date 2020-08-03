@@ -175,8 +175,13 @@ window.viewObj = {
                 var depot1 = $("#depot").val();
                 var tray1 = $("#tray").val();
                 //验证
-                if(!(/^(?!0+(\.0*)?$)\d+(.[0-9]{1,19})?$/.test(number))){
-                    layer.msg("请输入正确的数量！");
+                if(!(/^[0-9]\d*$/.test(number))){
+                    layer.msg("请输入正确的零数量！");
+                    return;
+                }
+                 //验证
+                if(!(/^[0-9]\d*$/.test(wholeNumber))){
+                    layer.msg("请输入正确的整数量！");
                     return;
                 }
                 if(!_itemCode||_itemCodeName==_itemCode){
@@ -394,9 +399,35 @@ window.viewObj = {
                         var continuity = $("#continuity").val();
                         // 是否开启连续 录单 
                         if(continuity=="true"){//开启
-                            var node = parent.document.getElementById("addsaleReturn");
-                         //调用该元素的Click事件
-                            node.click();//连续录单
+                               //然后看是不是有权限
+                            //没有权限就继续录单有权限就进入编辑页面
+                            var flag = res.flag;
+                            var id = res.id;//出库单id
+                            if(flag){
+                                //有权限 
+                                 var editIndex = layer.open({
+                                    title : "编辑出库",
+                                    type : 2,
+                                    content : "/stock/saleReturn/edit?id="+id,
+                                    success : function(layero, index){
+                                        setTimeout(function(){
+                                            layer.tips('点击此处返回出库列表', '.layui-layer-setwin .layui-layer-close', {
+                                                tips: 3
+                                            });
+                                        },500);
+                                    }
+                                });
+                                //改变窗口大小时，重置弹窗的高度，防止超出可视区域（如F12调出debug的操作）
+                                $(window).resize(function(){
+                                    layer.full(editIndex);
+                                });
+                                layer.full(editIndex);
+                            }else{
+                                 var node = parent.document.getElementById("addsaleReturn");
+                             //调用该元素的Click事件
+                                node.click();//连续录单
+                            }
+                         
                         }else{
                           // 刷新父页面
                            parent.location.reload(); 

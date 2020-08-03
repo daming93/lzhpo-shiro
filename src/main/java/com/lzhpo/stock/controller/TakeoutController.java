@@ -1,12 +1,14 @@
 package com.lzhpo.stock.controller;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -41,7 +43,6 @@ import com.lzhpo.stock.entity.Takeout;
 import com.lzhpo.stock.entity.TakeoutDetail;
 import com.lzhpo.stock.entity.TakeoutOperations;
 import com.lzhpo.stock.service.IMaterialDepotService;
-import com.lzhpo.stock.service.IMaterialService;
 import com.lzhpo.stock.service.ITakeoutDetailService;
 import com.lzhpo.stock.service.ITakeoutOperationsService;
 import com.lzhpo.stock.service.ITakeoutService;
@@ -193,15 +194,22 @@ public class TakeoutController {
 	@ResponseBody
 	@SysLog("保存新增数据")
 	public ResponseEntity add(@RequestBody Takeout takeout) {
+		ResponseEntity entity = new ResponseEntity();
 		try {
-			takeoutService.saveTakeout(takeout);
+			String id = takeoutService.saveTakeout(takeout).getId();
+			entity.setAny("id", id);
+			boolean flag = SecurityUtils.getSubject().isPermitted("stock:takeout:edit");//返回有没有编辑得权限
+			entity.setAny("flag", flag);
+			entity.setSuccess(true);
+			entity.setMessage("操作成功");
 		} catch (RuntimeJsonMappingException e) {
 			return ResponseEntity.failure(e.getMessage());
 		} catch (Exception e) {
 			e.printStackTrace();
 			return ResponseEntity.failure("系统异常,请联系管理员处理");
 		}
-		return ResponseEntity.success("操作成功");
+	
+		return entity;
 	}
 
 	@RequiresPermissions("stock:takeout:delete")

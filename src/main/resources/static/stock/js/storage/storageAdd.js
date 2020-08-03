@@ -409,9 +409,36 @@ window.viewObj = {
                         var continuity = $("#continuity").val();
                         // 是否开启连续 录单 
                         if(continuity=="true"){//开启
-                            var node = parent.document.getElementById("addStorage");
-                         //调用该元素的Click事件
-                            node.click();//连续录单
+                               //然后看是不是有权限
+                            //没有权限就继续录单有权限就进入编辑页面
+                            var flag = res.flag;
+                            var id = res.id;//出库单id
+                            if(flag){
+                                //有权限 
+                                 var editIndex = layer.open({
+                                    title : "编辑出库",
+                                    type : 2,
+                                    content : "/stock/storage/edit?id="+id,
+                                    success : function(layero, index){
+                                        setTimeout(function(){
+                                            layer.tips('点击此处返回出库列表', '.layui-layer-setwin .layui-layer-close', {
+                                                tips: 3
+                                            });
+                                        },500);
+                                    }
+                                });
+                                //改变窗口大小时，重置弹窗的高度，防止超出可视区域（如F12调出debug的操作）
+                                $(window).resize(function(){
+                                    layer.full(editIndex);
+                                });
+                                layer.full(editIndex);
+                            }else{
+                                var node = parent.document.getElementById("addStorage");
+                                //调用该元素的Click事件
+                                node.click();//连续录单
+                            }
+
+                           
                         }else{
                           // 刷新父页面
                            parent.location.reload(); 

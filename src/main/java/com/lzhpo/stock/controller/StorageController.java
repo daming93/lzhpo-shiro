@@ -6,6 +6,7 @@ import java.util.Map;
 import javax.servlet.ServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -225,8 +226,14 @@ public class StorageController {
 		// if(storageService.getStorageCount(storage.getName())>0){
 		// return ResponseEntity.failure("修改提示信息（不能重复)");
 		// }
-		storageService.saveStorage(storage);
-		return ResponseEntity.success("操作成功");
+		ResponseEntity entity = new ResponseEntity();
+		String id = storageService.saveStorage(storage).getId();
+		boolean flag = SecurityUtils.getSubject().isPermitted("stock:storage:edit");//返回有没有编辑得权限
+		entity.setAny("flag", flag);
+		entity.setAny("id", id);
+		entity.setSuccess(true);
+		entity.setMessage("操作成功");
+		return entity;
 	}
 
 	@RequiresPermissions("stock:storage:delete")
