@@ -412,6 +412,7 @@
                 </otherwise>
             </choose>
 		) s ON d.time = s.time
+		order by date
   </select>
       <select id="showTakoutCountAll" resultMap="StorageCount" parameterType="java.util.Map">
    	 	SELECT
@@ -525,7 +526,7 @@
             </choose>
 		) s ON d.time = s.time
 	
-		
+			order by date
   </select>
   
        <select id="showReturnCountAll" resultMap="StorageCount" parameterType="java.util.Map">
@@ -638,7 +639,7 @@
                 </otherwise>
             </choose>
 		) s ON d.time = s.time
-		
+			order by date
   </select>
   
   <!-- 只能是今日得数量排序 -->

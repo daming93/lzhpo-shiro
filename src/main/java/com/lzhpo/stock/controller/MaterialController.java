@@ -105,20 +105,20 @@ public class MaterialController {
 	// 创建者，和修改人
 	private List<Material> setUserToMaterial(List<Material> materials,Integer mode) {
 		materials.forEach(r -> {
-			if (StringUtils.isNotBlank(r.getCreateId())) {
-				User u = userService.findUserById(r.getCreateId());
-				if (StringUtils.isBlank(u.getNickName())) {
-					u.setNickName(u.getLoginName());
-				}
-				r.setCreateUser(u);
-			}
-			if (StringUtils.isNotBlank(r.getUpdateId())) {
-				User u = userService.findUserById(r.getUpdateId());
-				if (StringUtils.isBlank(u.getNickName())) {
-					u.setNickName(u.getLoginName());
-				}
-				r.setUpdateUser(u);
-			}
+//			if (StringUtils.isNotBlank(r.getCreateId())) {
+//				User u = userService.findUserById(r.getCreateId());
+//				if (StringUtils.isBlank(u.getNickName())) {
+//					u.setNickName(u.getLoginName());
+//				}
+//				r.setCreateUser(u);
+//			}
+//			if (StringUtils.isNotBlank(r.getUpdateId())) {
+//				User u = userService.findUserById(r.getUpdateId());
+//				if (StringUtils.isBlank(u.getNickName())) {
+//					u.setNickName(u.getLoginName());
+//				}
+//				r.setUpdateUser(u);
+//			}
 			if (StringUtils.isNotBlank(r.getItemId())) {// 品项
 				Clientitem item = clientitemService.getById(r.getItemId());
 				r.setRate(item.getUnitRate() + "");
@@ -195,20 +195,20 @@ public class MaterialController {
 	// 创建者，和修改人
 		private List<MaterialOperations> setUserToMaterialOperations(List<MaterialOperations> materialOperations,boolean batchFlag) {
 			materialOperations.forEach(r -> {
-				if (StringUtils.isNotBlank(r.getCreateId())) {
-					User u = userService.findUserById(r.getCreateId());
-					if (StringUtils.isBlank(u.getNickName())) {
-						u.setNickName(u.getLoginName());
-					}
-					r.setCreateUser(u);
-				}
-				if (StringUtils.isNotBlank(r.getUpdateId())) {
-					User u = userService.findUserById(r.getUpdateId());
-					if (StringUtils.isBlank(u.getNickName())) {
-						u.setNickName(u.getLoginName());
-					}
-					r.setUpdateUser(u);
-				}
+//				if (StringUtils.isNotBlank(r.getCreateId())) {
+//					User u = userService.findUserById(r.getCreateId());
+//					if (StringUtils.isBlank(u.getNickName())) {
+//						u.setNickName(u.getLoginName());
+//					}
+//					r.setCreateUser(u);
+//				}
+//				if (StringUtils.isNotBlank(r.getUpdateId())) {
+//					User u = userService.findUserById(r.getUpdateId());
+//					if (StringUtils.isBlank(u.getNickName())) {
+//						u.setNickName(u.getLoginName());
+//					}
+//					r.setUpdateUser(u);
+//				}
 				if (r.getType()!=null) {
 					if(r.getType()==2){
 						r.setNumber(0-r.getNumber());

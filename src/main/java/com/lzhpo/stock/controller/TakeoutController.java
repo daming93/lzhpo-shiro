@@ -143,20 +143,20 @@ public class TakeoutController {
 	// 创建者，和修改人
 	private List<Takeout> setUserToTakeout(List<Takeout> takeouts) {
 		takeouts.forEach(r -> {
-			if (StringUtils.isNotBlank(r.getCreateId())) {
-				User u = userService.findUserById(r.getCreateId());
-				if (StringUtils.isBlank(u.getNickName())) {
-					u.setNickName(u.getLoginName());
-				}
-				r.setCreateUser(u);
-			}
-			if (StringUtils.isNotBlank(r.getUpdateId())) {
-				User u = userService.findUserById(r.getUpdateId());
-				if (StringUtils.isBlank(u.getNickName())) {
-					u.setNickName(u.getLoginName());
-				}
-				r.setUpdateUser(u);
-			}
+//			if (StringUtils.isNotBlank(r.getCreateId())) {
+//				User u = userService.findUserById(r.getCreateId());
+//				if (StringUtils.isBlank(u.getNickName())) {
+//					u.setNickName(u.getLoginName());
+//				}
+//				r.setCreateUser(u);
+//			}
+//			if (StringUtils.isNotBlank(r.getUpdateId())) {
+//				User u = userService.findUserById(r.getUpdateId());
+//				if (StringUtils.isBlank(u.getNickName())) {
+//					u.setNickName(u.getLoginName());
+//				}
+//				r.setUpdateUser(u);
+//			}
 			if (StringUtils.isNotBlank(r.getClientId())) {
 				r.setClientName(basicdateService.getById(r.getClientId()).getClientShortName());
 			}

@@ -114,20 +114,20 @@ public class SaleReturnController {
 	// 创建者，和修改人
 	private List<SaleReturn> setUserToSaleReturn(List<SaleReturn> saleReturns) {
 		saleReturns.forEach(r -> {
-			if (StringUtils.isNotBlank(r.getCreateId())) {
-				User u = userService.findUserById(r.getCreateId());
-				if (StringUtils.isBlank(u.getNickName())) {
-					u.setNickName(u.getLoginName());
-				}
-				r.setCreateUser(u);
-			}
-			if (StringUtils.isNotBlank(r.getUpdateId())) {
-				User u = userService.findUserById(r.getUpdateId());
-				if (StringUtils.isBlank(u.getNickName())) {
-					u.setNickName(u.getLoginName());
-				}
-				r.setUpdateUser(u);
-			}
+//			if (StringUtils.isNotBlank(r.getCreateId())) {
+//				User u = userService.findUserById(r.getCreateId());
+//				if (StringUtils.isBlank(u.getNickName())) {
+//					u.setNickName(u.getLoginName());
+//				}
+//				r.setCreateUser(u);
+//			}
+//			if (StringUtils.isNotBlank(r.getUpdateId())) {
+//				User u = userService.findUserById(r.getUpdateId());
+//				if (StringUtils.isBlank(u.getNickName())) {
+//					u.setNickName(u.getLoginName());
+//				}
+//				r.setUpdateUser(u);
+//			}
 			if (StringUtils.isNotBlank(r.getClientId())) {
 				r.setClientName(basicdateService.getById(r.getClientId()).getClientShortName());
 			}

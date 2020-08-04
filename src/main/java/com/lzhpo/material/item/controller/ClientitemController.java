@@ -24,7 +24,6 @@ import org.springframework.web.util.WebUtils;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.lzhpo.admin.entity.User;
 import com.lzhpo.admin.service.UserService;
 import com.lzhpo.client.entity.Basicdata;
 import com.lzhpo.client.service.IBasicdataService;
@@ -107,20 +106,20 @@ public class ClientitemController {
 	// 创建者，和修改人
 	private List<Clientitem> setUserToClientitem(List<Clientitem> clientitems) {
 		clientitems.forEach(r -> {
-			if (StringUtils.isNotBlank(r.getCreateId())) {
-				User u = userService.findUserById(r.getCreateId());
-				if (StringUtils.isBlank(u.getNickName())) {
-					u.setNickName(u.getLoginName());
-				}
-				r.setCreateUser(u);
-			}
-			if (StringUtils.isNotBlank(r.getUpdateId())) {
-				User u = userService.findUserById(r.getUpdateId());
-				if (StringUtils.isBlank(u.getNickName())) {
-					u.setNickName(u.getLoginName());
-				}
-				r.setUpdateUser(u);
-			}
+//			if (StringUtils.isNotBlank(r.getCreateId())) {
+//				User u = userService.findUserById(r.getCreateId());
+//				if (StringUtils.isBlank(u.getNickName())) {
+//					u.setNickName(u.getLoginName());
+//				}
+//				r.setCreateUser(u);
+//			}
+//			if (StringUtils.isNotBlank(r.getUpdateId())) {
+//				User u = userService.findUserById(r.getUpdateId());
+//				if (StringUtils.isBlank(u.getNickName())) {
+//					u.setNickName(u.getLoginName());
+//				}
+//				r.setUpdateUser(u);
+//			}
 			if (StringUtils.isNotBlank(r.getClientId())) {
 				r.setClientId(basicdateService.getById(r.getClientId()).getClientShortName());
 			}
