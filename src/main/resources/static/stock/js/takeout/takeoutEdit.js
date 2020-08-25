@@ -34,7 +34,7 @@ layui.use('laydate', function(){
 
         var tableData=new Array(); // 用于存放表格数据
         $.ajax({
-          url: "/stock/takeout/selectDetail?takeoutId="+takeoutId
+          url: "/stock/takeout/selectDetail?takeoutId="+takeoutId+"&limit=2000"
           ,type:"get"
           ,async:false
           ,dataType:"json"

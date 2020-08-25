@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <meta charset="utf-8">
+    <title>司机修改--司机管理</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <link rel="stylesheet" th:href="@{/static/layui/css/layui.css}" media="all" />
+    <style type="text/css">
+        .layui-form-item .layui-inline{ min-width:15%; float:left; margin-right:0 }
+        .layui-form-item .driver-box {
+            position: relative;
+        }
+    </style>
+</head>
+<body class="childrenBody">
+<form class="layui-form">
+   <input name="id" type="hidden" th:value="${driver.id}">
+ <div class="layui-form-item">
+        <div class="layui-inline">
+            <label class="layui-form-label">司机名称</label>
+            <div class="layui-input-block">
+                     <input type="text"  name="driverName" th:value="${driver.driverName}" lay-verify="required" placeholder="请输入" autocomplete="off" class="layui-input">
+            </div>  
+        </div>
+        <div class="layui-inline">
+              <label class="layui-form-label">联系电话</label>
+            <div class="layui-input-block">
+                     <input type="text"  name="phone" th:value="${driver.phone}"  lay-verify="required|phone" placeholder="请输入" autocomplete="off" class="layui-input">
+            </div> 
+        </div>
+           <div class="layui-inline">
+             <label class="layui-form-label">驾照号码</label>
+            <div class="layui-input-block">
+                     <input type="text"  name="licencseNumber" th:value="${driver.licencseNumber}" lay-verify="required" placeholder="请输入" autocomplete="off" class="layui-input">
+            </div> 
+        </div>
+        <div class="layui-inline">
+              <label class="layui-form-label">紧急联系电话</label>
+            <div class="layui-input-block">
+                     <input type="text"  name="urgencyPhone" th:value="${driver.urgencyPhone}" lay-verify="phone" placeholder="请输入" autocomplete="off" class="layui-input">
+            </div> 
+        </div>
+    </div>
+
+  <div class="layui-form-item">
+        <div class="layui-inline">
+            <label class="layui-form-label">驾照类型</label>
+            <div class="layui-input-block">
+                <select name="licencseType"  class="form-control1"  lay-verify="required" lay-search>
+                    <option th:each="basic:${licencseType}" th:selected="${driver.licencseType eq basic.value}" th:value="${basic.value}" lay-verify="required" th:text="${basic.name}"></option>
+                </select>
+            </div> 
+        </div>
+        <div class="layui-inline">
+            <label class="layui-form-label">从业资格证</label>
+            <div class="layui-input-block">
+                <select name="isExistCertNum"  class="form-control1"   lay-verify="required" lay-search>
+                    <option th:each="basic:${certNum}" th:selected="${driver.isExistCertNum eq basic.value}" th:value="${basic.value}" lay-verify="required" th:text="${basic.name}"></option>
+                </select>
+            </div> 
+        </div> 
+        <div class="layui-inline">
+             <label class="layui-form-label">驾驶证有效期</label>
+            <div class="layui-input-block">
+                <input type="text" class="layui-input layTime" id="licencseTime" name="licencseTime" lay-verify="required" placeholder="请输入">
+            </div>
+        </div>  
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-inline">
+             <label class="layui-form-label">微信登陆账号</label>
+            <div class="layui-input-block">
+                     <input type="text"  name="wxLoginAccount"  th:value="${driver.wxLoginAccount}" placeholder="请输入" autocomplete="off" class="layui-input">
+            </div> 
+        </div>
+        <div class="layui-inline">
+              <label class="layui-form-label">微信登陆密码</label>
+            <div class="layui-input-block">
+                     <input type="password"  name="wxLoginPwd"   th:value="${driver.wxLoginPwd}"  placeholder="请输入" autocomplete="off" class="layui-input">
+            </div> 
+        </div>
+  
+    </div>
+
+        
+    <div class="layui-form-item">
+        <fieldset class="layui-elem-field layui-field-title"  style="margin-top: 30px;margin-left: 10px;">
+            <legend>备注</legend>
+        </fieldset>
+    </div>
+    <div class="layui-form-item layui-form-text">
+        <div class="layui-input-block" style="width: 80%">
+            <textarea placeholder="备注(不超过200字)" name="remarks" th:text="${driver.remarks}" class="layui-textarea"></textarea>
+        </div>
+    </div>
+  <input type="hidden" id="areaName" name="areaName">
+    <shiro:hasPermission name="deliver:driver:edit">
+    <div class="layui-form-item" style="padding-left: 30%;">
+        <div class="layui-input-block">
+            <button class="layui-btn" lay-submit="" lay-filter="editdriver">确认修改</button>
+            <button class="layui-btn layui-btn-primary">放弃修改</button>
+        </div>
+    </div>
+    </shiro:hasPermission>
+</form>
+<script type="text/javascript" th:src="@{/static/layui/layui.js}"></script>
+<script type="text/javascript" th:src="@{/static/deliver/js/driver/driverEdit.js}"></script>
+</body>
+</html>

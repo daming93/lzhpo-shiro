@@ -28,6 +28,16 @@ public class CommomUtil {
 		}
 		return null;
 	}
+	
+	public static Integer nameToValueInDict(String name,String listName){
+		List<Dictionary> dicList = CacheUtils.allDicts.get(listName);
+		for (Dictionary dictionary : dicList) {
+			if(StringUtils.checkValNotNull(name)&&name.equals(dictionary.getName())){
+				return dictionary.getValue();
+			}
+		}
+		return null;
+	}
 	public static Integer AllToOne(String numZ,Integer rate){
 		if(numZ!=null&&numZ.contains(".")){
 			String[] str = numZ.split("\\.");

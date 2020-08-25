@@ -72,7 +72,7 @@ window.viewObj = {
 
         var tableData=new Array(); // 用于存放表格数据
         $.ajax({
-          url: "/stock/saleReturn/selectDetail?returnId="+saleReturnId
+          url: "/stock/saleReturn/selectDetail?returnId="+saleReturnId+"&limit=2000"
           ,type:"get"
           ,async:false
           ,dataType:"json"

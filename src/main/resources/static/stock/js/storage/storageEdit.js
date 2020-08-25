@@ -71,7 +71,7 @@ window.viewObj = {
 
         var tableData=new Array(); // 用于存放表格数据
         $.ajax({
-          url: "/stock/storage/selectDetail?storageId="+storageId
+          url: "/stock/storage/selectDetail?storageId="+storageId+"&limit=2000"
           ,type:"get"
           ,async:false
           ,dataType:"json"

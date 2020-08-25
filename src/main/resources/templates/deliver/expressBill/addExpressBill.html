@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <meta charset="utf-8">
+    <title>新增单据--单据管理</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" th:href="@{/static/layui/css/layui.css}" media="all" />
+    <style type="text/css">
+        .layui-form-item .layui-inline{ min-width:15%; float:left; margin-right:0; }
+        .layui-form-item .expressBill-box {
+            position: relative;
+        }
+    </style>
+</head>
+<body class="childrenBody">
+
+<form class="layui-form">
+    <div class="layui-form-item">
+        <fieldset class="layui-elem-field layui-field-title" style="margin-top: 30px;margin-left: 10px;">
+            <legend>寄件人</legend>
+        </fieldset>
+    </div>
+    <div class="layui-form-item">
+         <div class="layui-inline">
+            <label class="layui-form-label">手机号</label>
+            <div class="layui-input-block">
+                     <input type="text" required name="sendPhone" id="sendPhone" lay-verify="required|phone" placeholder="请输入" autocomplete="off" class="layui-input">
+            </div>  
+         </div>
+         <div class="layui-inline">
+            <label class="layui-form-label">姓名</label>
+            <div class="layui-input-block">
+                     <input type="text" required name="sendName" id="sendName" lay-verify="required" placeholder="请输入" autocomplete="off" class="layui-input">
+            </div>  
+         </div>
+    </div>
+   <div class="layui-form-item">
+        <div class="layui-inline">
+            <label class="layui-form-label">省</label>
+            <div class="layui-input-block">
+                <select name="sendProvinceId" id="provinceId" class="form-control1"  lay-filter="provinceId" lay-verify="required" lay-search>
+                    <option value="">请选择</option>
+                    <option th:each="basic:${provinceList}"  th:value="${basic.id}" lay-verify="required" th:text="${basic.name}"></option>
+                </select>
+            </div> 
+        </div>
+        <div class="layui-inline">
+            <label class="layui-form-label">市</label>
+             <div class="layui-input-block">
+                <select name="sendCityId" id="cityId"  class="form-control1"  lay-filter="cityId"  lay-verify="required" lay-search>
+                    <option value="">请选择</option>
+                </select>
+            </div> 
+        </div>
+           <div class="layui-inline">
+            <label class="layui-form-label">区</label>
+             <div class="layui-input-block">
+                <select name="sendAreaId" id="countiesId"  class="form-control1"   lay-filter="countiesId" lay-verify="required" lay-search>
+                    <option value="">请选择</option>
+                </select>
+            </div> 
+        </div>
+      
+    </div>
+
+   <div class="layui-form-item">
+            <label class="layui-form-label">详细地址</label>
+            <div class="layui-input-block">
+                     <input type="text" required name="sendDetailArea" lay-verify="required" placeholder="请输入" autocomplete="off" class="layui-input">
+            </div>  
+    </div>
+    <div class="layui-form-item">
+        <fieldset class="layui-elem-field layui-field-title" style="margin-top: 30px;margin-left: 10px;">
+            <legend>收件人</legend>
+        </fieldset>
+    </div>
+    <div class="layui-form-item">
+         <div class="layui-inline">
+            <label class="layui-form-label">手机号</label>
+            <div class="layui-input-block">
+                     <input type="text" required name="receivePhone" id="receivePhone" lay-verify="required|phone" placeholder="请输入" autocomplete="off" class="layui-input">
+            </div>  
+         </div>
+         <div class="layui-inline">
+            <label class="layui-form-label">姓名</label>
+            <div class="layui-input-block">
+                     <input type="text" required name="receiveName" id="receiveName" lay-verify="required" placeholder="请输入" autocomplete="off" class="layui-input">
+            </div>  
+         </div>
+    </div>
+   <div class="layui-form-item">
+        <div class="layui-inline">
+            <label class="layui-form-label">省</label>
+            <div class="layui-input-block">
+                <select name="receiveProvinceId" id="receiveProvinceId" class="form-control1"  lay-filter="receiveProvinceId" lay-verify="required" lay-search>
+                    <option value="">请选择</option>
+                    <option th:each="basic:${provinceList}"  th:value="${basic.id}" lay-verify="required" th:text="${basic.name}"></option>
+                </select>
+            </div> 
+        </div>
+        <div class="layui-inline">
+            <label class="layui-form-label">市</label>
+             <div class="layui-input-block">
+                <select name="receiveCityId" id="receiveCityId"  class="form-control1"  lay-filter="receiveCityId"  lay-verify="required" lay-search>
+                    <option value="">请选择</option>
+                </select>
+            </div> 
+        </div>
+           <div class="layui-inline">
+            <label class="layui-form-label">区</label>
+             <div class="layui-input-block">
+                <select name="receiveAreaId" id="receiveAreaId"  class="form-control1"   lay-filter="receiveAreaId" lay-verify="required" lay-search>
+                    <option value="">请选择</option>
+                </select>
+            </div> 
+        </div>
+   
+    </div>
+
+   <div class="layui-form-item">
+            <label class="layui-form-label">详细地址</label>
+            <div class="layui-input-block">
+                     <input type="text" required name="receiveDetailArea" lay-verify="required" placeholder="请输入" autocomplete="off" class="layui-input">
+            </div>  
+    </div>
+    <div class="layui-form-item">
+        <fieldset class="layui-elem-field layui-field-title" style="margin-top: 30px;margin-left: 10px;">
+            <legend>规格</legend>
+        </fieldset>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-inline">
+            <label class="layui-form-label">重量(kg)</label>
+            <div class="layui-input-block">
+                     <input type="text" required name="weight" id="weight" value="0"  lay-verify="required|number" placeholder="请输入" autocomplete="off" class="layui-input">
+            </div>  
+         </div>
+         <div class="layui-inline">
+            <label class="layui-form-label">体积(m³)</label>
+            <div class="layui-input-block">
+                     <input type="text" required name="volume" id="volume" value="0"  lay-verify="required|number" placeholder="请输入" autocomplete="off" class="layui-input">
+            </div>  
+         </div>
+         <div class="layui-inline">
+            <label class="layui-form-label">件数</label>
+            <div class="layui-input-block">
+                     <input type="text" required name="number" id="number" value="0" lay-verify="required|number" placeholder="请输入" autocomplete="off" class="layui-input">
+            </div>  
+         </div>
+         <div class="layui-inline">
+            <label class="layui-form-label">金额</label>
+            <div class="layui-input-block">
+                     <input type="text" required name="moeny" id="moeny" value="0"  lay-verify="required|number" placeholder="请输入" autocomplete="off" class="layui-input">
+            </div>  
+         </div>
+    </div>
+
+    <div class="layui-form-item">
+        <fieldset class="layui-elem-field layui-field-title" style="margin-top: 30px;margin-left: 10px;">
+            <legend>备注</legend>
+        </fieldset>
+    </div>
+    <div class="layui-form-item layui-form-text">
+        <div class="layui-input-block" style="width: 80%">
+            <textarea placeholder="备注(不超过200字)" name="remarks" class="layui-textarea"></textarea>
+        </div>
+    </div>
+    <input type="hidden" id="areaName" name="areaName">
+    <shiro:hasPermission name="deliver:expressBill:add">
+    <div class="layui-form-item" style="padding-left: 30%;">
+        <div class="layui-input-block">
+            <button class="layui-btn" lay-submit="" lay-filter="addexpressBill">立即提交</button>
+            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+        </div>
+    </div>
+    </shiro:hasPermission>
+</form>
+<script type="text/javascript" th:src="@{/static/layui/layui.js}"></script>
+<script type="text/javascript" th:src="@{/static/deliver/js/expressBill/expressBillAdd.js}"></script>
+</body>
+</html>

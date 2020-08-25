@@ -152,6 +152,12 @@ window.viewObj = {
                 var number = $("#number").val();// 
                 var wholeNum =  $("#wholeNumber").val();// 整数
                 var clientId =  $("#clientId").val();// 客户Id
+                if(!number){
+                    number = 0;
+                }
+                if(!wholeNumber){
+                    wholeNumber = 0;
+                }
                    //验证
                 if(!(/^[0-9]\d*$/.test(number))){
                     layer.msg("请输入正确的零数量！");

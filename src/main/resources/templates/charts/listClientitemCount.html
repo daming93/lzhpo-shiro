@@ -97,7 +97,7 @@
     var item =JSON.parse($("#item").val());
     var itemId =item.id;
     if(itemId){
-        clientName+=item.name;
+        clientName+="\n"+item.name;
     }
     var startTime = $("#startTime").val();
     if(startTime){
@@ -132,7 +132,7 @@
                 takeoutMonthOption = null;
                 takeoutMonthOption = {
                     title: {
-                        text: clientName +"\n"
+                        text: clientName 
                     },
                     tooltip: {
                         trigger: 'axis'

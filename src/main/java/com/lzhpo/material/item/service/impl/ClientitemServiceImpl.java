@@ -135,6 +135,11 @@ public class ClientitemServiceImpl extends ServiceImpl<ClientitemMapper, Clienti
 			buffer.append("文件格式有误(使用导出模板,另存为xls[excel2003-2007]格式)");
 			return buffer.toString();
 		}
+		if(buffer.length()<3){
+			buffer.append("文件上传完毕");
+		}else{
+			buffer.append("除了以上，已上传完毕，请调整后重新上传");
+		}
 		return buffer.toString();
 	}
 

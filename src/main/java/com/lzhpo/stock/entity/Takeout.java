@@ -34,6 +34,14 @@ public class Takeout extends DataEntity<Takeout> implements Serializable {
      */
     @TableField("client_id")
     private String clientId;
+    
+
+    /**
+     * 客户Id
+     */
+    @TableField("excption_id")
+    private String excptionId;
+
 
     /**
      * 送达方ID
@@ -195,6 +203,14 @@ public class Takeout extends DataEntity<Takeout> implements Serializable {
     
     
     
+	public String getExcptionId() {
+		return excptionId;
+	}
+
+	public void setExcptionId(String excptionId) {
+		this.excptionId = excptionId;
+	}
+
 	public Integer getScatteredNum() {
 		return scatteredNum;
 	}

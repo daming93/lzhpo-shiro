@@ -119,7 +119,7 @@ window.viewObj = {
             addRow: function(){ //添加一行
                 var oldData = table.cache[layTableId];
                 console.log(oldData);
-                var newRow = {tempId: new Date().valueOf(),optionId:null,money:0, type: null};
+                var newRow = {tempId: new Date().valueOf(),optionId:null,money:0, type: null}; 
                 oldData.push(newRow);
                 tableIns.reload({
                     data : oldData
