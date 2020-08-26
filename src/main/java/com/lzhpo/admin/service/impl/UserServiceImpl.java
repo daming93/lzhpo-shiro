@@ -8,6 +8,7 @@ import com.lzhpo.admin.mapper.UserMapper;
 import com.lzhpo.admin.service.UserService;
 import com.lzhpo.common.util.Encodes;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,6 +33,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     @Override
+    @Cacheable(value = "userInfo", key="#id")
     public User findUserById(String id) {
         Map<String,Object> map = new HashMap();
         map.put("id", id);
@@ -62,6 +64,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    @CacheEvict(value = "userInfo", key="#user.id", allEntries = true)
     public void updateUser(User user) {
         dropUserRolesByUserId(user.getId());
         baseMapper.updateById(user);

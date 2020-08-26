@@ -98,8 +98,8 @@ window.viewObj = {
         $("#batch").val(today.format("yyyy-MM-dd"));
         $("#batch").keypress(function(e) {
             if (e.which == 13) {
-               $("#itemId").parent().find('input:first').click();
-               $("#itemId").parent().find('input:first').focus();
+               $("#depot").parent().find('input:first').click();
+               $("#depot").parent().find('input:first').focus();
             }
         });
         $("#wholeNumber").keypress(function(e) {
@@ -117,7 +117,8 @@ window.viewObj = {
                $("#depot").parent().find('input:first').val("");
                $("#tray").parent().find('input:first').val("");
                $("#batch").val(today.format("yyyy-MM-dd"));
-               $("#batch").focus();
+               $("#itemId").parent().find('input:first').click();
+               $("#itemId").parent().find('input:first').focus();
             }
 
         });
@@ -375,11 +376,11 @@ window.viewObj = {
             $("#clientCode").focus();
         });
         form.on('select(adjustment)', function(data){
-              $("#batch").focus();
+             $("#itemId").parent().find('input:first').click();
+             $("#itemId").parent().find('input:first').focus();
         });
         form.on('select(itemId)', function(data){
-             $("#depot").parent().find('input:first').click();
-             $("#depot").parent().find('input:first').focus();
+             $("#batch").focus();
         });
         form.on('select(depot)', function(data){
              $("#tray").parent().find('input:first').click();
