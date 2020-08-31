@@ -43,6 +43,15 @@
 		FROM
 			stock_material
 		where 1= 1	
+		<if test="itemName != null and itemName != ''" >	
+			and item_id in (SELECT id from material_item_clientitem where code like CONCAT('%','${itemName}','%' )  ) 
+		</if>
+		<if test="status != null and status != ''" >	
+			and type = #{status}
+		</if>
+		<if test="batch != null and batch != ''" >	
+			and batch_number like CONCAT('%','${batch}','%' ) 
+		</if>
 		<if test="continuity == 'on'" >	
 			and available_num!=0
 		</if>
@@ -102,6 +111,15 @@
 		FROM
 			stock_material
 			where 1= 1	
+		<if test="itemName != null and itemName != ''" >	
+			and item_id in (SELECT id from material_item_clientitem where code like CONCAT('%','${itemName}','%' )  ) 
+		</if>
+		<if test="status != null and status != ''" >	
+			and type = #{status}
+		</if>
+		<if test="batch != null and batch != ''" >	
+			and batch_number like CONCAT('%','${batch}','%' ) 
+		</if>	
 		<if test="continuity == 'on'" >	
 			and available_num!=0
 		</if>

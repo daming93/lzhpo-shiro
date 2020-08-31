@@ -76,7 +76,7 @@ public class InventoryServiceImpl extends ServiceImpl<InventoryMapper, Inventory
 		// 1 全盘
 		if (auditor_type_all.equals(inventory.getAuditorType())) {
 			Map<String, Object> mapRes = materialService.selectMaterial(null, null, null, 0, 999999,
-					inventory.getBatchStatus(), null, inventory.getClientId());
+					inventory.getBatchStatus(), null, inventory.getClientId(),null,null);
 			list = (List<Material>) mapRes.get("list");
 
 		} else {// 异动盘点

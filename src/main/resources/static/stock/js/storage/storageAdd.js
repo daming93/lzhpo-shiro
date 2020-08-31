@@ -87,6 +87,9 @@ window.viewObj = {
         var $ = layui.$, table = layui.table, form = layui.form, layer = layui.layer,upload = layui.upload;
         $("#clientId").parent().find('input:first').click();
         $("#clientId").parent().find('input:first').focus();    
+        $("#itemId").parent().find('input:first').keyup(function(){
+           console.log(1);
+        })
         //回车操作
         $("#clientCode").keypress(function(e) {
             if (e.which == 13) {
@@ -123,7 +126,7 @@ window.viewObj = {
 
         });
         $("form").keypress(function(e) {
-             if(e.keyCode==10&&e.ctrlKey) {
+            if(e.keyCode==10&&e.ctrlKey) {
                 $("#addstorage").click();
             }
         });

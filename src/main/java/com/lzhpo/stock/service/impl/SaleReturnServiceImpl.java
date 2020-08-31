@@ -168,6 +168,7 @@ public class SaleReturnServiceImpl extends ServiceImpl<SaleReturnMapper, SaleRet
 			materialOperationsService.save(materialOperations);
 			saleReturnDetail.setMaterialId(material.getId());
 			saleReturnDetail.setSalesReturnId(saleReturn.getId());
+			saleReturnDetail.setId(null);//清空前台可能产生的id，重新生成
 			saleReturnDetailService.save(saleReturnDetail);
 		}
 

@@ -177,6 +177,7 @@ public class StorageServiceImpl extends ServiceImpl<StorageMapper, Storage> impl
 			materialOperationsService.save(materialOperations);
 			storageDetail.setMaterialId(material.getId());
 			storageDetail.setStorageId(storage.getId());
+			storageDetail.setId(null);//清空前台编辑产生的id
 			detailService.save(storageDetail);
 
 		}

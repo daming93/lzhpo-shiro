@@ -57,7 +57,7 @@ public interface IMaterialService extends IService<Material> {
 	 * @param flag
 	 * @return
 	 */
-	Map<String,Object> selectMaterial(String itemName,String startTime,String endTime,Integer start,Integer limit,Integer type,String continuity,String clientId);
+	Map<String,Object> selectMaterial(String itemName,String startTime,String endTime,Integer start,Integer limit,Integer type,String continuity,String clientId,String batch,String status);
 	
 	/**
 	 * 查询储位上面有多少物资分布

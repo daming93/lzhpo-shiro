@@ -89,14 +89,18 @@ public class MaterialController {
 		String overTime =null;
 		String continuity =null;
 		String clientId = null;
+		String status =null;
+		String batch = null;
 		Integer mode = 1;//正常模式
 		if (!map.isEmpty()) {
 			itemCode = (String) map.get("itemCode");
 			mode = Integer.valueOf((String)map.get("mode"));
 			continuity = (String) map.get("continuity");
 			clientId =  (String) map.get("clientId");
+			status =  (String) map.get("status");
+			batch =  (String) map.get("batch");
 		}
-		Map<String,Object> mapRes = materialService.selectMaterial(itemCode, startTime, overTime,  (page-1)*limit, limit, mode,continuity,clientId);
+		Map<String,Object> mapRes = materialService.selectMaterial(itemCode, startTime, overTime,  (page-1)*limit, limit, mode,continuity,clientId,batch,status);
 		materialPageData.setCount((Long) mapRes.get("count"));
 		materialPageData.setData(setUserToMaterial((List<Material>) mapRes.get("list"),mode));
 		return materialPageData;

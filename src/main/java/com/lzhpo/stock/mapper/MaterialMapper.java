@@ -18,10 +18,12 @@ import com.lzhpo.stock.entity.Material;
  */
 public interface MaterialMapper extends BaseMapper<Material> {
 	List<Material> selectMaterial(@Param("itemName") String itemName, @Param("startTime")String startTime, @Param("overTime")String overTime,
-			@Param("start")Integer start,@Param("limit")Integer limit, @Param("type")Integer type,@Param("continuity")String continuity,@Param("clientId")String clientId);
+			@Param("start")Integer start,@Param("limit")Integer limit, @Param("type")Integer type,@Param("continuity")String continuity,@Param("clientId")String clientId,
+			@Param("batch")String batch,@Param("status")String status);
 
 	Long selectMaterialCount(@Param("itemName") String itemName, @Param("startTime")String startTime, @Param("overTime")String overTime,
-			@Param("start")Integer start,@Param("limit")Integer limit, @Param("type")Integer type,@Param("continuity")String continuity,@Param("clientId")String clientId);
+			@Param("start")Integer start,@Param("limit")Integer limit, @Param("type")Integer type,@Param("continuity")String continuity,@Param("clientId")String clientId,
+			@Param("batch")String batch,@Param("status")String status);
 	
 	
 	List<Material> selectMaterialByDepot(@Param("start")Integer start,@Param("limit")Integer limit, @Param("depotCode")String depotCode,  @Param("itemId")String itemId, @Param("batch")String batch, @Param("depotMaterilId")String depotMaterilId);

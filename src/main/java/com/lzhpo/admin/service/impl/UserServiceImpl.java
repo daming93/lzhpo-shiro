@@ -55,6 +55,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     @Override
+    @CacheEvict(value = "userInfo", key="#user.id")
     @Transactional(rollbackFor = Exception.class)
     public void saveUser(User user) {
         Encodes.entryptPassword(user);
@@ -64,7 +65,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    @CacheEvict(value = "userInfo", key="#user.id", allEntries = true)
+    @CacheEvict(value = "userInfo", key="#user.id")
     public void updateUser(User user) {
         dropUserRolesByUserId(user.getId());
         baseMapper.updateById(user);

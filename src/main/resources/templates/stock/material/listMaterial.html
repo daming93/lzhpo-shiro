@@ -18,6 +18,7 @@
     <legend>选项检索</legend>
     <div class="layui-field-box">
         <form class="layui-form">
+          <div class="layui-form-item">
             <div class="layui-inline">
                 <select name="s_clientId" id="clientId" class="form-control1" lay-verify="" lay-filter="clientId" lay-search>
                     <option value="">请选择客户</option>
@@ -25,8 +26,19 @@
                 </select>
             </div>
             <div class="layui-inline">
+                <select name="s_status"  class="form-control1" lay-verify="" lay-filter="clientId" lay-search>
+                    <option value="">全部</option>
+                    <option value="1">良品</option>
+                    <option value="2">不良品</option>
+                </select>
+            </div>
+              <div class="layui-inline">
                 <input type="text" value="" name="s_itemCode" placeholder="物料编号" class="layui-input search_input">
             </div>
+            <div class="layui-inline">
+                <input type="text" value="" name="s_batch" placeholder="批次" class="layui-input search_input">
+            </div>
+        </div>
              <div class="layui-inline">
                 <input type="radio" name="s_mode" value="1" title="详情" checked >
                 <input type="radio" name="s_mode" value="2" title="忽略批次" >
