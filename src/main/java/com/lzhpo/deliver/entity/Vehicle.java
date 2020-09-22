@@ -1,6 +1,7 @@
 package com.lzhpo.deliver.entity;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -101,7 +102,35 @@ public class Vehicle extends DataEntity<Vehicle> implements Serializable {
     @TableField(exist=false)
     private String vehicleStatusStr;
     
+    /**
+     * 容积
+     */
+    @TableField(exist=false)
+    private BigDecimal volume;
+
+    /**
+     * 承重
+     */
+    @TableField(exist=false)
+    private BigDecimal bearing;
     
+    
+	public BigDecimal getVolume() {
+		return volume;
+	}
+
+	public void setVolume(BigDecimal volume) {
+		this.volume = volume;
+	}
+
+	public BigDecimal getBearing() {
+		return bearing;
+	}
+
+	public void setBearing(BigDecimal bearing) {
+		this.bearing = bearing;
+	}
+
 	public String getVehicleStatusStr() {
 		return vehicleStatusStr;
 	}

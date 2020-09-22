@@ -72,6 +72,8 @@ public class ExpressBillController {
 				expressBillWrapper.like("code", keys);
 			}
 		}
+		expressBillWrapper.orderByAsc("status");
+		expressBillWrapper.orderByDesc("code");
 		IPage<ExpressBill> expressBillPage = expressBillService.page(new Page<>(page, limit), expressBillWrapper);
 		expressBillPageData.setCount(expressBillPage.getTotal());
 		expressBillPageData.setData(setUserToExpressBill(expressBillPage.getRecords()));
@@ -109,7 +111,32 @@ public class ExpressBillController {
 
 		return expressBills;
 	}
-
+	private ExpressBill setExpToExpressBill (ExpressBill r){
+		if (StringUtils.isNotBlank(r.getSendProvinceId())) {
+			r.setProvinceName(territoryService.getById(r.getSendProvinceId()).getName());
+		}
+		if (StringUtils.isNotBlank(r.getSendCityId())) {
+			r.setCityName(territoryService.getById(r.getSendCityId()).getName());
+		}
+		if (StringUtils.isNotBlank(r.getSendAreaId())) {
+			r.setCountiesName(territoryService.getById(r.getSendAreaId()).getName());
+		}
+		if (StringUtils.isNotBlank(r.getReceiveProvinceId())) {
+			r.setReceiveProvinceName(territoryService.getById(r.getReceiveProvinceId()).getName());
+		}
+		if (StringUtils.isNotBlank(r.getReceiveCityId())) {
+			r.setReceiveCityName(territoryService.getById(r.getReceiveCityId()).getName());
+		}
+		if (StringUtils.isNotBlank(r.getReceiveAreaId())) {
+			r.setReceiveCountiesName(territoryService.getById(r.getReceiveAreaId()).getName());
+		}
+		if (r.getStatus() != null) {
+			r.setStatusStr(CommomUtil.valueToNameInDict(r.getStatus(), "modify_status"));
+		}
+		r.setSendDetail(r.getProvinceName()+r.getCityName()+r.getCountiesName());
+		r.setReceiveDetail(r.getReceiveProvinceName()+r.getReceiveCityName()+r.getReceiveCountiesName());
+		return r;
+	}
 	/**
 	 * 根据id查询
 	 */
@@ -187,27 +214,29 @@ public class ExpressBillController {
 		return ResponseEntity.success("操作成功");
 	}
 
-	@PostMapping("getSendPeopelInfoBySendPhone")
+	@GetMapping("getSendPeopelInfoBySendPhone")
 	@ResponseBody
 	public ResponseEntity getSendPeopelInfoBySendPhone(String sendPhone) {
 		ExpressBill expressBill = expressBillService.getSendPeopelInfoBySendPhone(sendPhone);
 		if (expressBill != null) {
-			return ResponseEntity.success("操作成功").setAny("data", expressBill);
+			return ResponseEntity.success("操作成功").setAny("data", setExpToExpressBill(expressBill));
 		} else {
 			return ResponseEntity.failure("无");
 		}
 	}
+	
 
-	@PostMapping("getReceivePeopelInfoBySendPhone")
+	@GetMapping("getReceivePeopelInfoBySendPhone")
 	@ResponseBody
 	public ResponseEntity getReceivePeopelInfoByReceivePhone(String receivePhone) {
 		ExpressBill expressBill = expressBillService.getReceivePeopelInfoByReceivePhone(receivePhone);
 		if (expressBill != null) {
-			return ResponseEntity.success("操作成功").setAny("data", expressBill);
+			return ResponseEntity.success("操作成功").setAny("data", setExpToExpressBill(expressBill));
 		} else {
 			return ResponseEntity.failure("无");
 		}
 	}
+	
 	
 	@RequiresPermissions("deliver:expressBill:back")
 	@PostMapping("back")

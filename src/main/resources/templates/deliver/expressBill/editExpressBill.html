@@ -39,13 +39,26 @@
                      <input type="text" required name="sendName" th:value="${expressBill.sendName}" id="sendName" lay-verify="required" placeholder="请输入" autocomplete="off" class="layui-input">
             </div>  
          </div>
+        <div class="layui-inline">
+             <label class="layui-form-label">接单时间</label>
+            <div class="layui-input-block">
+                <input type="text" class="layui-input layTime"  th:value="${expressBill.receiveBillTime}"  id="receiveBillTime" name="receiveBillTime" lay-verify="required" placeholder="请输入接单时间">
+            </div>
+        </div>
+          <div class="layui-inline">
+             <label class="layui-form-label">配送时间</label>
+            <div class="layui-input-block">
+                <input type="text" class="layui-input layTime"  th:value="${expressBill.deliverBillTime}"  id="deliverBillTime" name="deliverBillTime" lay-verify="required" placeholder="请输入配送时间">
+            </div>
+        </div>
     </div>
    <div class="layui-form-item">
         <div class="layui-inline">
             <label class="layui-form-label">省</label>
             <div class="layui-input-block">
                 <select name="sendProvinceId" id="provinceId" class="form-control1"  lay-filter="provinceId" lay-verify="required" lay-search>
-                    <option th:value="${expressBill.sendProvinceId}" th:text="${expressBill.provinceName}"></option>
+                    <option value="">请选择</option>
+                    <option th:each="basic:${provinceList}" th:selected="${expressBill.sendProvinceId eq basic.id}" th:value="${basic.id}"  lay-verify="required" th:text="${basic.name}"></option>
                 </select>
             </div> 
         </div>
@@ -94,11 +107,12 @@
          </div>
     </div>
    <div class="layui-form-item">
-        <div class="layui-inline">
+         <div class="layui-inline">
             <label class="layui-form-label">省</label>
             <div class="layui-input-block">
                 <select name="receiveProvinceId" id="receiveProvinceId" class="form-control1"  lay-filter="receiveProvinceId" lay-verify="required" lay-search>
-                   <option th:value="${expressBill.receiveProvinceId}" th:text="${expressBill.receiveProvinceName}"></option>
+                    <option value="">请选择</option>
+                    <option th:each="basic:${provinceList}" th:selected="${expressBill.receiveProvinceId eq basic.id}" th:value="${basic.id}"  lay-verify="required" th:text="${basic.name}"></option>
                 </select>
             </div> 
         </div>

@@ -1,21 +1,22 @@
 package com.lzhpo.deliver.entity;
 
-import java.math.BigDecimal;
-import com.baomidou.mybatisplus.annotation.TableName;
-import java.time.LocalDateTime;
-import com.baomidou.mybatisplus.annotation.TableField;
 import java.io.Serializable;
+import java.math.BigDecimal;
+
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableName;
+import com.lzhpo.common.base.DataEntity;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
-import com.lzhpo.common.base.DataEntity;
 /**
  * <p>
  * 
  * </p>
  *
  * @author xdm
- * @since 2020-08-20
+ * @since 2020-08-20s
  */
 @Data
 @EqualsAndHashCode(callSuper = false)

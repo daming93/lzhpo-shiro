@@ -201,8 +201,22 @@ public class Takeout extends DataEntity<Takeout> implements Serializable {
     @TableField(exist = false)
     private Set<TakeoutDetail> detailSet;
     
+    /**
+     * 1 是拆分 null是不拆分 得单子 用于调度拆单使用
+     */
+    private Integer split;
     
     
+    
+    
+	public Integer getSplit() {
+		return split;
+	}
+
+	public void setSplit(Integer split) {
+		this.split = split;
+	}
+
 	public String getExcptionId() {
 		return excptionId;
 	}

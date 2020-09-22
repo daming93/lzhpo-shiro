@@ -152,7 +152,7 @@ window.viewObj = {
                 var number = $("#number").val();// 
                 var wholeNum =  $("#wholeNumber").val();// 整数
                 var clientId =  $("#clientId").val();// 客户Id
-                if(!number){
+                if(!number){ 
                     number = 0;
                 }
                 if(!wholeNumber){

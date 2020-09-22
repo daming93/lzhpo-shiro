@@ -80,10 +80,13 @@ public class TakeoutServiceImpl extends ServiceImpl<TakeoutMapper, Takeout> impl
 		Integer modify_status_await = CacheUtils.keyDict.get("modify_status_await").getValue();
 		//新建出库
 		Integer trunover_type_takeout_new = CacheUtils.keyDict.get("trunover_type_takeout_new").getValue();
+		
+		//scheduling_status_no 调度未排单
+		Integer scheduling_status_no = CacheUtils.keyDict.get("scheduling_status_no").getValue();
 		takeout.setNumber(null);
 		takeout.setStatus(modify_status_await);
 		takeout.setCode(generateNoService.nextCode("CK"));
-
+		takeout.setSchedulingStatus(scheduling_status_no);
 		baseMapper.insert(takeout);
 
 		Set<TakeoutDetail> detailSet = takeout.getDetailSet();

@@ -2,6 +2,7 @@ package com.lzhpo.deliver.entity;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -66,7 +67,17 @@ public class ExpressBill extends DataEntity<ExpressBill> implements Serializable
     private BigDecimal volume;
     
     private BigDecimal weight;
+    /**
+     * 接单时间
+     */
+    @TableField("receive_bill_time")
+    private LocalDate receiveBillTime;
     
+    /**
+     * 配送时间
+     */
+    @TableField("deliver_bill_time")
+    private LocalDate deliverBillTime;
     
     /**
      * 寄件人详细地址
@@ -131,6 +142,17 @@ public class ExpressBill extends DataEntity<ExpressBill> implements Serializable
      */
     private BigDecimal moeny;
     
+    /**
+     * 1 是拆分 null是不拆分 得单子 用于调度拆单使用
+     */
+    private Integer split;
+    
+    /**
+     * 排单状态（0:未排单; 1:已排单; 2:待确认; 3:配送中; 4:配送完成; 5:配送异常; 6:二次配送 ）
+     */
+    @TableField("scheduling_status")
+    private Integer schedulingStatus;
+    
     @TableField(exist=false)
     private String sendDetail ;
     
@@ -160,6 +182,38 @@ public class ExpressBill extends DataEntity<ExpressBill> implements Serializable
     
     
     
+	public Integer getSchedulingStatus() {
+		return schedulingStatus;
+	}
+
+	public void setSchedulingStatus(Integer schedulingStatus) {
+		this.schedulingStatus = schedulingStatus;
+	}
+
+	public Integer getSplit() {
+		return split;
+	}
+
+	public void setSplit(Integer split) {
+		this.split = split;
+	}
+
+	public LocalDate getReceiveBillTime() {
+		return receiveBillTime;
+	}
+
+	public void setReceiveBillTime(LocalDate receiveBillTime) {
+		this.receiveBillTime = receiveBillTime;
+	}
+
+	public LocalDate getDeliverBillTime() {
+		return deliverBillTime;
+	}
+
+	public void setDeliverBillTime(LocalDate deliverBillTime) {
+		this.deliverBillTime = deliverBillTime;
+	}
+
 	public Integer getStatus() {
 		return status;
 	}

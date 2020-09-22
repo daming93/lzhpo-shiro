@@ -30,6 +30,7 @@ import com.lzhpo.client.entity.Basicdata;
 import com.lzhpo.client.service.IBasicdataService;
 import com.lzhpo.common.annotation.SysLog;
 import com.lzhpo.common.base.PageData;
+import com.lzhpo.common.init.CacheUtils;
 import com.lzhpo.common.util.CommomUtil;
 import com.lzhpo.common.util.ResponseEntity;
 import com.lzhpo.material.item.entity.Clientitem;
@@ -256,6 +257,11 @@ public class StorageController {
 	public ResponseEntity back(@RequestParam(value = "id", required = false) String id) {
 		if (StringUtils.isBlank(id)) {
 			return ResponseEntity.failure("单据ID不能为空");
+		}
+		Integer modify_status_revocation = CacheUtils.keyDict.get("modify_status_revocation").getValue();
+		
+		if(!modify_status_revocation.equals(storageService.getById(id).getStatus())){
+			return ResponseEntity.failure("该单据不在可撤销状态无法撤销");
 		}
 		storageService.backStorage(id);
 		return ResponseEntity.success("操作成功");

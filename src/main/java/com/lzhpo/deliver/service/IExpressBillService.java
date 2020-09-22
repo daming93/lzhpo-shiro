@@ -30,10 +30,12 @@ public interface IExpressBillService extends IService<ExpressBill> {
 	//选取所有记录
 	List<ExpressBill> selectAll();
 
-	//分页查询数据在父类
+	//撤回
 	public ExpressBill backExpressBill(String id);
 	
 	public ExpressBill getSendPeopelInfoBySendPhone(String sendPhone);
 	
 	public ExpressBill getReceivePeopelInfoByReceivePhone(String receivePhone);
+	
+	
 }

@@ -4,7 +4,23 @@ Array.prototype.contains = function ( needle ) {
     }
     return false;
 };
+//时间控件
+layui.use('laydate', function(){
+  var laydate = layui.laydate;
+  
+  //执行一个laydate实例
+  laydate.render({
+    elem: '#receiveBillTime' //指定元素
+      ,value: new Date()
+  });
+  var laydate2 = layui.laydate;
+   laydate2.render({
+    elem: '#deliverBillTime' //指定元素
+      ,value: new Date()
+  });
 
+
+});
 layui.use(['form','jquery','layer'],function(){
     var form = layui.form,
         $ = layui.jquery,

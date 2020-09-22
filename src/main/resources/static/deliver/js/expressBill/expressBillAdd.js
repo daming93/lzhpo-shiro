@@ -4,10 +4,65 @@ Array.prototype.contains = function ( needle ) {
     }
     return false;
 };
+//时间控件
+layui.use('laydate', function(){
+  var laydate = layui.laydate;
+  
+  //执行一个laydate实例
+  laydate.render({
+    elem: '#receiveBillTime' //指定元素
+      ,value: new Date()
+  });
+  var laydate2 = layui.laydate;
+   laydate2.render({
+    elem: '#deliverBillTime' //指定元素
+      ,value: new Date()
+  });
+
+
+});
 layui.use(['form','layer','jquery'], function(){
     var form = layui.form,
         layer = layui.layer,
         $ = layui.jquery;
+    $("#sendPhone").keypress(function(e) {
+            if (e.which == 13) {
+                var sendPhone = $("#sendPhone").val();
+                 var url = '/deliver/expressBill/getSendPeopelInfoBySendPhone?sendPhone=' + sendPhone;
+                 $.get(url,function(data){
+                    if(data.data){
+                        var item = data.data;
+                        $("#sendName").val(item.sendName);
+                        $("#provinceId").val(item.sendProvinceId);
+                        $("#cityId").empty();
+                        $("#cityId").append(new Option(item.cityName,item.sendCityId));
+                        $("#countiesId").empty();
+                        $("#countiesId").append(new Option(item.countiesName,item.sendAreaId));
+                        $("#sendDetailArea").val(item.sendDetailArea);
+                        layui.form.render("select");
+                    }
+                 });
+            }
+    }); 
+      $("#receivePhone").keypress(function(e) {
+            if (e.which == 13) {
+                var receivePhone = $("#receivePhone").val();
+                 var url = '/deliver/expressBill/getReceivePeopelInfoBySendPhone?receivePhone=' + receivePhone;
+                 $.get(url,function(data){
+                    if(data.data){
+                        var item = data.data;
+                        $("#receiveName").val(item.receiveName);
+                        $("#receiveProvinceId").val(item.receiveProvinceId);
+                        $("#receiveCityId").empty();
+                        $("#receiveCityId").append(new Option(item.cityName,item.receiveCityId));
+                        $("#receiveAreaId").empty();
+                        $("#receiveAreaId").append(new Option(item.countiesName,item.receiveAreaId));
+                        $("#receiveDetailArea").val(item.receiveDetailArea);
+                        layui.form.render("select");
+                    }
+                 });
+            }
+    });         
     form.on('select(provinceId)', function(data){
         $("#cityId").empty();
         $("#countiesId").empty();

@@ -1,13 +1,16 @@
 package com.lzhpo.deliver.service.impl;
 
 import com.lzhpo.deliver.entity.Vehicle;
+import com.lzhpo.deliver.entity.VehicleType;
 import com.lzhpo.deliver.mapper.VehicleMapper;
 import com.lzhpo.deliver.service.IVehicleService;
+import com.lzhpo.deliver.service.IVehicleTypeService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 
@@ -23,6 +26,8 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 public class VehicleServiceImpl extends ServiceImpl<VehicleMapper, Vehicle> implements IVehicleService {
+	@Autowired
+	private IVehicleTypeService vehicleTypeService ;
 	@Override
     public long getVehicleCount(String licence_plate) {
         QueryWrapper<Vehicle> wrapper = new QueryWrapper<>();
@@ -71,7 +76,13 @@ public class VehicleServiceImpl extends ServiceImpl<VehicleMapper, Vehicle> impl
     public List<Vehicle> selectAll() {
         QueryWrapper<Vehicle> wrapper = new QueryWrapper<>();
         wrapper.eq("del_flag",false);
-        return baseMapper.selectList(wrapper);
+        List<Vehicle> list= baseMapper.selectList(wrapper);
+        for (Vehicle vehicle : list) {
+			VehicleType type = vehicleTypeService.getById(vehicle.getVehicleTypeId());
+			vehicle.setBearing(type.getBearing());
+			vehicle.setVolume(type.getVolume());
+		}
+        return list;
     }
 
 

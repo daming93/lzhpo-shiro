@@ -1,7 +1,6 @@
 package com.lzhpo.stock.controller;
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -20,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.util.WebUtils;
+import org.thymeleaf.templateparser.markup.decoupled.IDecoupledTemplateLogicResolver;
 
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -36,6 +36,8 @@ import com.lzhpo.common.config.MySysUser;
 import com.lzhpo.common.init.CacheUtils;
 import com.lzhpo.common.util.CommomUtil;
 import com.lzhpo.common.util.ResponseEntity;
+import com.lzhpo.deliver.entity.Address;
+import com.lzhpo.deliver.service.IAddressService;
 import com.lzhpo.material.item.entity.Clientitem;
 import com.lzhpo.material.item.service.IClientitemService;
 import com.lzhpo.stock.entity.MaterialDepot;
@@ -90,6 +92,10 @@ public class TakeoutController {
 	
 	@Autowired
 	private IMaterialDepotService materialDepotService;
+	
+	@Autowired
+	private IAddressService addressService;
+	
 	@GetMapping(value = "list")
 	public String list(ModelMap modelMap) {
 		List<Basicdata> basicDatas = basicdateService.selectAll();
@@ -179,11 +185,15 @@ public class TakeoutController {
 	// return null;
 	// }
 
+	
 	@GetMapping("add")
 	public String add(ModelMap modelMap,@RequestParam(value = "continuity", required = false) String continuity) {
 		List<Basicdata> basicDatas = basicdateService.selectAll();
 		modelMap.put("basicDatas", basicDatas);
 		List<Tray> trayList = trayService.selectAll();
+		
+		List<Address> addressList = addressService.selectAll();
+		modelMap.put("addressList", addressList);
 		modelMap.put("trayList", trayList);
 		modelMap.put("continuity", continuity);
 		return "stock/takeout/addTakeout";
