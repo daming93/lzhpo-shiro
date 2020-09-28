@@ -34,5 +34,6 @@ public interface ITableService extends IService<Table> {
 
 	//分页查询数据在父类
 
-
+	//选取所有记录
+	List<Table> selectListByModular(Integer modular);
 }

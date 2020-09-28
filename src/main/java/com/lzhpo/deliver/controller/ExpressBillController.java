@@ -24,12 +24,17 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.lzhpo.common.annotation.SysLog;
 import com.lzhpo.common.base.PageData;
+import com.lzhpo.common.config.MySysUser;
+import com.lzhpo.common.init.CacheUtils;
 import com.lzhpo.common.util.CommomUtil;
 import com.lzhpo.common.util.ResponseEntity;
 import com.lzhpo.deliver.entity.ExpressBill;
 import com.lzhpo.deliver.service.IExpressBillService;
+import com.lzhpo.finance.service.ITableService;
+import com.lzhpo.finance.service.IUserTableService;
 import com.lzhpo.sys.entity.Territory;
 import com.lzhpo.sys.service.ITerritoryService;
+import com.lzhpo.sys.service.IUserSettingService;
 
 /**
  * <p>
@@ -48,8 +53,24 @@ public class ExpressBillController {
 	@Autowired
 	private ITerritoryService territoryService;
 
+ 	@Autowired
+    private ITableService tableService;
+ 	
+ 	@Autowired
+	private IUserSettingService userSettingService; 
+ 	
+	@Autowired
+    private IUserTableService userTableService;
 	@GetMapping(value = "list")
-	public String list() {
+	public String list(ModelMap modelMap) {
+		// 自定义附表
+		Integer user_setting_table = CacheUtils.keyDict.get("user_setting_table").getValue();
+		//快速发单模块
+		Integer modular_express_bill = CacheUtils.keyDict.get("modular_express_bill").getValue();
+		
+		modelMap.put("tableList", tableService.selectListByModular(modular_express_bill));
+		String userId = MySysUser.id();
+		modelMap.put("modular", userSettingService.getUserSettingByUserId(userId, modular_express_bill, user_setting_table));
 		return "deliver/expressBill/listExpressBill";
 	}
 
@@ -107,6 +128,7 @@ public class ExpressBillController {
 			}
 			r.setSendDetail(r.getProvinceName()+r.getCityName()+r.getCountiesName());
 			r.setReceiveDetail(r.getReceiveProvinceName()+r.getReceiveCityName()+r.getReceiveCountiesName());
+			r.setUserTable(userTableService.getUserTableByuserTableId(r.getId()));
 		});
 
 		return expressBills;

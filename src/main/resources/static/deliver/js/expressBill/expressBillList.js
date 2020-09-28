@@ -29,6 +29,60 @@ layui.use(['layer','form','table' ,'upload'], function() {
             });
             layer.full(editIndex);
         }
+        if(obj.event === 'userTable'){
+            var editIndex = layer.open({
+                title : "编辑附表",
+                type : 2,
+                content : "/finance/userTable/edit?id="+data.userTable.id.toString(),
+                success : function(layero, index){
+                    setTimeout(function(){
+                        layer.tips('点击此处返回单据列表', '.layui-layer-setwin .layui-layer-close', {
+                            tips: 3
+                        });
+                    },500);
+                }
+            });
+            //改变窗口大小时，重置弹窗的高度，防止超出可视区域（如F12调出debug的操作）
+            $(window).resize(function(){
+                layer.full(editIndex);
+            });
+            layer.full(editIndex);
+        }
+        if(obj.event === 'schedule'){
+            var userTableId =  $("#tableListId").val();
+
+            if(!userTableId){
+                 layer.msg("请选择附表类型")
+                return 
+            }
+            //偏好设置
+            $.ajax({
+                type:"GET",
+                url:"/sys/userSetting/add?type=1&modular=2&tableId="+userTableId,
+                dataType:"json",
+                contentType:"application/json",
+                success:function(res){
+                   
+                }
+            });
+            var editIndex = layer.open({
+                title : "增加附表",
+                type : 2,
+                content : "/finance/userTable/add?tableId="+data.id.toString()+"&userTableId="+userTableId+"&modular=2"+"&code="+data.code,
+                success : function(layero, index){
+                    setTimeout(function(){
+                        layer.tips('点击此处返回单据列表', '.layui-layer-setwin .layui-layer-close', {
+                            tips: 3
+                        });
+                    },500);
+                }
+            });
+            //改变窗口大小时，重置弹窗的高度，防止超出可视区域（如F12调出debug的操作）
+            $(window).resize(function(){
+                layer.full(editIndex);
+            });
+            layer.full(editIndex);
+        }
          if(obj.event === "back"){
             layer.confirm("你确定要撤销该单据么？",{btn:['是的,我确定','我再想想']},
                 function(){
@@ -114,6 +168,14 @@ layui.use(['layer','form','table' ,'upload'], function() {
             { field:'receiveName' ,title:'收件人'},
             { field:'receivePhone' ,title:'收件人号码'},
             { field:'moeny' ,title:'收费'},
+            { field:'userTableCode' ,event:"userTable",title:'附表',templet: function(d){   
+                    if(d.userTable.code!=null){
+                        return  '<div><a> '+ d.userTable.code+' </a></div>'
+                    }else{
+                         return  '暂无'
+                    }
+                }
+            },
             { field:'statusStr' ,title:'状态'},
             {title: '操作',fixed: 'right',  width:'15%',    align: 'center',toolbar: '#expressBillBar'}
         ]]/*,

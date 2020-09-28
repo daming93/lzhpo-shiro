@@ -37,7 +37,7 @@
      <div class="layui-form-item">
         <label class="layui-form-label">表单名称</label>
             <div class="layui-input-block">
-                <input type="text" class="layui-input" name="name" lay-verify="required" placeholder="请输入表单名称">
+                <input type="text" class="layui-input" name="name"  lay-verify="required" placeholder="请输入表单名称">
             </div>
     </div>
     <div class="layui-form-item">
@@ -46,7 +46,7 @@
             <div class="layui-input-block">
                 <select name="modular"  class="form-control1" lay-verify="required" lay-search>
                     <option value="">请选择</option>
-                    <option th:each="dict:${modular}"  th:value="${dict.value}" lay-verify="required" th:text="${dict.name}"></option>
+                    <option th:each="dict:${modular}" th:value="${dict.value}" lay-verify="required" th:text="${dict.name}"></option>
                 </select>
              </div>    
          </div>

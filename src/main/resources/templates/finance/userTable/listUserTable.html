@@ -24,12 +24,12 @@
             <div class="layui-input-inline">
                 <a class="layui-btn" lay-submit="" lay-filter="searchForm">查询</a>
             </div>
-            <shiro:hasPermission name="finance:table:delete">
+            <shiro:hasPermission name="finance:userTable:delete">
             <div class="layui-inline">
                 <a class="layui-btn layui-btn-danger" data-type="deleteSome">批量删除</a>
             </div>
             </shiro:hasPermission>
-            <shiro:hasPermission name="finance:table:add">
+            <shiro:hasPermission name="finance:userTable:add">
                 <div class="layui-inline">
                     <a class="layui-btn layui-btn-normal" id="addtable" data-type="addUser">添加</a>
 
@@ -46,14 +46,14 @@
     <table class="layui-table" id="table-table"  lay-filter="tableList"></table>
     <script type="text/html" id="tableBar">
     {{# if (d.isAudit != 1){}}
-      <shiro:hasPermission name="finance:table:audit">
+      <shiro:hasPermission name="finance:userTable:audit">
         <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="audit">审核</a>
       </shiro:hasPermission>
-      <shiro:hasPermission name="finance:table:edit">
+      <shiro:hasPermission name="finance:userTable:edit">
         <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
        </shiro:hasPermission>
     {{# } }}  
-    <shiro:hasPermission name="finance:table:delete">
+    <shiro:hasPermission name="finance:userTable:delete">
         <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
     </shiro:hasPermission>
     </script>
@@ -62,6 +62,6 @@
 
 <script type="text/javascript" th:src="@{/static/layui/layui.js}"></script>
 <script type="text/javascript" th:src="@{/static/admin/js/tools.js}"></script>
-<script type="text/javascript" th:src="@{/static/finance/js/table/tableList.js}"></script>
+<script type="text/javascript" th:src="@{/static/finance/js/userTable/tableList.js}"></script>
 </body>
 </html>

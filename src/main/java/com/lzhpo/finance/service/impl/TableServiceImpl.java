@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.lzhpo.common.util.CommomUtil;
 import com.lzhpo.finance.entity.Table;
 import com.lzhpo.finance.entity.TableDetail;
 import com.lzhpo.finance.mapper.TableMapper;
@@ -47,6 +48,7 @@ public class TableServiceImpl extends ServiceImpl<TableMapper, Table> implements
 	@CacheEvict(value = "Tables", allEntries = true)
 	public Table saveTable(Table table) {
 		table.setCode(generateNoService.nextCode("CWBD"));
+		table.setModularName(CommomUtil.valueToNameInDict(table.getModular(), "modular"));
 		baseMapper.insert(table);
 		Set<TableDetail> detailSet = table.getDetailSets();
 		for (TableDetail tableDetail : detailSet) {
@@ -65,9 +67,10 @@ public class TableServiceImpl extends ServiceImpl<TableMapper, Table> implements
 	@Transactional(rollbackFor = Exception.class)
 	@CacheEvict(value = "Tables", allEntries = true)
 	public void updateTable(Table table) {
+		table.setModularName(CommomUtil.valueToNameInDict(table.getModular(), "modular"));
 		baseMapper.updateById(table);
 		//删除过去得选项
-		deleteDetailByTableId(table.getId());
+		tableDetailService.deleteDetailByTableId(table.getId());
 		Set<TableDetail> detailSet = table.getDetailSets();
 		for (TableDetail tableDetail : detailSet) {
 			tableDetail.setTableId(table.getId());
@@ -88,15 +91,11 @@ public class TableServiceImpl extends ServiceImpl<TableMapper, Table> implements
 	public List<Table> selectAll() {
 		QueryWrapper<Table> wrapper = new QueryWrapper<>();
 		wrapper.eq("del_flag", false);
+		//要审核过得
+		wrapper.eq("is_audit", 1);
 		return baseMapper.selectList(wrapper);
 	}
 
-	//删除主表下得所有子表
-	private void deleteDetailByTableId(String tableId){
-		QueryWrapper<Table> wrapper = new QueryWrapper<>();
-		wrapper.eq("table_id", tableId);
-		baseMapper.delete(wrapper);
-	}
 
 	@Override
 	public void ChangeAduitStatus(Integer status, String id) {
@@ -104,5 +103,15 @@ public class TableServiceImpl extends ServiceImpl<TableMapper, Table> implements
 		table.setId(id);
 		table.setIsAudit(status);
 		baseMapper.updateById(table);
+	}
+
+	@Override
+	public List<Table> selectListByModular(Integer modular) {
+		QueryWrapper<Table> wrapper = new QueryWrapper<>();
+		wrapper.eq("del_flag", false);
+		//要审核过得
+		wrapper.eq("is_audit", 1);
+		wrapper.eq("modular", modular);
+		return baseMapper.selectList(wrapper);
 	};
 }

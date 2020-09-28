@@ -12,7 +12,7 @@ layui.use(['layer','form','table'], function() {
             var editIndex = layer.open({
                 title : "编辑表单",
                 type : 2,
-                content : "/finance/table/edit?id="+data.id,
+                content : "/finance/userTable/edit?id="+data.id,
                 success : function(layero, index){
                     setTimeout(function(){
                         layer.tips('点击此处返回表单列表', '.layui-layer-setwin .layui-layer-close', {
@@ -30,7 +30,7 @@ layui.use(['layer','form','table'], function() {
         if(obj.event === "del"){
             layer.confirm("你确定要删除该表单么？",{btn:['是的,我确定','我再想想']},
                 function(){
-                    $.post("/finance/table/delete",{"id":data.id},function (res){
+                    $.post("/finance/userTable/delete",{"id":data.id},function (res){
                         if(res.success){
                             layer.msg("删除成功",{time: 1000},function(){
                                 table.reload('table-table', t);
@@ -45,7 +45,7 @@ layui.use(['layer','form','table'], function() {
         if(obj.event === "audit"){
             layer.confirm("你确定要审核该表单么(请仔细阅读表单条款)？",{btn:['是的,我确定','我再想想']},
                 function(){
-                    $.post("/finance/table/audit",{"id":data.id,"status":1},function (res){
+                    $.post("/finance/userTable/audit",{"id":data.id,"status":1},function (res){
                         if(res.success){
                             layer.msg("审核成功",{time: 1000},function(){
                                 table.reload('table-table', t);
@@ -63,7 +63,7 @@ layui.use(['layer','form','table'], function() {
         var editIndex = layer.open({
             title : "表单详情",
             type : 2,
-            content : "/finance/table/edit?id="+data.id,
+            content : "/finance/userTable/edit?id="+data.id,
             success : function(layero, index){
                 setTimeout(function(){
                     layer.tips('点击此处返回表单列表', '.layui-layer-setwin .layui-layer-close', {
@@ -81,7 +81,7 @@ layui.use(['layer','form','table'], function() {
     t = {
         elem: '#table-table',
         even: true,
-        url:'/finance/table/list',
+        url:'/finance/userTable/list',
         method:'post',
         toolbar: true ,
         page: { //支持传入 laypage 组件的所有参数（某些参数除外，如：jump/elem） - 详见文档
@@ -113,7 +113,7 @@ layui.use(['layer','form','table'], function() {
             addIndex = layer.open({
                 title : "添加选项",
                 type : 2,
-                content : "/finance/table/add",
+                content : "/finance/userTable/add",
                 success : function(layero, addIndex){
                     setTimeout(function(){
                         layer.tips('点击此处返回列表', '.layui-layer-setwin .layui-layer-close', {
@@ -138,7 +138,7 @@ layui.use(['layer','form','table'], function() {
                         var deleteindex = layer.msg('删除中，请稍候',{icon: 16,time:false,shade:0.8});
                         $.ajax({
                             type:"POST",
-                            url:"/finance/table/deleteSome",
+                            url:"/finance/userTable/deleteSome",
                             dataType:"json",
                             contentType:"application/json",
                             data:JSON.stringify(data),

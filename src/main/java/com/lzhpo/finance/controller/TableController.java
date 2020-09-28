@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.util.WebUtils;
 
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -27,6 +28,7 @@ import com.lzhpo.admin.service.UserService;
 import com.lzhpo.common.annotation.SysLog;
 import com.lzhpo.common.base.PageData;
 import com.lzhpo.common.init.CacheUtils;
+import com.lzhpo.common.util.CommomUtil;
 import com.lzhpo.common.util.ResponseEntity;
 import com.lzhpo.finance.entity.Table;
 import com.lzhpo.finance.entity.TableDetail;
@@ -110,6 +112,16 @@ public class TableController {
         return tables;
     }	
  
+   //创建者，和修改人
+   private List<TableDetail> setUserToTableDetail (List<TableDetail> tables){
+        tables.forEach(r -> {
+        	if(r.getMath()!=null){
+        		r.setMathStr(CommomUtil.valueToNameInDict(r.getMath(), "income_type"));
+        	}
+        });
+
+        return tables;
+    }	
     /**
      * 根据id查询
      */
@@ -141,7 +153,7 @@ public class TableController {
 		IPage<TableDetail> TableDetailPage = tableDetailService.page(new Page<>(page, limit),
 				TableDetailWrapper);
 		ContTableDetailData.setCount(TableDetailPage.getTotal());
-		ContTableDetailData.setData(TableDetailPage.getRecords());
+		ContTableDetailData.setData(setUserToTableDetail(TableDetailPage.getRecords()));
 		return ContTableDetailData;
 	}
     @GetMapping("add")
@@ -150,9 +162,9 @@ public class TableController {
     	List<Dictionary> modular = CacheUtils.allDicts.get("modular");
     	List<Dictionary> incomeType = CacheUtils.allDicts.get("income_type");
     	//income_type
-    	modelMap.put("options", options);
-    	modelMap.put("modular", modular);
-    	modelMap.put("incomeType", incomeType);
+    	modelMap.put("options", JSONObject.toJSON(options));
+    	modelMap.put("modular", JSONObject.toJSON(modular));
+    	modelMap.put("incomeType", JSONObject.toJSON(incomeType));
         return "finance/table/addTable";
     }
 
@@ -204,9 +216,9 @@ public class TableController {
     	List<Dictionary> modular = CacheUtils.allDicts.get("modular");
     	List<Dictionary> incomeType = CacheUtils.allDicts.get("income_type");
     	//income_type
-    	modelMap.put("options", options);
-    	modelMap.put("modular", modular);
-    	modelMap.put("incomeType", incomeType);
+    	modelMap.put("options", JSONObject.toJSON(options));
+    	modelMap.put("modular", JSONObject.toJSON(modular));
+    	modelMap.put("incomeType", JSONObject.toJSON(incomeType));
         Map<String,Object> map = new HashMap();
         modelMap.put("table", table);
       

@@ -126,7 +126,7 @@ public class ExpressBillServiceImpl extends ServiceImpl<ExpressBillMapper, Expre
 	public ExpressBill getSendPeopelInfoBySendPhone(String sendPhone) {
 		QueryWrapper<ExpressBill> wrapper = new QueryWrapper<>();
 		wrapper.eq("send_phone", sendPhone);
-		return baseMapper.selectList(wrapper)!=null? baseMapper.selectList(wrapper).get(0):null;
+		return baseMapper.selectList(wrapper)!=null&&baseMapper.selectList(wrapper).size()>0?baseMapper.selectList(wrapper).get(0):null;
 	}
 
 	@Override

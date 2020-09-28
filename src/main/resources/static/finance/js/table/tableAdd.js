@@ -11,7 +11,7 @@ window.viewObj = {
             type: 2,
             name: '测试项名称',
             state: 1,
-            optionId:null,
+            optionName:null,
         }],
         typeData:JSON.parse(document.getElementById('incomeType').value),
         optionData:JSON.parse(document.getElementById('options').value),
@@ -58,15 +58,15 @@ window.viewObj = {
             limit: Number.MAX_VALUE, // 数据表格默认全部显示
             cols: [[
                 {title: '序号', type: 'numbers'},
-                {field: 'optionId', title: '选项', templet: function(d){
-                    var options = viewObj.renderSelectOptions(viewObj.optionData, {valueField: "id", textField: "name", selectedValue: d.optionId});
-                    return '<a lay-event="optionId"></a><select name="optionId" lay-filter="optionId"><option  value="">请选择</option>' + options + '</select>';
+                {field: 'optionName', title: '选项', templet: function(d){
+                    var options = viewObj.renderSelectOptions(viewObj.optionData, {valueField: "name", textField: "name", selectedValue: d.optionName});
+                    return '<a lay-event="optionName"></a><select name="optionName" lay-filter="optionName"><option  value="">请选择</option>' + options + '</select>';
                 }},
-                {field: 'type', title: '结算方式', templet: function(d){
-                    var options = viewObj.renderSelectOptions(viewObj.typeData, {valueField: "value", textField: "name", selectedValue: d.type});
-                    return '<a lay-event="type"></a><select name="type" lay-filter="type"><option  value="">请选择结算方式</option>' + options + '</select>';
+                {field: 'math', title: '收入类型', templet: function(d){
+                    var options = viewObj.renderSelectOptions(viewObj.typeData, {valueField: "value", textField: "name", selectedValue: d.math});
+                    return '<a lay-event="math"></a><select name="math" lay-filter="math"><option  value="">请选择结算方式</option>' + options + '</select>';
                 }},
-                {field: 'money',title: '金额', edit: 'number' ,event:"checkTest"},
+                {field: 'defaultMoney',title: '默认金额', edit: 'number' ,event:"checkTest"},
                                
                 {field: 'tempId', title: '操作', templet: function(d){
                     return '<a class="layui-btn layui-btn-xs layui-btn-danger" lay-event="del" lay-id="'+ d.tempId +'"><i class="layui-icon layui-icon-delete"></i>移除</a>';
@@ -81,7 +81,7 @@ window.viewObj = {
         var active = {
             addRow: function(){ //添加一行
                 var oldData = table.cache[layTableId];
-                var newRow = {tempId: new Date().valueOf(),optionId:null,money:0, type: null}; 
+                var newRow = {tempId: new Date().valueOf(),optionName:null,defaultMoney:0, type: null}; 
                 oldData.push(newRow);
                 tableIns.reload({
                     data : oldData
@@ -115,10 +115,9 @@ window.viewObj = {
             },
             save: function(){
                 var oldData = table.cache[layTableId];  
-                console.log(oldData);   
                 for(var i=0, row; i < oldData.length; i++){
                     row = oldData[i];
-                    if(!row.type){
+                    if(!row.math){
                         layer.msg("检查每一行，请选择分类！", { icon: 5 }); //提示
                         return;
                     }
@@ -151,46 +150,46 @@ window.viewObj = {
         });
         
         //监听select下拉选中事件
-        form.on('select(type)', function(data){
+        form.on('select(math)', function(data){
             var elem = data.elem; //得到select原始DOM对象
-            $(elem).prev("a[lay-event='type']").trigger("click");
+            $(elem).prev("a[lay-event='math']").trigger("click");
         });
         //监听select下拉选中事件
-        form.on('select(optionId)', function(data){
+        form.on('select(optionName)', function(data){
             var elem = data.elem; //得到select原始DOM对象
-            $(elem).prev("a[lay-event='optionId']").trigger("click");
+            $(elem).prev("a[lay-event='optionName']").trigger("click");
         });
          //监听工具条
         table.on('tool(dataTable)', function (obj) {
             var data = obj.data, event = obj.event, tr = obj.tr; //获得当前行 tr 的DOM对象;
             switch(event){
-                case "type":
+                case "math":
                     //console.log(data);
-                    var select = tr.find("select[name='type']");
+                    var select = tr.find("select[name='math']");
                     if(select){                     
                         var selectedVal = select.val();
                         if(!selectedVal){
                             layer.tips("请选择一个分类", select.next('.layui-form-select'), { tips: [3, '#FF5722'] }); //吸附提示
                         }
-                        $.extend(obj.data, {'type': selectedVal});
+                        $.extend(obj.data, {'math': selectedVal});
                         activeByType('updateRow', obj.data);    //更新行记录对象
                     }
                     break;
-                 case "optionId":
+                 case "optionName":
                     //console.log(data);
-                    var select = tr.find("select[name='optionId']");
+                    var select = tr.find("select[name='optionName']");
                     if(select){                     
                         var selectedVal = select.val();
                         if(!selectedVal){
                             layer.tips("请选择一个分类", select.next('.layui-form-select'), { tips: [3, '#FF5722'] }); //吸附提示
                         }
-                        $.extend(obj.data, {'optionId': selectedVal});
+                        $.extend(obj.data, {'optionName': selectedVal});
                         activeByType('updateRow', obj.data);    //更新行记录对象
                     }
                     break;    
-                case "money":
-                    var stateVal = tr.find("input[name='money']").val();
-                    $.extend(obj.data, {'money': stateVal}) 
+                case "defaultMoney":
+                    var stateVal = tr.find("input[name='defaultMoney']").val();
+                    $.extend(obj.data, {'defaultMoney': stateVal}) 
                     activeByType('updateRow', obj.data);    //更新行记录对象
                     break;                      
                 case "del":
@@ -212,7 +211,7 @@ window.viewObj = {
         form.on('submit(addtable)',function(data){
         activeByType('save');    //更新行记录对象
       
-        data.field.detailSet = table.cache[layTableId];  
+        data.field.detailSets = table.cache[layTableId];  
         var loadIndex = layer.load(2, {
             shade: [0.3, '#333']
         });

@@ -36,20 +36,26 @@
 </head>
 <body class="childrenBody">
 <form class="layui-form">
-   <input name="id" id="tableId" type="hidden" th:value="${table.id}">
+   <input name="id" id="tableId" type="hidden" th:value="${userTable.id}">
       <div class="layui-form-item">
         <label class="layui-form-label">表单名称</label>
             <div class="layui-input-block">
-                <input type="text" class="layui-input" name="name"  th:value="${table.name}"lay-verify="required" placeholder="请输入表单名称">
+                <input type="text" class="layui-input" name="name"  th:value="${userTable.name}"lay-verify="required" placeholder="请输入表单名称">
+            </div>
+    </div>
+     <div class="layui-form-item">
+        <label class="layui-form-label">表单编码</label>
+            <div class="layui-input-block">
+                <input type="text" class="layui-input" name="code" disabled th:value="${userTable.code}"lay-verify="required" placeholder="请输入表单编码">
             </div>
     </div>
     <div class="layui-form-item">
          <div class="layui-inline">
             <label class="layui-form-label">使用模块</label>
             <div class="layui-input-block">
-                <select name="modular"  class="form-control1" lay-verify="required" lay-search>
+                <select name="modular"  class="form-control1" disabled  lay-verify="required" lay-search>
                     <option value="">请选择</option>
-                    <option th:each="dict:${modular}"  th:selected="${table.modular eq dict.value}"  th:value="${dict.value}" lay-verify="required" th:text="${dict.name}"></option>
+                    <option   th:value="${userTable.modular}" selected lay-verify="required" th:text="${userTable.modularName}"></option>
                 </select>
              </div>    
          </div>
@@ -60,13 +66,6 @@
     <div class="layui-card">
         <div class="layui-card-header">表单自定义费用项</div>
         <div class="layui-card-body layui-text">
-            <div id="toolbar">
-                <div>
-                    <button type="button" class="layui-btn layui-btn-sm" data-type="addRow" title="添加一行">
-                        <i class="layui-icon layui-icon-add-1"></i> 添加一行
-                    </button>                   
-                </div>
-            </div>
             <div id="tableRes" class="table-overlay">
                 <table id="dataTable" lay-filter="dataTable" class="layui-hide"></table>
             </div>
@@ -82,17 +81,17 @@
     </div>
     <div class="layui-form-item layui-form-text">
         <div class="layui-input-block" style="width: 80%">
-            <textarea placeholder="备注(不超过200字)" name="remarks" th:text="${table.remarks}" class="layui-textarea"></textarea>
+            <textarea placeholder="备注(不超过200字)" name="remarks" th:text="${userTable.remarks}" class="layui-textarea"></textarea>
         </div>
     </div>
-    <shiro:hasPermission name="finance:table:edit">
+ <!--    <shiro:hasPermission name="finance:userTable:edit"> -->
     <div class="layui-form-item" style="padding-left: 30%;">
-        <div th:if="${table.isAudit!=1}" class="layui-input-block">
+        <div th:if="${userTable.isAudit!=1}" class="layui-input-block">
             <button class="layui-btn" lay-submit="" lay-filter="edittable">确认修改</button>
             <button class="layui-btn layui-btn-primary">放弃修改</button>
         </div>
     </div>
-    </shiro:hasPermission>
+   <!--  </shiro:hasPermission> -->
 </form>
 <input type="hidden" id="incomeType" th:value='${incomeType}'>
 <input type="hidden" id="options" th:value='${options}'>
@@ -101,7 +100,7 @@
 </script>
 
 <script type="text/javascript" th:src="@{/static/layui/layui.js}"></script>
-<script type="text/javascript" th:src="@{/static/finance/js/table/tableEdit.js}"></script>
+<script type="text/javascript" th:src="@{/static/finance/js/userTable/userTableEdit.js}"></script>
 
 
 </body>

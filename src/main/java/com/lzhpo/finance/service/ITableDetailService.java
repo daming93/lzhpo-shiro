@@ -32,5 +32,5 @@ public interface ITableDetailService extends IService<TableDetail> {
 
 	//分页查询数据在父类
 
-
+	void deleteDetailByTableId(String tableId);
 }

@@ -11,17 +11,17 @@ import lombok.experimental.Accessors;
 import com.lzhpo.common.base.DataEntity;
 /**
  * <p>
- * 自定义收入表明细
+ * 自定义收入表明细--用户使用（在不同表格中不同体现)
  * </p>
  *
  * @author xdm
- * @since 2020-09-21
+ * @since 2020-09-25
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@TableName("finance_table_detail")
-public class TableDetail extends DataEntity<TableDetail> implements Serializable {
+@TableName("finance_user_table_detail")
+public class UserTableDetail extends DataEntity<UserTableDetail> implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -50,6 +50,7 @@ public class TableDetail extends DataEntity<TableDetail> implements Serializable
 
     @TableField(exist=false)
     private String mathStr;
+    
     
     
 	public String getMathStr() {
@@ -92,7 +93,7 @@ public class TableDetail extends DataEntity<TableDetail> implements Serializable
 		this.defaultMoney = defaultMoney;
 	}
 
-  
+   
 
 
 }

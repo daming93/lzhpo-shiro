@@ -74,5 +74,11 @@ public class TableDetailServiceImpl extends ServiceImpl<TableDetailMapper, Table
         return baseMapper.selectList(wrapper);
     }
 
+	@Override
+	public void deleteDetailByTableId(String tableId) {
+		QueryWrapper<TableDetail> wrapper = new QueryWrapper<>();
+		wrapper.eq("table_id", tableId);
+		baseMapper.delete(wrapper);
+	}
 
 }
