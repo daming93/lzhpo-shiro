@@ -31,6 +31,6 @@ public interface IVehicleTypeService extends IService<VehicleType> {
 	List<VehicleType> selectAll();
 
 	//分页查询数据在父类
-
+	
 
 }

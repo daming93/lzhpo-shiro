@@ -199,8 +199,13 @@ public class Takeout extends DataEntity<Takeout> implements Serializable {
     private String pickStatusStr;
     
     @TableField(exist = false)
+    private String addressName;
+    
+    @TableField(exist = false)
     private Set<TakeoutDetail> detailSet;
     
+    @TableField(exist = false)
+    private String transportationTypeStr;
     /**
      * 1 是拆分 null是不拆分 得单子 用于调度拆单使用
      */
@@ -209,6 +214,22 @@ public class Takeout extends DataEntity<Takeout> implements Serializable {
     
     
     
+	public String getTransportationTypeStr() {
+		return transportationTypeStr;
+	}
+
+	public void setTransportationTypeStr(String transportationTypeStr) {
+		this.transportationTypeStr = transportationTypeStr;
+	}
+
+	public String getAddressName() {
+		return addressName;
+	}
+
+	public void setAddressName(String addressName) {
+		this.addressName = addressName;
+	}
+
 	public Integer getSplit() {
 		return split;
 	}

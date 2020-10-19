@@ -6,6 +6,7 @@ Array.prototype.contains = function ( needle ) {
 };
 
 
+
 //时间控件
 layui.use('laydate', function(){
   var laydate = layui.laydate;
@@ -15,7 +16,18 @@ layui.use('laydate', function(){
     elem: '#dispatchTime' //指定元素
       ,value: new Date()
   });
+   var laydate3 = layui.laydate;
+  
+  //执行一个laydate实例
+  laydate3.render({
+    elem: '#startTime' //指定元素
+  });
   var laydate2 = layui.laydate;
+  
+  //执行一个laydate实例
+  laydate2.render({
+    elem: '#overTime' //指定元素
+  });
   
 
 });
@@ -31,10 +43,10 @@ layui.use('laydate', function(){
                 var status = $(this).attr('data-status')
                 var position = '#order_dispatch'
                 switch (status) {
-                    case '1': position = '#order_bill'; break;
-                    default: position = '#order_dispatch';
+                    case '1': position = '#order_bill';    getExpressBillList(position, '') ; break;
+                    default: position = '#order_dispatch';getList(position, ''); break;
                 }
-                getList(position, status)
+              
         })        
 
         var dispatchWidth = $("#dispatchTable").width();
@@ -136,15 +148,87 @@ layui.use('laydate', function(){
                 active[type] ? active[type].call(this) : '';
             }
         }
-        function getList(position, status = '') {
+
+            //搜索
+        form.on("submit(searchForm)",function(data){
+            getExpressBillList('#order_bill', '',data.field) ;
+            getList('#order_dispatch', '',data.field);
+            return false;
+        });
+
+
+        function getList(position, status = '',field) {
                 var tableData=new Array();  
                 //数据表格实例化           
                 var tbWidth = $("#tableRes").width();
+                var oldData = table.cache['dispatchTable'];  
+                var waitList = [];
+
+                for(var i=0, row; i < oldData.length; i++){
+                    row = oldData[i];
+                    waitList.push(row.id);
+                }
+                if(field){
+                    field.s_waitList = waitList.toLocaleString();
+                }else{
+                    field = {};
+                    field.s_waitList = waitList.toLocaleString();
+                }
+                tableIns = table.render({
+                    url:'/deliver/dispactAddress/listTakout',
+                    where: field,
+                    elem: position,
+                    id: layTableId,
+                    method: 'post',
+                    height:312,
+                   // width: tbWidth,
+                    cellMinWidth:100,
+                    page: false,
+                    loading: true,
+                    even: false, //不开启隔行背景
+                    limit: 1000, // 数据表格默认全部显示
+                    cols: [[
+                              {title: '序号', type: 'numbers'},
+                            { field:'clientName',title:'客户名称',align:'center'},
+                            { field:'dispatchTime',title:'配送时间',align:'center'},
+                            { field:'clientCode',title:'客户单号',align:'center'},
+                            { field:'code',title:'系统单号',align:'center'},
+                            { field:'volume',title:'体积',align:'center',width:100},
+                            { field:'weight',title:'重量',align:'center',width:100},
+                            { field:'countiesName',title:'区域',align:'center',width:100},
+                            { field:'areaName',title:'送达地点',align:'center'},
+                            { field:'provinceId',title:'省id',align:'center',hide:true,width:100},
+                            { field:'cityId',title:'市id',align:'center',hide:true,width:100},
+                            { field:'countiesId',title:'区id',align:'center',hide:true,width:100},
+                            { field:'type',title:'类型id',align:'center',hide:true,width:100},
+                            { field:'id',title:'id',align:'center',hide:true,width:100},
+                             {title: '操作',fixed: 'right',  width:'15%',    align: 'center',toolbar: '#dispatchBillBar'}
+                    ]],
+                    done: function(res, curr, count){
+                  
+                    }
+                });
+
+        }
+        function getExpressBillList(position, status = '',field) {
+                var tableData=new Array();  
+                //数据表格实例化           
+                var tbWidth = $("#tableRes").width();
+                var oldData = table.cache['dispatchTable'];  
+                var waitList = [];
+                for(var i=0, row; i < oldData.length; i++){
+                    row = oldData[i];
+                    waitList.push(row.id);
+                }
+                if(field){
+                    field.s_waitList = waitList.toLocaleString();
+                }else{
+                    field = {};
+                    field.s_waitList = waitList.toLocaleString();
+                }
                 tableIns = table.render({
                     url:'/deliver/dispactAddress/list',
-                    where: {
-                        status: status
-                    },
+                    where: field,
                     elem: position,
                     id: layTableId,
                     method: 'post',
@@ -187,7 +271,7 @@ layui.use('laydate', function(){
                 type : 2,
                 offset: 'rt',
                 area: ['410px','800px'],
-                content : "/deliver/dispactAddress/spilt?id="+data.id,
+                content : "/deliver/dispactAddress/spilt?type=1&id="+data.id,
                 success : function(layero, index){
                   
                     setTimeout(function(){
@@ -197,15 +281,64 @@ layui.use('laydate', function(){
                     },500);
                 }
             });
-            //改变窗口大小时，重置弹窗的高度，防止超出可视区域（如F12调出debug的操作）
-          
         }
-    });     
+    });
+    table.on('tool(order_bill)', function(obj){
+        var data = obj.data;
+        if(obj.event === 'spilt'){
+            var editIndex = layer.open({
+                title : "拆单",
+                type : 2,
+                offset: 'rt',
+                area: ['410px','800px'],
+                content : "/deliver/dispactAddress/spilt?type=2&id="+data.id,
+                success : function(layero, index){
+                  
+                    setTimeout(function(){
+                        layer.tips('点击此处返回排单列表', '.layui-layer-setwin .layui-layer-close', {
+                            tips: 3
+                        });
+                    },500);
+                }
+            });
+        }
+    });       
    table.on('rowDouble(order_dispatch)', function(obj){
         var data = obj.data;
         //对应增加预载单据得行
         var newRow =data;
-        newRow.typeStr = "快速发单";
+        //在这里检测是否能添加
+        var vehicleId = $("#vehicleId").val();
+        if(!vehicleId){
+             layer.msg("请选择车辆");
+             return false;
+        }
+        $.ajax({
+            type:"POST",
+            url:"/deliver/vehicle/searchAreaCanDeliver",
+            data:{
+                vehicleId:vehicleId,
+                proviceId:data.provinceId,
+                cityId:data.cityId,
+                areaId:data.countiesId
+            },
+            success:function(res){
+                if(res.success){
+                   newRow.typeStr = "库存发单";
+                   active.addRow(newRow,'dispatchTable');
+                   obj.del(); //删除对应行（tr）的DOM结构，并更新缓存
+                   //合计数改下
+                   $("#dispatchVolume").val(mathV());
+                   $("#lodaRate").val(Percentage( $("#dispatchVolume").val(),vehicleV));
+                   $("#dispatchWeight").val(mathW());
+                   $("#weightRate").val(Percentage( $("#dispatchWeight").val(),vehicleW));
+                }else{
+                    layer.msg(res.message);
+                    return false;
+                }
+            }
+        });
+      
 //        newRow.id = data.id;
         // newRow.type = 1;
   
@@ -220,21 +353,58 @@ layui.use('laydate', function(){
         // newRow.provinceId = data.receiveProvinceId;
         // newRow.cityId = data.receiveCityId;
         // newRow.countiesId = data.receiveAreaId;
-        active.addRow(newRow,'dispatchTable');
-         obj.del(); //删除对应行（tr）的DOM结构，并更新缓存
-         //合计数改下
-         $("#dispatchVolume").val(mathV());
-         $("#lodaRate").val(Percentage( $("#dispatchVolume").val(),vehicleV));
-         $("#dispatchWeight").val(mathW());
-         $("#weightRate").val(Percentage( $("#dispatchWeight").val(),vehicleW));
+       
     }); 
-
+  table.on('rowDouble(order_bill)', function(obj){
+        var data = obj.data;
+        //对应增加预载单据得行
+        var newRow =data;
+        //在这里检测是否能添加
+        var vehicleId = $("#vehicleId").val();
+        if(!vehicleId){
+             layer.msg("请选择车辆");
+             return false;
+        }
+        $.ajax({
+            type:"POST",
+            url:"/deliver/vehicle/searchAreaCanDeliver",
+            data:{
+                vehicleId:vehicleId,
+                proviceId:data.provinceId,
+                cityId:data.cityId,
+                areaId:data.countiesId
+            },
+            success:function(res){
+                if(res.success){
+                   newRow.typeStr = "快速发单";
+                   active.addRow(newRow,'dispatchTable');
+                   obj.del(); //删除对应行（tr）的DOM结构，并更新缓存
+                   //合计数改下
+                   $("#dispatchVolume").val(mathV());
+                   $("#lodaRate").val(Percentage( $("#dispatchVolume").val(),vehicleV));
+                   $("#dispatchWeight").val(mathW());
+                   $("#weightRate").val(Percentage( $("#dispatchWeight").val(),vehicleW));
+                }else{
+                    layer.msg(res.message);
+                    return false;
+                }
+            }
+        });
+          
+    });    
     table.on('rowDouble(dispatchTable)', function(obj){
         var data = obj.data;
         //对应增加预载单据得行
         var newRow =data;
-        active.addRow(newRow,'order_dispatch');
         obj.del(); //删除对应行（tr）的DOM结构，并更新缓存
+        if(data.type==1||data.type==3){
+          getExpressBillList('#order_bill', '')  
+        }else{
+          getList('#order_dispatch', '')
+        }
+        
+
+       
             //合计数改下
          $("#dispatchVolume").val(mathV());
          $("#lodaRate").val(Percentage( $("#dispatchVolume").val(),vehicleV));
@@ -249,7 +419,6 @@ function mathV(){
      var data = table.cache["dispatchTable"];
      var sum = 0;
      for (var i = 0; i < data.length; i++) {
-          console.log(JSON.stringify(data[i]))
          if(JSON.stringify(data[i]) != "[]"){
             sum += data[i].volume;
          }
@@ -311,11 +480,11 @@ function Percentage(num, total) {
          $("#dispatchWeight").val(mathW());
          $("#weightRate").val(Percentage( $("#dispatchWeight").val(),vehicleW));
       }); 
-        
+       
 //提交数据代码
         form.on('submit(adddispatch)',function(data){
         activeByType('save');    //更新行记录对象
-      
+      console.log(data);
         data.field.detailSet = table.cache['dispatchTable'];  
         var loadIndex = layer.load(2, {
             shade: [0.3, '#333']

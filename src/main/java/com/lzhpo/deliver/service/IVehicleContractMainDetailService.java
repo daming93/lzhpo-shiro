@@ -34,10 +34,14 @@ public interface IVehicleContractMainDetailService extends IService<VehicleContr
 
 	//分页查询数据在父类
 
+	//给主表id找子表
+	List<VehicleContractMainDetail> getListByMainId(String mainId);
 	
 	void deleteAllDetailByMainId(String mainId);
 	
 	//根据主合同查询最贵的那条金额
 	BigDecimal selectDetailMoneyByInfo(String mainId,String proviceId,String cityId,String areaId,Integer range);
 
+	//根据主合同查询是否有该区域的报价
+	VehicleContractMainDetail selectDetailMoneyByInfoNoRange(String mainId,String proviceId,String cityId,String areaId);
 }

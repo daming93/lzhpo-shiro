@@ -136,8 +136,11 @@ window.viewObj = {
             ,data = obj.data //得到所在行所有键值
             ,field = obj.field; //得到字段
             if(obj.field=="scatteredNum"||obj.field=="wholeNum"){
+                var sumNumber = parseInt(data.wholeNum)*parseInt(data.rate.substring(2))+parseInt(data.scatteredNum);
+                console.log(data);
+                $(obj.tr.selector + ' td[data-field="number"] input').val(sumNumber);
                  obj.update({
-                      number:parseInt(data.wholeNum)*parseInt(data.rate.substring(2))+parseInt(data.scatteredNum)
+                      number:sumNumber
                  });
             }
 
@@ -302,12 +305,13 @@ window.viewObj = {
                     if(select){                     
                         var selectedVal = select.val();
                         if(!selectedVal){
-                            layer.tips("请选择一个分类", select.next('.layui-form-select'), { tips: [3, '#FF5722'] }); //吸附提示
+                            layer.tips("请选择一个品项", select.next('.layui-form-select'), { tips: [3, '#FF5722'] }); //吸附提示
                         }
                         var itemName = tr.find("td[data-field='itemName'] .layui-table-cell");
                         itemName.html(getListNameById(viewObj.itemsData,selectedVal));
                         var rate = tr.find("td[data-field='rate'] .layui-table-cell");
                         rate.html(getListRateById(viewObj.itemsData,selectedVal));
+                        obj.data.rate = rate.html();
                         tr.find("td[data-field='scatteredNum'] .layui-table-cell").html("0");
                         tr.find("td[data-field='number'] .layui-table-cell").html("0");
                         $.extend(obj.data, {'itemId': selectedVal});

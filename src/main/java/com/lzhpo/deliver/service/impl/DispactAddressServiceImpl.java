@@ -105,7 +105,14 @@ public class DispactAddressServiceImpl extends ServiceImpl<DispactAddressMapper,
 		BigDecimal weight = dispactAddress.getAdjustmentWeight() == null ? new BigDecimal(0)
 				: dispactAddress.getAdjustmentWeight();
 		// 前台传过来得信息不一定完全
-		dispactAddress = getDispactAddressByBillId(dispactAddress.getId());// 补全信息
+		//根据type不同 找不同得实体
+		if(dispactAddress.getType()!=null){
+    		if(dispactAddress.getType()==1){//库存发单
+    			dispactAddress = getDispactAddressByTakoutId(dispactAddress.getId());// 补全信息
+        	}else{//快速发单
+        		dispactAddress = getDispactAddressByBillId(dispactAddress.getId());// 补全信息
+        	}
+    	}
 		switch (dispactAddress.getType()) {
 		case 1: // 快单
 			// 要拆单标记下
@@ -120,9 +127,9 @@ public class DispactAddressServiceImpl extends ServiceImpl<DispactAddressMapper,
 			dispactAddress.setVolume(dispactAddress.getVolume().subtract(volume));
 			dispactAddress.setWeight(dispactAddress.getWeight().subtract(weight));
 			dispactAddress.setId(null);
-			dispactAddress.setCode(splitCode(dispactAddress.getClientCode()));
+			dispactAddress.setCode(splitCode(dispactAddress.getClientCode(),dispactAddress.getCode()));
 			baseMapper.insert(dispactAddress);
-			dispactAddress.setCode(splitCode(dispactAddress.getClientCode()));
+			dispactAddress.setCode(splitCode(dispactAddress.getClientCode(),dispactAddress.getCode()));
 			dispactAddress.setId(null);
 			dispactAddress.setTotal(total);
 			dispactAddress.setVolume(volume);
@@ -141,9 +148,9 @@ public class DispactAddressServiceImpl extends ServiceImpl<DispactAddressMapper,
 			dispactAddress.setVolume(dispactAddress.getVolume().subtract(volume));
 			dispactAddress.setWeight(dispactAddress.getWeight().subtract(weight));
 			dispactAddress.setId(null);
-			dispactAddress.setCode(splitCode(dispactAddress.getClientCode()));
+			dispactAddress.setCode(splitCode(dispactAddress.getClientCode(),dispactAddress.getCode()));
 			baseMapper.insert(dispactAddress);
-			dispactAddress.setCode(splitCode(dispactAddress.getClientCode()));
+			dispactAddress.setCode(splitCode(dispactAddress.getClientCode(),dispactAddress.getCode()));
 			dispactAddress.setId(null);
 			dispactAddress.setTotal(total);
 			dispactAddress.setVolume(volume);
@@ -159,7 +166,7 @@ public class DispactAddressServiceImpl extends ServiceImpl<DispactAddressMapper,
 			dispactAddress.setVolume(volume);
 			dispactAddress.setWeight(weight);
 			dispactAddress.setId(null);
-			dispactAddress.setCode(splitCode(dispactAddress.getClientCode()));
+			dispactAddress.setCode(splitCode(dispactAddress.getClientCode(),dispactAddress.getCode()));
 			baseMapper.insert(dispactAddress);
 			break;
 		}
@@ -172,11 +179,14 @@ public class DispactAddressServiceImpl extends ServiceImpl<DispactAddressMapper,
 	}
 
 	@Override
-	public String splitCode(String code) {
+	public String splitCode(String clientCode,String code) {
 		QueryWrapper<DispactAddress> wrapper = new QueryWrapper<>();
 		// 下行编辑条件
 		wrapper.eq("del_flag", false);
-		wrapper.eq("client_code", code);
+		if(code.contains("-")){
+			code = code.substring(code.indexOf("-")+1, code.length());
+		}
+		wrapper.like("code", code);
 		Integer count = baseMapper.selectCount(wrapper)+1;
 		return "CD"+count+"-"+code;
 	}
@@ -290,5 +300,33 @@ public class DispactAddressServiceImpl extends ServiceImpl<DispactAddressMapper,
 		wrapper.eq("dispacth_id", dispacthId);
 		long count = baseMapper.selectCount(wrapper);
 		return count;
+	}
+
+	@Override
+	public List<DispactAddress> getDispactWaitForTakeoutBill(Map<String, Object> map) {
+		return baseMapper.getDispactWaitForTakoutBill(map);
+	}
+
+	@Override
+	public DispactAddress getDispactAddressByTakoutId(String id) {
+		return baseMapper.getDispactAddressByTakoutId(id);
+	}
+
+	@Override
+	public List<DispactAddress> getListByDispatchId(String dispacthId) {
+		QueryWrapper<DispactAddress> wrapper = new QueryWrapper<>();
+		// 下行编辑条件
+		wrapper.eq("del_flag", false);
+		wrapper.eq("dispacth_id",dispacthId);
+		return baseMapper.selectList(wrapper);
+	}
+
+	@Override
+	public long countDetailByTableId(String tableId) {
+		QueryWrapper<DispactAddress> wrapper = new QueryWrapper<>();
+		// 下行编辑条件
+		wrapper.eq("del_flag", false);
+		wrapper.eq("table_id",tableId);
+		return baseMapper.selectCount(wrapper);
 	}
 }

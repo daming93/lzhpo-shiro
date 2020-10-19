@@ -77,8 +77,12 @@ layui.use('laydate', function(){
     elem: '#takeoutTime' //指定元素
       ,value: new Date()
   });
-  var laydate2 = layui.laydate;
-  
+  var laydate1 = layui.laydate;
+  //执行一个laydate实例
+  laydate1.render({
+    elem: '#deliveryTime' //指定元素
+    ,value: new Date()
+  });
 
 });
  
@@ -480,6 +484,14 @@ window.viewObj = {
             }
         });
        form.on('select(adjustment)', function(data){
+               $("#transportationType").parent().find('input:first').click();
+               $("#transportationType").parent().find('input:first').focus();
+        });
+        form.on('select(transportationType)', function(data){
+               $("#addressId").parent().find('input:first').click();
+               $("#addressId").parent().find('input:first').focus();
+        });
+         form.on('select(addressId)', function(data){
                $("#itemId").parent().find('input:first').click();
                $("#itemId").parent().find('input:first').focus();
         });

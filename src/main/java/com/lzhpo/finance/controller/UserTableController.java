@@ -26,16 +26,12 @@ import com.lzhpo.admin.entity.User;
 import com.lzhpo.admin.service.UserService;
 import com.lzhpo.common.annotation.SysLog;
 import com.lzhpo.common.base.PageData;
-import com.lzhpo.common.init.CacheUtils;
 import com.lzhpo.common.util.CommomUtil;
 import com.lzhpo.common.util.ResponseEntity;
 import com.lzhpo.finance.entity.UserTable;
 import com.lzhpo.finance.entity.UserTableDetail;
-import com.lzhpo.finance.service.ITableService;
 import com.lzhpo.finance.service.IUserTableDetailService;
 import com.lzhpo.finance.service.IUserTableService;
-import com.lzhpo.stock.entity.TakeoutDetail;
-import com.lzhpo.sys.entity.Dictionary;
 
 /**
  * <p>
@@ -243,19 +239,30 @@ public class UserTableController {
 		if (StringUtils.isBlank(detail.getId())) {
 			return ResponseEntity.failure("id（不能为空)");
 		}
-//		//只能改带确认状态得出库单
-//		// 待确认
-//		Integer modify_status_await = CacheUtils.keyDict.get("modify_status_await").getValue();
-//		String takoutId = userTableDetailService.getById(detail.getId()).getTakeoutId();
-//		if(!modify_status_await.equals(userTableService.getById(takoutId).getStatus())){
-//			return ResponseEntity.failure("该单据不在待确认状态无法修改");
-//		}
+		//只能改带确认状态得出库单
+		// 待确认
+		String tableId = userTableDetailService.getById(detail.getId()).getTableId();
+		if(userTableService.getById(tableId).getIsAudit()!=null&&userTableService.getById(tableId).getIsAudit()==1){
+			return ResponseEntity.failure("该单据已审核无法修改");
+		}
 		try {
 			userTableDetailService.updateById(detail);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return ResponseEntity.failure("操作失败");
 		}
+		return ResponseEntity.success("操作成功");
+	}
+	
+	@RequiresPermissions("finance:userTable:audit")
+	@PostMapping("audit")
+	@ResponseBody
+	@SysLog("审核数据")
+	public ResponseEntity audit(@RequestParam(value = "id", required = false) String id,Integer status) {
+		if (StringUtils.isBlank(id)) {
+			return ResponseEntity.failure("角色ID不能为空");
+		}
+		userTableService.ChangeAduitStatus(status, id);
 		return ResponseEntity.success("操作成功");
 	}
 }

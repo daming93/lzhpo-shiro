@@ -204,6 +204,7 @@ layui.config({
             {field:'dispatchWeight',        title: '重量(kg)'   },
          //   {field:'trayNumber',        title: '件/托(kg)'   },
             {field:'statusStr',        title: '状态'   },
+            {field:'dispactStatusStr',        title: '排单状态'   },
             {field:'remarks',        title: '备注'   },
             {title: '操作',fixed: 'right',  width:'15%',    align: 'center',toolbar: '#dispatchBar'}
         ]]/*,
@@ -237,12 +238,48 @@ layui.config({
             });
             layer.full(addIndex);
         },
+        addWaybill: function(){
+            var checkStatus = table.checkStatus('dispatch-table'),
+                data = checkStatus.data;
+            if(data.length > 0){
+                //验证运输计划得状态
+                for (var i = 0; i < data.length; i++) {
+                    if(data[i].status==1){
+                        layer.msg("有带确认得单据在选中列表中");
+                        return false;
+                    }
+                }
+                layer.confirm("你确定要录入这些运输计划到路单么？",{btn:['是的,我确定','我再想想']},
+                    function(){
+                        var deleteindex = layer.msg('操作中，请稍候',{icon: 16,time:false,shade:0.8});
+                        $.ajax({
+                            type:"POST",
+                            url:"/deliver/wayBill/add",
+                            dataType:"json",
+                            contentType:"application/json",
+                            data:JSON.stringify(data),
+                            success:function(res){
+                                layer.close(deleteindex);
+                                if(res.success){
+                                    layer.msg("操作成功",{time: 1000},function(){
+                                        table.reload('dispatch-table', t);
+                                    });
+                                }else{
+                                    layer.msg(res.message);
+                                }
+                            }
+                        });
+                    }
+                )
+            }else{
+                layer.msg("请选择需要录入的运输计划",{time:1000});
+            }
+        },
         //批量删除
         deleteSome : function(){
             var checkStatus = table.checkStatus('dispatch-table'),
                 data = checkStatus.data;
             if(data.length > 0){
-                console.log(JSON.stringify(data));
                 layer.confirm("你确定要删除这些运输计划么？",{btn:['是的,我确定','我再想想']},
                     function(){
                         var deleteindex = layer.msg('删除中，请稍候',{icon: 16,time:false,shade:0.8});

@@ -198,6 +198,32 @@ public class VehicleContractMainController {
 		return ResponseEntity.success("操作成功");
 	}
 
+	@RequiresPermissions("deliver:vehicleContractMain:copy")
+	@PostMapping("copy")
+	@ResponseBody
+	@SysLog("复制车辆合同")
+	public ResponseEntity copy(@RequestParam(value = "id", required = false) String id) {
+		if (StringUtils.isBlank(id)) {
+			return ResponseEntity.failure("角色ID不能为空");
+		}
+		vehicleContractMainService.copyContract(id);
+		return ResponseEntity.success("操作成功");
+	}
+	
+	@PostMapping("searchAreaCanDeliver")
+	@ResponseBody
+	public ResponseEntity searchAreaCanDeliver(String mainId,String proviceId,String cityId,String areaId) {
+		if (StringUtils.isBlank(mainId)) {
+			return ResponseEntity.failure("角色ID不能为空");
+		}
+		VehicleContractMainDetail detail = vehicleContractMainDetailService.selectDetailMoneyByInfoNoRange(mainId, proviceId, cityId, areaId);
+		if(detail!=null){
+			return ResponseEntity.success("操作成功");
+		}else{
+			return ResponseEntity.failure("该车辆合同中不含该区域的配送");
+		}
+	}
+	
 	@RequiresPermissions("deliver:vehicleContractMain:delete")
 	@PostMapping("deleteSome")
 	@ResponseBody

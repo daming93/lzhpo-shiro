@@ -114,6 +114,21 @@ layui.config({
                 }
             )
         }
+           if(obj.event === "copy"){
+            layer.confirm("你确定要复制该合同么？",{btn:['是的,我确定','我再想想']},
+                function(){
+                    $.post("/deliver/vehicleContractMain/copy",{"id":data.id},function (res){
+                        if(res.success){
+                            layer.msg("复制成功",{time: 1000},function(){
+                                table.reload('vehicleContractMain-table', t);
+                            });
+                        }else{
+                            layer.msg(res.message);
+                        }
+                    });
+                }
+            )
+        }
         if(obj.event === "back"){
             layer.confirm("你确定要撤销该合同么？",{btn:['是的,我确定','我再想想']},
                 function(){

@@ -95,6 +95,40 @@
          </div>
         </div>
     </div>
+<fieldset class="layui-elem-field">
+    <legend>选项检索</legend>
+    <div class="layui-field-box">
+           
+            <div class="layui-inline">
+                <input type="text" value="" name="s_code" placeholder="系统单号" class="layui-input search_input">
+            </div>
+            <div class="layui-inline">
+                <input type="text" value="" name="s_clientName" placeholder="客户名称" class="layui-input search_input">
+            </div>
+             <div class="layui-inline">
+                <input type="text" value="" name="s_clientCode" placeholder="客户单号" class="layui-input search_input">
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">配送时间</label>
+            </div>
+           <div class="layui-inline">
+                <input type="text" value="" id="startTime" name="s_startTime" placeholder="开始时间" class="layui-input layTime">
+            </div>
+            <div class="layui-inline">
+                <input type="text" value="" id="overTime" name="s_overTime"  placeholder="结束时间" class="layui-input layTime">
+            </div>
+            <div class="layui-input-inline">
+                <a class="layui-btn" lay-submit="" lay-filter="searchForm">查询</a>
+            </div>
+        <!--   <shiro:hasPermission name="deliver:dispatch:delete">
+                <div class="layui-inline">
+                <a class="layui-btn layui-btn-danger" data-type="deleteSome">批量删除</a>
+            </div>
+            </shiro:hasPermission> -->
+         
+    </div>
+</fieldset>
+
   <fieldset class="layui-elem-field layui-field-title" style="margin-top: 30px;">
         <legend>待排单据</legend>
     </fieldset>

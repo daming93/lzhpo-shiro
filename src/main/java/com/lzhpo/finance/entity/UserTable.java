@@ -55,9 +55,33 @@ public class UserTable extends DataEntity<UserTable> implements Serializable {
      */
     @TableField("is_audit")
     private Integer isAudit;
+    
+    @TableField(exist=false)
+    private String primordialTableId;
+    
+    @TableField(exist=false)
+    private String primordialTableCode;
 
     @TableField(exist=false)
     private Set<UserTableDetail> detailSet;
+
+    
+    
+	public String getPrimordialTableId() {
+		return primordialTableId;
+	}
+
+	public void setPrimordialTableId(String primordialTableId) {
+		this.primordialTableId = primordialTableId;
+	}
+
+	public String getPrimordialTableCode() {
+		return primordialTableCode;
+	}
+
+	public void setPrimordialTableCode(String primordialTableCode) {
+		this.primordialTableCode = primordialTableCode;
+	}
 
 	public Set<UserTableDetail> getDetailSet() {
 		return detailSet;

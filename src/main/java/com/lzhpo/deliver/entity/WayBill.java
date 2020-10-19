@@ -1,31 +1,28 @@
 package com.lzhpo.deliver.entity;
 
-import java.io.Serializable;
 import java.math.BigDecimal;
+import com.baomidou.mybatisplus.annotation.TableName;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Set;
-
 import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.lzhpo.common.base.DataEntity;
-
+import java.io.Serializable;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+import com.lzhpo.common.base.DataEntity;
 /**
  * <p>
- * 
+ * 录单(和计划表基本一样，是计划表得主表，和统计内容)
  * </p>
  *
  * @author xdm
- * @since 2020-09-03
+ * @since 2020-10-14
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@TableName("deliver_dispatch")
-public class Dispatch extends DataEntity<Dispatch> implements Serializable {
+@TableName("deliver_way_bill")
+public class WayBill extends DataEntity<WayBill> implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -35,17 +32,17 @@ public class Dispatch extends DataEntity<Dispatch> implements Serializable {
     private String code;
 
     /**
-     * 配送单系统编号
+     * 司机id
      */
     @TableField("driver_id")
     private String driverId;
+
     /**
-     * 配送单系统编号
+     * 车辆id
      */
-    @TableField("vehicle_id")
-    private String vehicleId;
-    
-    
+    @TableField("vehicle_num")
+    private Integer vehicleNum;
+
     /**
      * 车次
      */
@@ -89,11 +86,6 @@ public class Dispatch extends DataEntity<Dispatch> implements Serializable {
     private BigDecimal lodaRate;
 
     /**
-     * 承重率
-     */
-    @TableField("weight_rate")
-    private BigDecimal weightRate;
-    /**
      * 配送点数
      */
     @TableField("dispatch_piont")
@@ -130,12 +122,6 @@ public class Dispatch extends DataEntity<Dispatch> implements Serializable {
     private String deliveryCompletePeople;
 
     /**
-     * 对应录单得id
-     */
-    @TableField("way_bill_id")
-    private String wayBillId;
-    
-    /**
      * 配送完成时间
      */
     @TableField("delivery_complete_time")
@@ -158,81 +144,24 @@ public class Dispatch extends DataEntity<Dispatch> implements Serializable {
     @TableField("type_cities_status")
     private Integer typeCitiesStatus;
 
-    @TableField(exist=false)
-    private String driverName;
 
-    @TableField(exist=false)
-    private String vehicleCode;
+    /**
+     * 承重率
+     */
+    @TableField("weight_rate")
+    private BigDecimal weightRate;
 
-    @TableField(exist=false)
-    private String dispatchAreaName;
-
-    @TableField(exist=false)
-    private String statusStr;
-    
-    @TableField(exist=false)
-    private String dispactStatusStr;
-    
-    @TableField(exist=false)
-    private Set<DispactAddress> detailSet;
-    
+    /**
+     * 修改状态（1待确认2可撤销3锁定）
+     */
     private Integer status;
-    
-    
-	public String getDispactStatusStr() {
-		return dispactStatusStr;
+
+	public String getCode() {
+		return code;
 	}
 
-	public void setDispactStatusStr(String dispactStatusStr) {
-		this.dispactStatusStr = dispactStatusStr;
-	}
-
-	public String getWayBillId() {
-		return wayBillId;
-	}
-
-	public void setWayBillId(String wayBillId) {
-		this.wayBillId = wayBillId;
-	}
-
-	public Integer getStatus() {
-		return status;
-	}
-
-	public void setStatus(Integer status) {
-		this.status = status;
-	}
-
-	public BigDecimal getWeightRate() {
-		return weightRate;
-	}
-
-	public void setWeightRate(BigDecimal weightRate) {
-		this.weightRate = weightRate;
-	}
-
-	public Set<DispactAddress> getDetailSet() {
-		return detailSet;
-	}
-
-	public void setDetailSet(Set<DispactAddress> detailSet) {
-		this.detailSet = detailSet;
-	}
-
-	public String getStatusStr() {
-		return statusStr;
-	}
-
-	public void setStatusStr(String statusStr) {
-		this.statusStr = statusStr;
-	}
-
-	public String getDispatchAreaName() {
-		return dispatchAreaName;
-	}
-
-	public void setDispatchAreaName(String dispatchAreaName) {
-		this.dispatchAreaName = dispatchAreaName;
+	public void setCode(String code) {
+		this.code = code;
 	}
 
 	public String getDriverId() {
@@ -243,36 +172,14 @@ public class Dispatch extends DataEntity<Dispatch> implements Serializable {
 		this.driverId = driverId;
 	}
 
-	public String getVehicleId() {
-		return vehicleId;
+	
+
+	public Integer getVehicleNum() {
+		return vehicleNum;
 	}
 
-	public void setVehicleId(String vehicleId) {
-		this.vehicleId = vehicleId;
-	}
-
-	public String getDriverName() {
-		return driverName;
-	}
-
-	public void setDriverName(String driverName) {
-		this.driverName = driverName;
-	}
-
-	public String getVehicleCode() {
-		return vehicleCode;
-	}
-
-	public void setVehicleCode(String vehicleCode) {
-		this.vehicleCode = vehicleCode;
-	}
-
-	public String getCode() {
-		return code;
-	}
-
-	public void setCode(String code) {
-		this.code = code;
+	public void setVehicleNum(Integer vehicleNum) {
+		this.vehicleNum = vehicleNum;
 	}
 
 	public Integer getTrainNumber() {
@@ -290,7 +197,6 @@ public class Dispatch extends DataEntity<Dispatch> implements Serializable {
 	public void setTripNumber(Integer tripNumber) {
 		this.tripNumber = tripNumber;
 	}
-
 
 	public BigDecimal getDispatchVolume() {
 		return dispatchVolume;
@@ -372,7 +278,6 @@ public class Dispatch extends DataEntity<Dispatch> implements Serializable {
 		this.pickupTime = pickupTime;
 	}
 
-
 	public String getDeliveryCompletePeople() {
 		return deliveryCompletePeople;
 	}
@@ -386,7 +291,7 @@ public class Dispatch extends DataEntity<Dispatch> implements Serializable {
 	}
 
 	public void setDeliveryCompleteTime(LocalDateTime deliveryCompleteTime) {
-		this.deliveryCompleteTime =  deliveryCompleteTime;
+		this.deliveryCompleteTime = deliveryCompleteTime;
 	}
 
 	public Integer getIsPay() {
@@ -413,7 +318,22 @@ public class Dispatch extends DataEntity<Dispatch> implements Serializable {
 		this.typeCitiesStatus = typeCitiesStatus;
 	}
 
- 
+	public BigDecimal getWeightRate() {
+		return weightRate;
+	}
+
+	public void setWeightRate(BigDecimal weightRate) {
+		this.weightRate = weightRate;
+	}
+
+	public Integer getStatus() {
+		return status;
+	}
+
+	public void setStatus(Integer status) {
+		this.status = status;
+	}
 
 
+    
 }

@@ -42,12 +42,20 @@
             <shiro:hasPermission name="deliver:dispatch:add">
             <div class="layui-inline">
                 <a class="layui-btn layui-btn-normal" id="adddispatch" data-type="addUser">添加运输计划</a>
-
+                
             </div>
+             </shiro:hasPermission>
+            <shiro:hasPermission name="deliver:wayBill:add">
+            <div class="layui-inline">
+                <a class="layui-btn layui-btn-normal" id="addWaybill" data-type="addWaybill">录入路单</a>
+            </div>
+            </shiro:hasPermission>
+            <shiro:hasPermission name="deliver:dispatch:add">
              <div class="layui-input-inline">
                   <div class="layui-form-mid layui-word-aux">提示:双击行查看详情,ctrl+enter新建运输计划</div>
               </div>
              </shiro:hasPermission>
+        
              <div class="layui-input-inline">
                 <input type="checkbox" name="s_continuity" id="continuity" lay-skin="switch" lay-text="连续录出|关闭" >
             </div>

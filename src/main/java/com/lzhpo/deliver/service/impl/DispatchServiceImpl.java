@@ -66,7 +66,9 @@ public class DispatchServiceImpl extends ServiceImpl<DispatchMapper, Dispatch> i
 	@Transactional(rollbackFor = Exception.class)
 	@CacheEvict(value = "Dispatchs", allEntries = true)
 	public Dispatch saveDispatch(Dispatch dispatch) {
-
+		//未排单
+		Integer scheduling_status_no = CacheUtils.keyDict.get("scheduling_status_no").getValue();
+		dispatch.setDispatchStatus(scheduling_status_no);
 		dispatch.setCode(generateNoService.nextCode("YSJH"));
 		// 待确认
 		Integer modify_status_await = CacheUtils.keyDict.get("modify_status_await").getValue();
@@ -181,6 +183,28 @@ public class DispatchServiceImpl extends ServiceImpl<DispatchMapper, Dispatch> i
 		entity.setStatus(modify_status_await);
 		baseMapper.updateById(entity);
 		return entity;
+	}
+
+	@Override
+	public int backDispatchByWaybillId(String wayBillId) {
+		QueryWrapper<Dispatch> wrapper = new QueryWrapper<>();
+		wrapper.eq("del_flag", false);
+		wrapper.eq("way_bill_id", wayBillId);
+		Dispatch entity = new Dispatch();
+		entity.setWayBillId("");
+		//未排单
+		Integer scheduling_status_no = CacheUtils.keyDict.get("scheduling_status_no").getValue();
+		entity.setDispatchStatus(scheduling_status_no);
+		baseMapper.update(entity, wrapper);
+		return 0;
+	}
+
+	@Override
+	public List<Dispatch> selectByWayBillId(String wayBillId) {
+		QueryWrapper<Dispatch> wrapper = new QueryWrapper<>();
+		wrapper.eq("del_flag", false);
+		wrapper.eq("way_bill_id", wayBillId);
+		return baseMapper.selectList(wrapper);
 	}
 	
 

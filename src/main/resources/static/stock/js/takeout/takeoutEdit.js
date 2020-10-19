@@ -22,6 +22,12 @@ layui.use('laydate', function(){
   laydate.render({
     elem: '#takeoutTime' //指定元素
   });
+   var laydate1 = layui.laydate;
+  //执行一个laydate实例
+  laydate1.render({
+    elem: '#deliveryTime' //指定元素
+    ,value: new Date()
+  });
 });
     
     //layui 模块化引用

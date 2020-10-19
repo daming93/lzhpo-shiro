@@ -99,10 +99,35 @@
          </div>
         </div>
     </div>
-  <fieldset class="layui-elem-field layui-field-title" style="margin-top: 30px;">
+<fieldset th:if="${dispatch.status==1}"  class="layui-elem-field">
+    <legend>选项检索</legend>
+    <div class="layui-field-box">
+            <div class="layui-inline">
+                <input type="text" value="" name="s_code" placeholder="系统单号" class="layui-input search_input">
+            </div>
+            <div class="layui-inline">
+                <input type="text" value="" name="s_clientName" placeholder="客户名称" class="layui-input search_input">
+            </div>
+             <div class="layui-inline">
+                <input type="text" value="" name="s_clientCode" placeholder="客户单号" class="layui-input search_input">
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">配送时间</label>
+            </div>
+           <div class="layui-inline">
+                <input type="text" value="" id="startTime" name="s_startTime" placeholder="开始时间" class="layui-input layTime">
+            </div>
+            <div class="layui-inline">
+                <input type="text" value="" id="overTime" name="s_overTime"  placeholder="结束时间" class="layui-input layTime">
+            </div>
+            <div class="layui-input-inline">
+                <a class="layui-btn" lay-submit="" lay-filter="searchForm">查询</a>
+            </div>
+    </div>
+</fieldset>    
+  <fieldset th:if="${dispatch.status==1}"  class="layui-elem-field layui-field-title" style="margin-top: 30px;">
         <legend>待排单据</legend>
-    </fieldset>
-    <div class="layui-tab" lay-filter="tab-all">
+            <div class="layui-tab" lay-filter="tab-all">
         <ul class="layui-tab-title">
             <li data-status="" class="layui-this">库存出单</li>
             <li data-status="1">快速发单</li>
@@ -116,27 +141,30 @@
             </div>
         </div>
     </div>
+</fieldset>
+
  <div class="layui-form-item">
         <fieldset class="layui-elem-field layui-field-title" style="margin-left: 10px;">
             <legend>预载单据</legend>
+          <div class="layui-form-item">
+            <section class="layui-col-md10" style="margin: 0 auto; float: none">
+            <div class="layui-card">
+                <div class="layui-card-body layui-text">
+                   
+                    <div id="dispatchTableRes" class="table-overlay">
+                        <table id="dispatchTable"  lay-data="{id: 'dispatchTable'}" lay-filter="dispatchTable" class="layui-table"></table>
+                            <script type="text/html" id="dispatchBillBar">
+                                <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="spilt">拆单</a>
+                            </script>
+                    </div>
+
+                </div>
+            </div>
+            </section>
+         </div>   
         </fieldset>
  </div>      
- <div class="layui-form-item">
-    <section class="layui-col-md10" style="margin: 0 auto; float: none">
-    <div class="layui-card">
-        <div class="layui-card-body layui-text">
-           
-            <div id="dispatchTableRes" class="table-overlay">
-                <table id="dispatchTable"  lay-data="{id: 'dispatchTable'}" lay-filter="dispatchTable" class="layui-table"></table>
-                    <script type="text/html" id="dispatchBillBar">
-                        <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="spilt">拆单</a>
-                    </script>
-            </div>
 
-        </div>
-    </div>
-    </section>
- </div>
  <div class="layui-form-item">
     <div class="layui-form-item">
         <fieldset class="layui-elem-field layui-field-title"  style="margin-top: 30px;margin-left: 10px;">

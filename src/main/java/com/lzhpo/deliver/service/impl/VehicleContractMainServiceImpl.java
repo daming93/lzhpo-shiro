@@ -92,5 +92,30 @@ public class VehicleContractMainServiceImpl extends ServiceImpl<VehicleContractM
         return baseMapper.selectList(wrapper);
     }
 
+	@Override
+	public void copyContract(String contractId) {
+		VehicleContractMain main =  baseMapper.selectById(contractId);
+		List<VehicleContractMainDetail> detailList =  vehicleContractMainDetailService.getListByMainId(contractId);
+		//先把名字搞出来
+		String name = main.getName()+"副本";
+		String newName = name;
+		int i = 1;
+		while (getVehicleContractMainCount(newName)>0){
+			i++;
+			newName = name+i;
+		};
+		//名字搞出来,然后改code
+		main.setId(null);
+		main.setName(name);
+		main.setContractCode(generateNoService.nextCode("CLHT"));
+		baseMapper.insert(main);
+		//处理子表
+		for (VehicleContractMainDetail detail : detailList) {
+			detail.setId(null);//清空原先的id
+			detail.setContractId(main.getId());
+        	vehicleContractMainDetailService.save(detail);
+		}
+	}
+
 
 }

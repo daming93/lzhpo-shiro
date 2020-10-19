@@ -49,6 +49,7 @@ public class TableServiceImpl extends ServiceImpl<TableMapper, Table> implements
 	public Table saveTable(Table table) {
 		table.setCode(generateNoService.nextCode("CWBD"));
 		table.setModularName(CommomUtil.valueToNameInDict(table.getModular(), "modular"));
+		table.setIsAudit(0);//未审核
 		baseMapper.insert(table);
 		Set<TableDetail> detailSet = table.getDetailSets();
 		for (TableDetail tableDetail : detailSet) {

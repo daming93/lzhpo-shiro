@@ -1,5 +1,6 @@
 package com.lzhpo.deliver.controller;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -7,7 +8,6 @@ import java.util.Map;
 import javax.servlet.ServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -26,9 +26,10 @@ import com.lzhpo.admin.service.UserService;
 import com.lzhpo.common.annotation.SysLog;
 import com.lzhpo.common.base.PageData;
 import com.lzhpo.common.util.ResponseEntity;
-import com.lzhpo.deliver.entity.Address;
 import com.lzhpo.deliver.entity.DispactAddress;
+import com.lzhpo.deliver.entity.Dispatch;
 import com.lzhpo.deliver.service.IDispactAddressService;
+import com.lzhpo.deliver.service.IDispatchService;
 import com.lzhpo.sys.service.ITerritoryService;
 /**
  * <p>
@@ -44,6 +45,9 @@ public class DispactAddressController {
  	@Autowired
     private IDispactAddressService dispactAddressService;
 
+	@Autowired
+    private IDispatchService dispatchService;
+ 	
     @Autowired
     UserService userService;
 
@@ -56,7 +60,7 @@ public class DispactAddressController {
     }
 	
     /**
-     * 查询分页数据
+     * 查询分页数据（待选择表中的快速出单）
      */
     @PostMapping("list")
     @ResponseBody
@@ -64,14 +68,54 @@ public class DispactAddressController {
                                @RequestParam(value = "limit",defaultValue = "10")Integer limit,
                                ServletRequest request){
         Map map = WebUtils.getParametersStartingWith(request, "s_");
+        if(!map.isEmpty()){
+            String waitList = (String) map.get("waitList");
+            if(StringUtils.isNotBlank(waitList)) {
+                String[] arr = waitList.split(",");
+                List<String> list = new ArrayList<>();
+                for (String string : arr) {
+                	list.add(string);
+				}
+                if(!list.isEmpty()){
+                	map.put("waitedList", list);
+                }
+            }
+        }
         PageData<DispactAddress> dispactAddressPageData = new PageData<>();
         dispactAddressPageData.setData(setUserToDispactAddress(dispactAddressService.getDispactWaitForDeliverBill(map)));
         dispactAddressPageData.setCount(1000l);
         return dispactAddressPageData ;
     }
+    /**
+     * 查询分页数据（待选择表中的库存出单）
+     */
+    @PostMapping("listTakout")
+    @ResponseBody
+    public PageData<DispactAddress> listTakout(@RequestParam(value = "page",defaultValue = "1")Integer page,
+                               @RequestParam(value = "limit",defaultValue = "10")Integer limit,
+                               ServletRequest request){
+        Map map = WebUtils.getParametersStartingWith(request, "s_");
+        if(!map.isEmpty()){
+            String waitList = (String) map.get("waitList");
+            if(StringUtils.isNotBlank(waitList)) {
+                String[] arr = waitList.split(",");
+                List<String> list = new ArrayList<>();
+                for (String string : arr) {
+                	list.add(string);
+				}
+                if(!list.isEmpty()){
+                	map.put("waitedList", list);
+                }
+            }
+        }
+        PageData<DispactAddress> dispactAddressPageData = new PageData<>();
+        dispactAddressPageData.setData(setUserToDispactAddress(dispactAddressService.getDispactWaitForTakeoutBill(map)));
+        dispactAddressPageData.setCount(1000l);
+        return dispactAddressPageData ;
+    }
     
     /**
-     * 查询分页数据
+     * 查询分页数据（配送计划得明细）
      */
     @PostMapping("listByDispacthId")
     @ResponseBody
@@ -82,6 +126,28 @@ public class DispactAddressController {
         PageData<DispactAddress> dispactAddressPageData = new PageData<>();
         QueryWrapper<DispactAddress> addressWrapper = new QueryWrapper<>();
         addressWrapper.eq("dispacth_id", id);
+        IPage<DispactAddress> addressPage = dispactAddressService.page(new Page<>(page, limit), addressWrapper);
+        dispactAddressPageData.setData(setUserToDispactAddress(addressPage.getRecords()));
+        dispactAddressPageData.setCount(addressPage.getTotal());
+        return dispactAddressPageData ;
+    }
+    /**
+     * 查询分页数据(根据路单得id查，使用在路单得详情页面）
+     */
+    @PostMapping("listByWayBillId")
+    @ResponseBody
+    public PageData<DispactAddress> listByWayBillId(@RequestParam(value = "page",defaultValue = "1")Integer page,
+                               @RequestParam(value = "limit",defaultValue = "1000")Integer limit,String id,
+                               ServletRequest request){
+        Map map = WebUtils.getParametersStartingWith(request, "s_");
+        List<String> dispatchIds = new ArrayList<>();
+        List<Dispatch> mainList = dispatchService.selectByWayBillId(id);
+        for (Dispatch dispatch : mainList) {
+        	dispatchIds.add(dispatch.getId());
+		}
+        PageData<DispactAddress> dispactAddressPageData = new PageData<>();
+        QueryWrapper<DispactAddress> addressWrapper = new QueryWrapper<>();
+        addressWrapper.in("dispacth_id", dispatchIds);
         IPage<DispactAddress> addressPage = dispactAddressService.page(new Page<>(page, limit), addressWrapper);
         dispactAddressPageData.setData(setUserToDispactAddress(addressPage.getRecords()));
         dispactAddressPageData.setCount(addressPage.getTotal());
@@ -197,10 +263,15 @@ public class DispactAddressController {
     }
     
     @GetMapping("spilt")
-    public String toSpilt(String id,ModelMap modelMap){
-    	
-        modelMap.put("dispactAddress", dispactAddressService.getDispactAddressByBillId(id));
-      
+    public String toSpilt(String id,ModelMap modelMap,Integer type ){
+    	if(type!=null){
+    		if(type==1){//库存发单
+        		modelMap.put("dispactAddress", dispactAddressService.getDispactAddressByTakoutId(id));
+        	}else{//快速发单
+        		modelMap.put("dispactAddress", dispactAddressService.getDispactAddressByBillId(id));
+        	}
+    		modelMap.put("type",type);
+    	}
         return "deliver/dispatch/editSpilt";
    }
     

@@ -35,4 +35,9 @@ public interface IDispatchService extends IService<Dispatch> {
 	//撤回
 	public Dispatch backDispatch(String id);
 
+	//清除主表关系  撤销路单
+	int backDispatchByWaybillId(String wayBillId);
+	
+	//选取所有记录
+	List<Dispatch> selectByWayBillId(String wayBillId);
 }

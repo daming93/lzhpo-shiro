@@ -48,6 +48,7 @@ import com.lzhpo.stock.service.IMaterialDepotService;
 import com.lzhpo.stock.service.ITakeoutDetailService;
 import com.lzhpo.stock.service.ITakeoutOperationsService;
 import com.lzhpo.stock.service.ITakeoutService;
+import com.lzhpo.sys.entity.Dictionary;
 import com.lzhpo.warehouse.entity.Depot;
 import com.lzhpo.warehouse.entity.Tray;
 import com.lzhpo.warehouse.service.IDepotService;
@@ -172,6 +173,12 @@ public class TakeoutController {
 			if (r.getPickingStatus()!= null) {
 				r.setPickStatusStr(CommomUtil.valueToNameInDict(r.getPickingStatus(), "is_exsit_pick"));
 			}
+			if (r.getTransportationType() != null) {
+				r.setTransportationTypeStr(CommomUtil.valueToNameInDict(r.getTransportationType(), "transportation_type"));
+			}
+			if (StringUtils.isNotBlank(r.getAddressId())) {
+				r.setAddressName(addressService.getById(r.getAddressId()).getAddressName());
+			}
 		});
 
 		return takeouts;
@@ -194,6 +201,10 @@ public class TakeoutController {
 		
 		List<Address> addressList = addressService.selectAll();
 		modelMap.put("addressList", addressList);
+		
+		//配送方式 CacheUtils. transportation_type
+		List<Dictionary> transportationTypeList =   CacheUtils.allDicts.get("transportation_type");
+		modelMap.put("transportationTypeList", transportationTypeList);
 		modelMap.put("trayList", trayList);
 		modelMap.put("continuity", continuity);
 		return "stock/takeout/addTakeout";
@@ -261,6 +272,11 @@ public class TakeoutController {
 		modelMap.put("depots", JSONObject.toJSON(depots));
 		List<Clientitem> items = clientitemService.selectByClientId(takeout.getClientId());
 		modelMap.put("items", JSONObject.toJSON(items));
+		//配送方式 CacheUtils. transportation_type
+		List<Dictionary> transportationTypeList =   CacheUtils.allDicts.get("transportation_type");
+		modelMap.put("transportationTypeList", transportationTypeList);
+		List<Address> addressList = addressService.selectAll();
+		modelMap.put("addressList", addressList);
 		return "stock/takeout/editTakeout";
 	}
 

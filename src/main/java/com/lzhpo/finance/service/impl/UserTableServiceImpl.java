@@ -47,6 +47,7 @@ public class UserTableServiceImpl extends ServiceImpl<UserTableMapper, UserTable
     @Transactional(rollbackFor = Exception.class)
     @CacheEvict(value = "UserTables", allEntries = true)
     public UserTable saveUserTable(UserTable userTable) {
+    	userTable.setIsAudit(0);//未审核
     	userTable.setCode(generateNoService.nextCode("YHFB"));
     	userTable.setModularName(CommomUtil.valueToNameInDict(userTable.getModular(), "modular"));
         baseMapper.insert(userTable);
@@ -96,6 +97,14 @@ public class UserTableServiceImpl extends ServiceImpl<UserTableMapper, UserTable
         wrapper.eq("del_flag",false);
         wrapper.eq("table_id", userTableId);
         return baseMapper.selectList(wrapper)==null||baseMapper.selectList(wrapper).size()==0?new UserTable():baseMapper.selectList(wrapper).get(0);
+	}
+
+	@Override
+	public void ChangeAduitStatus(Integer status, String id) {
+		UserTable table = new UserTable();
+		table.setId(id);
+		table.setIsAudit(status);
+		baseMapper.updateById(table);
 	}
 
 

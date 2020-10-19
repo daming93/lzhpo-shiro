@@ -178,7 +178,7 @@ public class StorageController {
 				StorageDetailWrapper.like("name", keys);
 			}
 		}
-		StorageDetailWrapper.orderByDesc("create_date ");
+		StorageDetailWrapper.orderByDesc("create_date");
 		IPage<StorageDetail> StorageDetailPage = storageDetailService.page(new Page<>(page, limit),
 				StorageDetailWrapper);
 		ContStorageDetailData.setCount(StorageDetailPage.getTotal());

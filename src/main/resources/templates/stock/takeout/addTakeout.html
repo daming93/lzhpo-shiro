@@ -58,18 +58,45 @@
                 <input type="text" class="layui-input layTime" id="takeoutTime" name="takeoutTime" lay-verify="required" placeholder="请输入出库时间">
             </div>
         </div>
+         <div class="layui-inline">
+             <label class="layui-form-label">配送时间</label>
+            <div class="layui-input-block">
+                <input type="text" class="layui-input layTime" id="deliveryTime" name="deliveryTime" lay-verify="required" placeholder="请输入配送时间">
+            </div>
+        </div>
         <div  class="layui-inline">
             <label class="layui-form-label">客户单号</label>
             <div class="layui-input-block">
                 <input type="text" class="layui-input" id="clientCode" name="clientCode" lay-verify="required" placeholder="请输入客户单号"  >
             </div>
         </div>
+      
+    </div>
+    <div class="layui-form-item">
         <div class="layui-inline">
             <label class="layui-form-label">出库类型</label>
             <div class="layui-input-block">
                 <select name="adjustment" id="adjustment" class="form-control1" lay-filter="adjustment" lay-verify="required" >
                     <option value="0">正常</option>
                     <option value="1">调账</option>
+                </select>
+            </div>  
+        </div>
+        <div class="layui-inline">
+            <label class="layui-form-label">运输方式</label>
+            <div class="layui-input-block">
+                <select name="transportationType" id="transportationType" class="form-control1" lay-verify="" lay-filter="transportationType" lay-search>
+                    <option value="">请选择运输方式</option>
+                    <option th:each="basic:${transportationTypeList}" th:value="${basic.value}" lay-verify="required" th:text="${basic.name}"></option>
+                </select>
+            </div>  
+        </div>
+         <div class="layui-inline">
+            <label class="layui-form-label">配送地址</label>
+            <div class="layui-input-block">
+                <select name="addressId" id="addressId" class="form-control1" lay-verify="" lay-filter="addressId" lay-search>
+                    <option value="">请选择配送地址</option>
+                    <option th:each="basic:${addressList}" th:value="${basic.id}" lay-verify="required" th:text="${basic.addressName}"></option>
                 </select>
             </div>  
         </div>

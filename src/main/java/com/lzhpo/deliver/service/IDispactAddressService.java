@@ -34,13 +34,17 @@ public interface IDispactAddressService extends IService<DispactAddress> {
 	//分页查询数据在父类
 	public List<DispactAddress> getDispactWaitForDeliverBill(Map<String, Object> map);
 	
+	
+	//分页查询数据在父类
+	public List<DispactAddress> getDispactWaitForTakeoutBill(Map<String, Object> map);
 	//根据实例Id获取实例 排单管理中得
 	DispactAddress getDispactAddressByBillId(String id);
-	
+	//根据实例Id获取实例 排单管理中得库存出单
+	DispactAddress getDispactAddressByTakoutId(String id);
 	//拆单
 	public String splitBill(DispactAddress dispactAddress);
 	
-	public String splitCode(String code);
+	public String splitCode(String clientCode,String code);
 	
 	public String changeBindingStatus(String disAddressId);
 	
@@ -48,4 +52,9 @@ public interface IDispactAddressService extends IService<DispactAddress> {
 	public String bindingStatus(DispactAddress dispactAddress);
 	
 	public long getCountByCodeAndIDispacthId(String code, String dispacthId);
+	
+	//分页查询数据在父类
+	public List<DispactAddress> getListByDispatchId(String dispacthId);
+	
+	long countDetailByTableId(String tableId);
 }

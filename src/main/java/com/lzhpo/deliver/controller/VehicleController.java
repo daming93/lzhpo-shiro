@@ -28,7 +28,10 @@ import com.lzhpo.common.init.CacheUtils;
 import com.lzhpo.common.util.CommomUtil;
 import com.lzhpo.common.util.ResponseEntity;
 import com.lzhpo.deliver.entity.Vehicle;
+import com.lzhpo.deliver.entity.VehicleContractMainDetail;
+import com.lzhpo.deliver.entity.VehicleType;
 import com.lzhpo.deliver.service.IDriverService;
+import com.lzhpo.deliver.service.IVehicleContractMainDetailService;
 import com.lzhpo.deliver.service.IVehicleService;
 import com.lzhpo.deliver.service.IVehicleTypeService;
 /**
@@ -54,6 +57,10 @@ public class VehicleController {
     @Autowired
     private IDriverService driverService ;
 
+
+	@Autowired
+	private IVehicleContractMainDetailService  vehicleContractMainDetailService;
+	
     @GetMapping(value = "list")
     public String list(){
         return "deliver/vehicle/listVehicle";
@@ -190,4 +197,29 @@ public class VehicleController {
          vehicleService.updateVehicle(vehicle);
         return ResponseEntity.success("操作成功");
     }
+    
+	@PostMapping("searchAreaCanDeliver")
+	@ResponseBody
+	public ResponseEntity searchAreaCanDeliver(@RequestParam String vehicleId,@RequestParam String proviceId,@RequestParam String cityId,@RequestParam String areaId) {
+		if (StringUtils.isBlank(vehicleId)) {
+			return ResponseEntity.failure("角色ID不能为空");
+		}
+		//根据车辆id找到合同id
+		Vehicle vehicle = vehicleService.getById(vehicleId);
+		if(vehicle!=null){
+			VehicleType type = vehicleTypeService.getById(vehicle.getVehicleTypeId());
+			if(type!=null){
+				VehicleContractMainDetail detail = vehicleContractMainDetailService.selectDetailMoneyByInfoNoRange(type.getContractId(), proviceId, cityId, areaId);
+				if(detail!=null){
+					return ResponseEntity.success("操作成功");
+				}else{
+					return ResponseEntity.failure("该车辆合同中不含该区域的配送");
+				}
+			}else{
+				return ResponseEntity.failure("未找到该车辆对应车型");
+			}
+		}else{
+			return ResponseEntity.failure("未找到该车辆信息,请检查表单是否选取车辆");
+		}
+	}
 }

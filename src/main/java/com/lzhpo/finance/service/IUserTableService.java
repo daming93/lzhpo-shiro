@@ -34,4 +34,8 @@ public interface IUserTableService extends IService<UserTable> {
 
 	//根据实例userTableId获取实例
 	UserTable getUserTableByuserTableId(String userTableId);	
+	
+	void ChangeAduitStatus(Integer status, String id);
+	
+	
 }

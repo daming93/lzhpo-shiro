@@ -78,6 +78,10 @@ public class DispatchController {
 			if (StringUtils.isNotBlank(keys)) {
 				dispatchWrapper.like("name", keys);
 			}
+			String wayBillId = (String) map.get("wayBillId");
+			if (StringUtils.isNotBlank(wayBillId)) {
+				dispatchWrapper.like("way_bill_id", wayBillId);
+			}
 		}
 		//排序
 		dispatchWrapper.orderByDesc("code");
@@ -98,6 +102,9 @@ public class DispatchController {
 			}
 			if (r.getStatus() != null) {
 				r.setStatusStr(CommomUtil.valueToNameInDict(r.getStatus(), "modify_status"));
+			}
+			if (r.getDispatchStatus() != null) {
+				r.setDispactStatusStr(CommomUtil.valueToNameInDict(r.getDispatchStatus(), "scheduling_status"));
 			}
 		});
 
