@@ -26,10 +26,15 @@ import com.lzhpo.admin.entity.User;
 import com.lzhpo.admin.service.UserService;
 import com.lzhpo.common.annotation.SysLog;
 import com.lzhpo.common.base.PageData;
+import com.lzhpo.common.config.MySysUser;
+import com.lzhpo.common.init.CacheUtils;
 import com.lzhpo.common.util.ResponseEntity;
 import com.lzhpo.deliver.entity.Dispatch;
 import com.lzhpo.deliver.entity.WayBill;
 import com.lzhpo.deliver.service.IWayBillService;
+import com.lzhpo.finance.service.ITableService;
+import com.lzhpo.finance.service.IUserTableService;
+import com.lzhpo.sys.service.IUserSettingService;
 /**
  * <p>
  * 录单(和计划表基本一样，是计划表得主表，和统计内容) 前端控制器
@@ -47,8 +52,24 @@ public class WayBillController {
     @Autowired
     UserService userService;
 
+	@Autowired
+	private IUserSettingService userSettingService; 
+ 	
+	@Autowired
+    private IUserTableService userTableService;
+	
+	@Autowired
+    private ITableService tableService;
     @GetMapping(value = "list")
-    public String list(){
+    public String list(ModelMap modelMap){
+    	// 自定义附表
+		Integer user_setting_table = CacheUtils.keyDict.get("user_setting_table").getValue();
+		//快速发单模块
+		Integer modular_way_bill = CacheUtils.keyDict.get("modular_way_bill").getValue();
+		
+		modelMap.put("tableList", tableService.selectListByModular(modular_way_bill));
+		String userId = MySysUser.id();
+		modelMap.put("modular", userSettingService.getUserSettingByUserId(userId, modular_way_bill, user_setting_table));
         return "deliver/wayBill/listWayBill";
     }
 	
@@ -94,6 +115,7 @@ public class WayBillController {
                 }
                 r.setUpdateUser(u);
             }
+            r.setUserTable(userTableService.getUserTableByuserTableId(r.getId()));
         });
 
         return wayBills;

@@ -28,7 +28,7 @@ public class VehicleTypeServiceImpl extends ServiceImpl<VehicleTypeMapper, Vehic
         QueryWrapper<VehicleType> wrapper = new QueryWrapper<>();
 	// 下行编辑条件
         wrapper.eq("del_flag",false); 
-       // wrapper.eq("name",name);
+        wrapper.eq("name",name);
         return baseMapper.selectCount(wrapper);
     }
 

@@ -10,6 +10,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 import com.lzhpo.common.base.DataEntity;
+import com.lzhpo.finance.entity.UserTable;
 /**
  * <p>
  * 录单(和计划表基本一样，是计划表得主表，和统计内容)
@@ -156,6 +157,18 @@ public class WayBill extends DataEntity<WayBill> implements Serializable {
      */
     private Integer status;
 
+    @TableField(exist=false)
+    private UserTable userTable;
+    
+    
+	public UserTable getUserTable() {
+		return userTable;
+	}
+
+	public void setUserTable(UserTable userTable) {
+		this.userTable = userTable;
+	}
+	
 	public String getCode() {
 		return code;
 	}
