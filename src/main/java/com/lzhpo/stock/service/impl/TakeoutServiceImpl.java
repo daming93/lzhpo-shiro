@@ -261,4 +261,9 @@ public class TakeoutServiceImpl extends ServiceImpl<TakeoutMapper, Takeout> impl
 		
 	}
 
+	@Override
+	public List<Takeout> selectAllByDispatchIds(Set<String> dispatchIds) {
+		return baseMapper.selectAllByDispatchIds(dispatchIds);
+	}
+
 }

@@ -35,4 +35,30 @@
 		GROUP BY
 			o.takeoutId
 	</select>
+	
+		<select id="selectAllByDispatchIds" resultType="com.lzhpo.stock.entity.Takeout" parameterType="java.util.Set">
+		SELECT
+			client_id,
+			client_name,
+			sum(ifnull(volume, 0)) AS volume,
+			sum(ifnull(weight,0)) AS weight,
+			sum(ifnull(money,0)) AS money,
+			sum(ifnull(total,0)) AS total,
+		  	sum(ifnull(number,0)) AS number,
+		  	sum(ifnull(scattered_num,0)) AS scattered_num,
+			transportation_type,
+			address_id,
+			client_id
+		FROM
+			stock_takeout 
+		    where id in
+		    <foreach collection="takeoutIds" item="id" index="index" open="(" close=")" separator=",">
+			  #{id}
+			</foreach>
+		GROUP BY
+			client_id,
+			delivery_time,
+			transportation_type,
+	address_id
+	</select>
 </mapper>

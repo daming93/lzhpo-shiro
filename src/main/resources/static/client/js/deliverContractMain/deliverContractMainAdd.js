@@ -5,6 +5,24 @@ Array.prototype.contains = function ( needle ) {
     return false;
 };
 
+
+//时间控件
+layui.use('laydate', function(){
+  var laydate = layui.laydate;
+  
+  //执行一个laydate实例
+  laydate.render({
+    elem: '#startTime' //指定元素
+     ,value: new Date()
+  });
+  var laydate2 = layui.laydate;
+  
+  //执行一个laydate实例
+  laydate2.render({
+    elem: '#overTime' //指定元素
+    ,value: new Date()
+  });
+});
  
 window.viewObj = {
         tbData: [{
@@ -16,7 +34,8 @@ window.viewObj = {
                         money:"",
                         provinceId:"",
                         cityId:"",
-                        areaId:""
+                        areaId:"",
+                        type:""
         }]
     };
     
@@ -26,8 +45,11 @@ window.viewObj = {
        
         var $ = layui.$, table = layui.table, form = layui.form, layer = layui.layer,upload = layui.upload;
    
-        //回车操作
-   
+            //回车操作
+        form.on('select(clientId)', function(data){
+            $("#clientName").val(data.elem[data.elem.selectedIndex].text);
+        })
+
         form.on('select(provinceId)', function(data){
             $("#cityId").empty();
             $("#countiesId").empty();
@@ -75,6 +97,13 @@ window.viewObj = {
         });
         $("#number").keypress(function(e) {
             if (e.which == 13) {
+                $("#detailType").parent().find('input:first').click();
+                $("#detailType").parent().find('input:first').focus();
+           
+            }
+
+        });
+        form.on('select(detailType)', function(data){
                activeByType('addRow');
                //清空部分输入框
                $("#number").val("");
@@ -83,12 +112,10 @@ window.viewObj = {
                $("#provinceId").parent().find('input:first').val("");
                $("#countiesId").parent().find('input:first').val("");
                $("#cityId").parent().find('input:first').val("");
-            }
-
-        });
+        }); 
         $("form").keypress(function(e) {
              if(e.keyCode==10&&e.ctrlKey) {
-                $("#addvehicleContractMain").click();
+                $("#adddeliverContractMain").click();
             }
         });
        
@@ -111,7 +138,9 @@ window.viewObj = {
                     { field:'areaName',title:'区',align:'center',width:100},
                     { field:'minNumber',title:'最小值',align:'center',width:100},
                     { field:'maxNumber',title:'最大值',align:'center',width:100},
-                    { field:'money',title:'金额',align:'center',width:100},
+                    { field:'money',title:'单价',align:'center',width:100},
+                    { field:'type',title:'类型',align:'center',hide:true,width:100},
+                    { field:'typeName',title:'类型名称',align:'center',width:100},
                     { field:'provinceId',title:'省id',align:'center',hide:true,width:100},
                     { field:'cityId',title:'市id',align:'center',hide:true,width:100},
                     { field:'areaId',title:'区id',align:'center',hide:true,width:100},
@@ -140,6 +169,8 @@ window.viewObj = {
                 var minNumber = $("#minNumber").val().trim();
                 var maxNumber = $("#maxNumber").val().trim();
                 var money = $("#number").val().trim();
+                var type = $("#detailType").val();
+                var typeName = $("#detailType").find("option:selected").text();
                 //验证
                 if(!( /^\d+(\.\d{0,2})?$/.test(minNumber))){
                     layer.msg("请输入正确最小值！(两位小数)");
@@ -150,11 +181,18 @@ window.viewObj = {
                     layer.msg("请输入正确最大值！(两位小数)");
                     return;
                 }
+                if(minNumber>maxNumber){
+                    layer.msg("最大值应该大于最小值！");
+                    return;
+                }
                 if(!provinceId){
                     layer.msg("请选择必填省！");
                     return;
                 }
-            
+                if(!type){
+                    layer.msg("请选择类型！");
+                    return;
+                }
             
                 var newRow = {
                     provinceId:provinceId,
@@ -165,6 +203,8 @@ window.viewObj = {
                     areaName:areaName,
                     minNumber:minNumber,
                     maxNumber:maxNumber,
+                    type:type,
+                    typeName:typeName,
                     money:money //合计
                 };
                 oldData.push(newRow);
@@ -234,7 +274,7 @@ window.viewObj = {
 
         
 //提交数据代码
-        form.on('submit(addvehicleContractMain)',function(data){
+        form.on('submit(adddeliverContractMain)',function(data){
         activeByType('save');    //更新行记录对象
        
         data.field.detailSet = table.cache[layTableId];  
@@ -247,7 +287,7 @@ window.viewObj = {
         });
         $.ajax({
             type:"POST",
-            url:"/deliver/vehicleContractMain/add",
+            url:"/client/deliverContractMain/add",
             dataType:"json",
             contentType:"application/json",
             data:JSON.stringify(data.field),

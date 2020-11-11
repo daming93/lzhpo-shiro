@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <meta charset="UTF-8">
+    <title>车辆合同管理</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <link rel="stylesheet" th:href="@{/static/layui/css/layui.css}" media="all" />
+    <link rel="stylesheet" th:href="@{/static/admin/css/list.css}" media="all" />
+</head>
+<body class="childrenBody">
+<fieldset class="layui-elem-field">
+    <legend>选项检索</legend>
+    <div class="layui-field-box">
+        <form class="layui-form">
+       
+            <div class="layui-inline">
+                <input type="text" value="" name="s_name" placeholder="合同名称" class="layui-input search_input">
+            </div>
+      
+        <!--     <shiro:hasPermission name="client:deliverContractMain:delete">
+            <div class="layui-inline">
+                <a class="layui-btn layui-btn-danger" data-type="deleteSome">批量删除</a>
+            </div>
+            </shiro:hasPermission> -->
+            <shiro:hasPermission name="client:deliverContractMain:add">
+            <div class="layui-inline">
+                <a class="layui-btn layui-btn-normal" id="adddeliverContractMain" data-type="addUser">添加</a>
+
+            </div>
+             <div class="layui-input-inline">
+                  <div class="layui-form-mid layui-word-aux">双击行查看详情,ctrl+enter新建</div>
+              </div>
+             </shiro:hasPermission>
+            
+        </form>
+    </div>
+</fieldset>
+
+<script type="text/html" id="toolbarDemo">
+       <div class="layui-col-md2 layui-col-sm3 layui-col-xs6" style="text-align: left;padding-left: 10px;">
+            <div class="layui-input-inline yutons-btn-margin-right">
+               <span class="layui-btn yutons layui-btn-sm yutons-color-detail" lay-event="table_export">导出全部</span>
+            </div>
+        </div>
+</script>
+<div class="layui-form users_list">
+    <table class="layui-table" id="deliverContractMain-table"  lay-filter="deliverContractMainList"></table>
+    <script type="text/html" id="deliverContractMainBar">
+    {{# if (d.isUse){}}
+        <a class="layui-btn layui-btn-normal layui-btn-xs">使用中</a>
+       {{#  } else { }}
+       <a class="layui-btn layui-btn-warm layui-btn-xs">未使用</a>
+    {{# } }}
+      {{# if (d.isAudit != 1){}}
+      <shiro:hasPermission name="client:contractMain:audit">
+        <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="audit">审核</a>
+      </shiro:hasPermission>
+    <shiro:hasPermission name="client:deliverContractMain:edit">
+        <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+    </shiro:hasPermission>
+        {{# } }}
+    <shiro:hasPermission name="client:deliverContractMain:copy">
+        <a class="layui-btn layui-btn-warm layui-btn-xs" lay-event="copy">复制</a>
+    </shiro:hasPermission>
+       <shiro:hasPermission name="client:deliverContractMain:delete">
+        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+    </shiro:hasPermission>
+    </script>
+</div>
+<div id="page"></div>
+<div id ="show" hidden="hidden">
+  
+
+</div>
+<script type="text/javascript" th:src="@{/static/layui/layui.js}"></script>
+<script type="text/javascript" th:src="@{/static/admin/js/tools.js}"></script>
+<script type="text/javascript" th:src="@{/static/client/js/deliverContractMain/deliverContractMainList.js}"></script>
+</body>
+</html>

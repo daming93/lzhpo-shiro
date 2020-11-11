@@ -50,6 +50,15 @@
                 <a class="layui-btn layui-btn-normal" id="addWaybill" data-type="addWaybill">录入路单</a>
             </div>
             </shiro:hasPermission>
+               <div class="layui-inline">
+                    <label class="layui-form-label">财务附表</label>
+                    <div class="layui-input-block">
+                        <select name="tableListId" id="tableListId" lay-search>
+                            <option value="">请选择</option>
+                            <option th:each="dict:${tableList}" th:selected="${modular.tableId eq dict.id}" th:value="${dict.id}" lay-verify="required" th:text="${dict.name}"></option>
+                        </select>
+                     </div>    
+                 </div>
             <shiro:hasPermission name="deliver:dispatch:add">
              <div class="layui-input-inline">
                   <div class="layui-form-mid layui-word-aux">提示:双击行查看详情,ctrl+enter新建运输计划</div>
@@ -87,6 +96,9 @@
         <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
     </shiro:hasPermission>
     {{#  } }}
+        {{# if (d.userTable.code==null){ }}
+     <a class="layui-btn layui-btn-xs" lay-event="schedule">附表</a>
+     {{#  } }}
     </script>
 </div>
 <div id="page"></div>

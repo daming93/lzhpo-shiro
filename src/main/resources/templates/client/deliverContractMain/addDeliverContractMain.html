@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <meta charset="utf-8">
+    <title>新增--合同主体</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" th:href="@{/static/layui/css/layui.css}" media="all" />
+    <style type="text/css">
+        .layui-form-item .layui-inline{` min-width:15%; float:left; margin-right:0; }
+        .layui-form-item .deliverContractMain-box {
+            position: relative;
+        }
+    /*您可以将下列样式写入自己的样式表中*/
+        .childBody{padding: 15px;}
+        
+        /*layui 元素样式改写*/
+        .layui-btn-sm{line-height: normal; font-size: 12.5px;}      
+        .layui-table-view .layui-table-body{min-height: 256px;}
+        .layui-input.layui-unselect{height: 30px; line-height: 30px;}
+        .layui-table-cell {
+            font-size:14px;
+            padding:0 5px;
+            height:auto;
+            overflow:visible;
+            text-overflow:inherit;
+            white-space:normal;
+            word-break: break-all;
+        }
+        
+        /*设置 layui 表格中单元格内容溢出可见样式*/
+        .table-overlay .layui-table-view,
+        .table-overlay .layui-table-box,
+        .table-overlay .layui-table-body{overflow: visible;}
+        .table-overlay .layui-table-cell{height: auto; overflow: visible;}
+        
+        /*文本对齐方式*/
+        .text-center{text-align: center;}
+    </style>
+</head>
+<body class="childrenBody">
+
+<form class="layui-form" id="form">
+    <input type="hidden" id="clientName" name="clientName">
+    <div class="layui-form-item">
+        <fieldset class="layui-elem-field layui-field-title" style="margin-top: 30px;margin-left: 10px;">
+            <legend>主体</legend>
+        </fieldset>
+    </div>
+
+     <div class="layui-form-item">
+            <label class="layui-form-label">合同名称</label>
+            <div class="layui-input-block">
+                     <input type="text" required name="name" lay-verify="required" placeholder="请输入名称" autocomplete="off" class="layui-input">
+            </div>  
+    </div>
+     <div class="layui-form-item">
+            <label class="layui-form-label">客户</label>
+            <div class="layui-input-block">
+                <select name="clientId" id="clientId" class="form-control1"  lay-filter="clientId" lay-search>
+                    <option value="">请选择</option>
+                    <option th:each="basic:${clientList}"  th:value="${basic.id}" lay-verify="required" th:text="${basic.clientName}"></option>
+                </select>
+            </div> 
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-inline">
+            <label class="layui-form-label">加急倍率</label>
+            <div class="layui-input-block">
+                <input type="text" class="layui-input" value="1.00" id="transportationTypeUrgent"  name="transportationTypeUrgent" lay-verify="number" placeholder="请输入加急倍率">
+            </div> 
+        </div>
+         <div class="layui-inline">
+            <label class="layui-form-label">节日倍率</label>
+            <div class="layui-input-block">
+                <input type="text" class="layui-input" value="1.00" id="transportationTypeHoliday"  name="transportationTypeHoliday" lay-verify="number" placeholder="请输入节日倍率">
+            </div> 
+        </div>
+        <div class="layui-inline">
+            <label class="layui-form-label">托运倍率</label>
+            <div class="layui-input-block">
+                <input type="text" class="layui-input" value="1.00" id="transportationTypeConsign"  name="transportationTypeConsign" lay-verify="number" placeholder="请输入节日倍率">
+            </div> 
+        </div>
+    </div>
+    <div class="layui-inline">
+        <div class="layui-inline">
+             <label class="layui-form-label">开始日期</label>
+            <div class="layui-input-block">
+                <input type="text" class="layui-input layTime" id="startTime"  name="startTime" lay-verify="required" placeholder="请输入开始日期">
+            </div>
+        </div>
+        <div class="layui-inline">
+             <label class="layui-form-label">截止日期</label>
+            <div class="layui-input-block">
+                <input type="text" class="layui-input layTime" id="overTime"  name="overTime" lay-verify="required" placeholder="请输入截止日期">
+            </div>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <fieldset class="layui-elem-field layui-field-title" style="margin-top: 30px;margin-left: 10px;">
+            <legend>明细</legend>
+        </fieldset>
+    </div>
+   <div class="layui-form-item">
+        <div class="layui-inline">
+            <label class="layui-form-label">省</label>
+            <div class="layui-input-block">
+                <select name="provinceId" id="provinceId" class="form-control1"  lay-filter="provinceId" lay-search>
+                    <option value="">请选择</option>
+                    <option th:each="basic:${provinceList}"  th:value="${basic.id}" lay-verify="required" th:text="${basic.name}"></option>
+                </select>
+            </div> 
+        </div>
+        <div class="layui-inline">
+            <label class="layui-form-label">市</label>
+             <div class="layui-input-block">
+                <select name="cityId" id="cityId"  class="form-control1"  lay-filter="cityId"   lay-search>
+                </select>
+            </div> 
+        </div>
+           <div class="layui-inline">
+            <label class="layui-form-label">区</label>
+             <div class="layui-input-block">
+                <select name="areaId" id="countiesId"  class="form-control1"   lay-filter="countiesId" lay-search>
+                </select>
+            </div> 
+        </div>
+      
+    </div>
+     <div class="layui-form-item">
+            <div class="layui-inline">
+            <label class="layui-form-label">最小值</label>
+                     <div class="layui-input-block">
+                        <input type="text" class="layui-input layTime" lay-filter="minNumber"  id="minNumber"   placeholder="请输入">
+                    </div> 
+         </div>
+         <div class="layui-inline">
+            <label class="layui-form-label">最大值</label>
+                     <div class="layui-input-block">
+                        <input type="text" class="layui-input layTime" lay-filter="maxNumber"  id="maxNumber"   placeholder="请输入">
+                    </div> 
+         </div>
+         <div class="layui-inline">
+            <label class="layui-form-label">单价</label>
+                     <div class="layui-input-block">
+                        <input type="text" class="layui-input layTime" lay-filter="number" id="number"   placeholder="请输入">
+                    </div> 
+         </div>
+          <div class="layui-inline">
+            <label class="layui-form-label">类型</label>
+                     <div class="layui-input-block">
+                        <select name="detailType" id="detailType" class="form-control1"  lay-filter="detailType" lay-search>
+                            <option value="">请选择</option>
+                            <option th:each="basic:${freightType}"  th:value="${basic.value}" th:text="${basic.name}"></option>
+                        </select>
+                    </div> 
+         </div>
+        <div class="layui-inline">
+             <label class="layui-form-label">提示:</label>
+            <div class="layui-form-mid layui-word-aux">在类型处回车添加一行</div>
+        </div>
+    </div>
+       
+ <div class="layui-form-item">
+    <section class="layui-col-md10" style="margin: 0 auto; float: none;width: 80%">
+    <div class="layui-card">
+        <div class="layui-card-body layui-text">
+            <div id="toolbar">
+                <div>
+                    <button type="button" class="layui-btn layui-btn-sm" data-type="addRow" title="添加一行">
+                        <i class="layui-icon layui-icon-add-1"></i> 添加一行
+                    </button>                   
+                </div>
+            </div>
+            <div id="tableRes" class="table-overlay">
+                <table id="dataTable" lay-filter="dataTable" class="layui-hide"></table>
+            </div>
+        </div>
+    </div>
+    </section>
+ </div>
+    <div class="layui-form-item">
+        <fieldset class="layui-elem-field layui-field-title" style="margin-top: 30px;margin-left: 10px;">
+            <legend>备注</legend>
+        </fieldset>
+    </div>
+    <div class="layui-form-item layui-form-text">
+        <div class="layui-input-block" style="width: 80%">
+            <textarea placeholder="备注(不超过200字)" name="remarks" class="layui-textarea"></textarea>
+        </div>
+    </div>
+    <shiro:hasPermission name="client:deliverContractMain:add">
+    <div class="layui-form-item" style="padding-left: 30%;">
+        <div class="layui-input-block">
+            <button  type="button"  class="layui-btn" lay-submit="" id="adddeliverContractMain" lay-filter="adddeliverContractMain">立即提交</button>
+            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+        </div>
+    </div>
+    </shiro:hasPermission>
+</form>
+<script type="text/javascript" th:src="@{/static/layui/layui.js}"></script>
+<script type="text/javascript" th:src="@{/static/client/js/deliverContractMain/deliverContractMainAdd.js}"></script>
+<script type="text/javascript" th:src="@{/static/layui/js/jquery-1.10.2.min.js}">
+ 
+</script>
+<script type="text/javascript">
+ </script>
+</body>
+</html>

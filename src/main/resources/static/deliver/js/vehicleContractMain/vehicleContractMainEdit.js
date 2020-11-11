@@ -142,7 +142,7 @@ window.viewObj = {
             var oldtext = $(selector).text();
 
             if( field=="minNumber"){
-                 if(!(/^[0-9]\d*$/.test(value))){
+                 if(!( /^\d+(\.\d{0,2})?$/.test(value))){
                     layer.msg("请输入正确最小值！");
                     $(obj.tr.selector + ' td[data-field="' + obj.field + '"] input').val(oldtext);
                     return;
@@ -157,7 +157,7 @@ window.viewObj = {
                 });
             }
             if( field=="maxNumber"){
-                 if(!(/^[0-9]\d*$/.test(value))){
+                 if(!( /^\d+(\.\d{0,2})?$/.test(value))){
                     layer.msg("请输入正确最大值！");
                     $(obj.tr.selector + ' td[data-field="' + obj.field + '"] input').val(oldtext);
                     return;
@@ -172,7 +172,7 @@ window.viewObj = {
                 });
             }
             if( field=="money"){
-                 if(!(/^[0-9]+\.[0-9]{2}$/.test(value))){
+                 if(!( /^\d+(\.\d{0,2})?$/.test(value))){
                     layer.msg("请输入金额(两位小数)！");
                     $(obj.tr.selector + ' td[data-field="' + obj.field + '"] input').val(oldtext);
                     return;
@@ -196,12 +196,12 @@ window.viewObj = {
                 var maxNumber = $("#maxNumber").val().trim();
                 var money = $("#number").val().trim();
                 //验证
-                if(!(/^[0-9]\d*$/.test(minNumber))){
+                if(!( /^\d+(\.\d{0,2})?$/.test(minNumber))){
                     layer.msg("请输入正确最小值！");
                     return;
                 }
                  //验证
-                if(!(/^[0-9]\d*$/.test(maxNumber))){
+                if(!( /^\d+(\.\d{0,2})?$/.test(maxNumber))){
                     layer.msg("请输入正确最大值！");
                     return;
                 }

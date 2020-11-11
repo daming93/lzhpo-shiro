@@ -9,6 +9,7 @@ import java.util.Set;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.lzhpo.common.base.DataEntity;
+import com.lzhpo.finance.entity.UserTable;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -178,7 +179,18 @@ public class Dispatch extends DataEntity<Dispatch> implements Serializable {
     
     private Integer status;
     
+    @TableField(exist=false)
+    private UserTable userTable;
     
+    
+	public UserTable getUserTable() {
+		return userTable;
+	}
+
+	public void setUserTable(UserTable userTable) {
+		this.userTable = userTable;
+	}
+	
 	public String getDispactStatusStr() {
 		return dispactStatusStr;
 	}

@@ -189,6 +189,10 @@ public class ContractMainController {
 		/*
 		 * 新增合同主体要生成code
 		 */
+		//时间验证
+		if(contractMain.getStartTime().isAfter(contractMain.getOverTime())){
+			return ResponseEntity.failure("结束时间不应在开始时间之前");
+		}
 		contractMain.setContractCode(generateNoService.nextCode("HT"));
 		contractMainService.saveContractMain(contractMain);
 		return ResponseEntity.success("操作成功");
@@ -259,6 +263,9 @@ public class ContractMainController {
 	public ResponseEntity edit(@RequestBody ContractMain contractMain) {
 		if (StringUtils.isBlank(contractMain.getId())) 
 			return ResponseEntity.failure("不能为空");
+		if(contractMain.getStartTime().isAfter(contractMain.getOverTime())){
+			return ResponseEntity.failure("结束时间不应在开始时间之前");
+		}
 	//	ContractMain oldContractMain = contractMainService.getContractMainById(contractMain.getId());
 		contractMainService.updateContractMain(contractMain);
 		return ResponseEntity.success("操作成功");
@@ -281,4 +288,5 @@ public class ContractMainController {
 			return ResponseEntity.failure("非整进整出客户");
 		}
 	}
+
 }

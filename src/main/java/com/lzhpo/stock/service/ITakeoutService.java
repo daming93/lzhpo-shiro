@@ -1,8 +1,10 @@
 package com.lzhpo.stock.service;
 
-import com.lzhpo.stock.entity.Takeout;
-import com.baomidou.mybatisplus.extension.service.IService;
 import java.util.List;
+import java.util.Set;
+
+import com.baomidou.mybatisplus.extension.service.IService;
+import com.lzhpo.stock.entity.Takeout;
 /**
  * <p>
  * 出库表 服务类
@@ -35,4 +37,6 @@ public interface ITakeoutService extends IService<Takeout> {
 	//分页查询数据在父类
 
 	void ensurePick(String id);
+	
+	List<Takeout> selectAllByDispatchIds(Set<String> dispatchIds);
 }

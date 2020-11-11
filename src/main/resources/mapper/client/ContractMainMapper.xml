@@ -37,6 +37,7 @@
 		start_time   &lt;= NOW()
 		and over_time  &gt;= NOW()
 		and is_audit = 1
+		and del_flag = FALSE
 		and client_id = #{clientId}
 		ORDER BY create_date DESC
 		 limit 1

@@ -78,6 +78,7 @@ layui.use('laydate', function(){
                             { field:'cityId',title:'市id',align:'center',hide:true,width:100},
                             { field:'countiesId',title:'区id',align:'center',hide:true,width:100},
                             { field:'type',title:'类型id',align:'center',hide:true,width:100},
+                            { field:'tableId',title:'原表Id',align:'center',hide:true,width:100},
                             { field:'id',title:'id',align:'center',hide:true,width:100},
                            
                     ]],
@@ -200,6 +201,7 @@ layui.use('laydate', function(){
                             { field:'provinceId',title:'省id',align:'center',hide:true,width:100},
                             { field:'cityId',title:'市id',align:'center',hide:true,width:100},
                             { field:'countiesId',title:'区id',align:'center',hide:true,width:100},
+                            { field:'tableId',title:'原表Id',align:'center',hide:true,width:100},
                             { field:'type',title:'类型id',align:'center',hide:true,width:100},
                             { field:'id',title:'id',align:'center',hide:true,width:100},
                              {title: '操作',fixed: 'right',  width:'15%',    align: 'center',toolbar: '#dispatchBillBar'}
@@ -252,6 +254,7 @@ layui.use('laydate', function(){
                             { field:'provinceId',title:'省id',align:'center',hide:true,width:100},
                             { field:'cityId',title:'市id',align:'center',hide:true,width:100},
                             { field:'countiesId',title:'区id',align:'center',hide:true,width:100},
+                            { field:'tableId',title:'原表Id',align:'center',hide:true,width:100},
                             { field:'type',title:'类型id',align:'center',hide:true,width:100},
                             { field:'id',title:'id',align:'center',hide:true,width:100},
                              {title: '操作',fixed: 'right',  width:'15%',    align: 'center',toolbar: '#dispatchBillBar'}
@@ -324,14 +327,31 @@ layui.use('laydate', function(){
             },
             success:function(res){
                 if(res.success){
-                   newRow.typeStr = "库存发单";
-                   active.addRow(newRow,'dispatchTable');
-                   obj.del(); //删除对应行（tr）的DOM结构，并更新缓存
-                   //合计数改下
-                   $("#dispatchVolume").val(mathV());
-                   $("#lodaRate").val(Percentage( $("#dispatchVolume").val(),vehicleV));
-                   $("#dispatchWeight").val(mathW());
-                   $("#weightRate").val(Percentage( $("#dispatchWeight").val(),vehicleW));
+                   $.ajax({
+                        type:"POST",
+                        url:"/client/deliverContractMain/searchAreaCanDeliver",
+                        data:{
+                            tableId:data.tableId,//上面方法名是一样的类不同，其次在这里使用的是出库表的id
+                            proviceId:data.provinceId,
+                            cityId:data.cityId,
+                            areaId:data.countiesId
+                        },
+                        success:function(res){
+                            if(res.success){
+                               newRow.typeStr = "库存发单";
+                               active.addRow(newRow,'dispatchTable');
+                               obj.del(); //删除对应行（tr）的DOM结构，并更新缓存
+                               //合计数改下
+                               $("#dispatchVolume").val(mathV());
+                               $("#lodaRate").val(Percentage( $("#dispatchVolume").val(),vehicleV));
+                               $("#dispatchWeight").val(mathW());
+                               $("#weightRate").val(Percentage( $("#dispatchWeight").val(),vehicleW));
+                            }else{
+                                layer.msg(res.message);
+                                return false;
+                            }
+                        }
+                    });
                 }else{
                     layer.msg(res.message);
                     return false;

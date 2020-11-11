@@ -87,7 +87,7 @@ public class VehicleContractMainDetailServiceImpl extends ServiceImpl<VehicleCon
 		// TODO Auto-generated method stub
 		//先看区级 //包含关系都是含下不含上
 		QueryWrapper<VehicleContractMainDetail> wrapper = new QueryWrapper<>();
-		wrapper.eq("contract_id", mainId).eq("province_id", proviceId).eq("city_id", cityId).eq("area_id", areaId).ge("min_number", range).lt("max_number", range);
+		wrapper.eq("contract_id", mainId).eq("province_id", proviceId).eq("city_id", cityId).eq("area_id", areaId).ge("max_number", range).lt("min_number", range);
 		wrapper.orderByAsc("max_number - min_number");
 		VehicleContractMainDetail detail =baseMapper.selectList(wrapper)!=null&&baseMapper.selectList(wrapper).size()>0?baseMapper.selectList(wrapper).get(0):null;
 		if(detail!=null){
@@ -95,7 +95,7 @@ public class VehicleContractMainDetailServiceImpl extends ServiceImpl<VehicleCon
 		}else{
 			//找市一级
 			wrapper = new QueryWrapper<>();
-			wrapper.eq("contract_id", mainId).eq("province_id", proviceId).eq("city_id", cityId).ge("min_number", range).lt("max_number", range);
+			wrapper.eq("contract_id", mainId).eq("province_id", proviceId).eq("city_id", cityId).ge("max_number", range).lt("min_number", range);
 			wrapper.orderByAsc("max_number - min_number");
 			detail = baseMapper.selectList(wrapper)!=null&&baseMapper.selectList(wrapper).size()>0?baseMapper.selectList(wrapper).get(0):null;
 			if(detail!=null){
@@ -103,7 +103,7 @@ public class VehicleContractMainDetailServiceImpl extends ServiceImpl<VehicleCon
 			}else{
 				//找省一级
 				wrapper = new QueryWrapper<>();
-				wrapper.eq("contract_id", mainId).eq("province_id", proviceId).ge("min_number", range).lt("max_number", range);
+				wrapper.eq("contract_id", mainId).eq("province_id", proviceId).ge("max_number", range).lt("min_number", range);
 				wrapper.orderByAsc("max_number - min_number");
 				detail = baseMapper.selectList(wrapper)!=null&&baseMapper.selectList(wrapper).size()>0?baseMapper.selectList(wrapper).get(0):null;
 				if(detail!=null){

@@ -79,8 +79,49 @@ public class Income extends DataEntity<Income> implements Serializable {
     @TableField(exist=false)
     private String optionName;
     
+    /**
+     * 依据的表编号
+     */
+    @TableField("table_code")
+    private String tableCode;
+    
+    /**
+     * 依据的表id
+     */
+    @TableField("table_id")
+    private String tableId;
+    
+    /**
+     * 原表的来源(1,录单)
+     */
+    @TableField("table_from")
+    private Integer tableFrom;
     
     
+	public String getTableCode() {
+		return tableCode;
+	}
+
+	public void setTableCode(String tableCode) {
+		this.tableCode = tableCode;
+	}
+
+	public String getTableId() {
+		return tableId;
+	}
+
+	public void setTableId(String tableId) {
+		this.tableId = tableId;
+	}
+
+	public Integer getTableFrom() {
+		return tableFrom;
+	}
+
+	public void setTableFrom(Integer tableFrom) {
+		this.tableFrom = tableFrom;
+	}
+
 	public String getTypeStr() {
 		return typeStr;
 	}

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lzhpo.client.mapper.DeliverContractMainMapper">
+  <select id="getUsingContractId" parameterType="java.lang.String" resultType="String">
+      SELECT id from 
+		client_deliver_contract_main
+		WHERE
+		start_time   &lt;= NOW()
+		and over_time  &gt;= NOW()
+		and is_audit = 1
+		and del_flag = FALSE
+		and client_id = #{clientId}
+		ORDER BY create_date DESC
+		 limit 1
+    </select>
+</mapper>

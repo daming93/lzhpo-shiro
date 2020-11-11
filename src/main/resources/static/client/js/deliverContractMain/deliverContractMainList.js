@@ -1,20 +1,3 @@
-//时间控件
-layui.use('laydate', function(){
-  var laydate = layui.laydate;
-  
-  //执行一个laydate实例
-  laydate.render({
-    elem: '#startTime' //指定元素
-  });
-  var laydate2 = layui.laydate;
-  
-  //执行一个laydate实例
-  laydate2.render({
-    elem: '#overTime' //指定元素
-  });
-});
-
-
 layui.config({
                 base:"/static/layui/layui_exts/"
             }).use(['layer','form','table' ,'upload', 'excel'], function() {
@@ -27,12 +10,12 @@ layui.config({
         t; //表格变量
       
     //监听头工具栏事件
-    table.on('toolbar(dispatchList)', function(obj) {
+    table.on('toolbar(deliverContractMainList)', function(obj) {
         var checkStatus = table.checkStatus(obj.config.id),
             data = checkStatus.data; //获取选中的数据
             switch (obj.event) {
                 case 'table_export':
-                    exportFile('dispatch-table')
+                    exportFile('deliverContractMain-table')
                     break;
                 };
             });
@@ -69,7 +52,7 @@ layui.config({
                     var s_code = $("#s_code").val();
                     $.ajax({
                             type:"POST",
-                            url:"/deliver/dispatch/list?limit=999999",
+                            url:"/client/deliverContractMain/list?limit=999999",
                             dataType:"json",
                             contentType:'application/x-www-form-urlencoded; charset=UTF-8',
                             data:$('.layui-form').serialize(),
@@ -82,7 +65,7 @@ layui.config({
                                  //导出excel
                                 excel.exportExcel({
                                     sheet1: data
-                                }, '运输计划列表' + new Date().toLocaleString() + '.xlsx', 'xlsx');
+                                }, '车辆合同列表' + new Date().toLocaleString() + '.xlsx', 'xlsx');
 
                             }
                     });
@@ -91,21 +74,20 @@ layui.config({
 
     $("body").keypress(function(e) {
         if(e.keyCode==10&&e.ctrlKey) {
-            $("#adddispatch").click();
+            $("#adddeliverContractMain").click();
         }
     });
     //监听工具条
-    table.on('tool(dispatchList)', function(obj){
+    table.on('tool(deliverContractMainList)', function(obj){
         var data = obj.data;
         if(obj.event === 'edit'){
             var editIndex = layer.open({
-                title : "编辑运输计划",
+                title : "编辑合同",
                 type : 2,
-                content : "/deliver/dispatch/edit?id="+data.id,
-              
+                content : "/client/deliverContractMain/edit?id="+data.id,
                 success : function(layero, index){
                     setTimeout(function(){
-                        layer.tips('点击此处返回运输计划列表', '.layui-layer-setwin .layui-layer-close', {
+                        layer.tips('点击此处返回合同列表', '.layui-layer-setwin .layui-layer-close', {
                             tips: 3
                         });
                     },500);
@@ -117,17 +99,34 @@ layui.config({
             });
             layer.full(editIndex);
         }
-      
-        if(obj.event === 'print'){
-            window.open("/deliver/dispatch/print?id="+data.id);
-        }
         if(obj.event === "del"){
-            layer.confirm("你确定要删除该运输计划么？",{btn:['是的,我确定','我再想想']},
+            //檢查合同状态
+            if(data.isUse){
+                layer.msg("正在使用的合同无法删除");
+                return;
+            }
+            layer.confirm("你确定要删除该合同么？",{btn:['是的,我确定','我再想想']},
                 function(){
-                    $.post("/deliver/dispatch/delete",{"id":data.id},function (res){
+
+                    $.post("/client/deliverContractMain/delete",{"id":data.id},function (res){
                         if(res.success){
                             layer.msg("删除成功",{time: 1000},function(){
-                                table.reload('dispatch-table', t);
+                                table.reload('deliverContractMain-table', t);
+                            });
+                        }else{
+                            layer.msg(res.message);
+                        }
+                    });
+                }
+            )
+        }
+           if(obj.event === "copy"){
+            layer.confirm("你确定要复制该合同么？",{btn:['是的,我确定','我再想想']},
+                function(){
+                    $.post("/client/deliverContractMain/copy",{"id":data.id},function (res){
+                        if(res.success){
+                            layer.msg("复制成功",{time: 1000},function(){
+                                table.reload('deliverContractMain-table', t);
                             });
                         }else{
                             layer.msg(res.message);
@@ -137,12 +136,12 @@ layui.config({
             )
         }
         if(obj.event === "back"){
-            layer.confirm("你确定要撤销该运输计划么？",{btn:['是的,我确定','我再想想']},
+            layer.confirm("你确定要撤销该合同么？",{btn:['是的,我确定','我再想想']},
                 function(){
-                    $.post("/deliver/dispatch/back",{"id":data.id,"status":1},function (res){
+                    $.post("/client/deliverContractMain/back",{"id":data.id,"status":1},function (res){
                         if(res.success){
                             layer.msg("撤销成功",{time: 1000},function(){
-                                table.reload('dispatch-table', t);
+                                table.reload('deliverContractMain-table', t);
                             });
                         }else{
                             layer.msg(res.message);
@@ -151,72 +150,31 @@ layui.config({
                 }
             )
         }
-       if(obj.event === 'userTable'){
-            var editIndex = layer.open({
-                title : "编辑附表",
-                type : 2,
-                content : "/finance/userTable/edit?id="+data.userTable.id.toString(),
-                success : function(layero, index){
-                    setTimeout(function(){
-                        layer.tips('点击此处返回单据列表', '.layui-layer-setwin .layui-layer-close', {
-                            tips: 3
-                        });
-                    },500);
+        if(obj.event === "audit"){
+            layer.confirm("你确定要审核该合同么(请仔细阅读合同条款)？",{btn:['是的,我确定','我再想想']},
+                function(){
+                    $.post("/client/deliverContractMain/audit",{"id":data.id,"status":1},function (res){
+                        if(res.success){
+                            layer.msg("审核成功",{time: 1000},function(){
+                                table.reload('deliverContractMain-table', t);
+                            });
+                        }else{
+                            layer.msg(res.message);
+                        }
+                    });
                 }
-            });
-            //改变窗口大小时，重置弹窗的高度，防止超出可视区域（如F12调出debug的操作）
-            $(window).resize(function(){
-                layer.full(editIndex);
-            });
-            layer.full(editIndex);
+            )
         }
-        if(obj.event === 'schedule'){
-            var userTableId =  $("#tableListId").val();
-
-            if(!userTableId){
-                 layer.msg("请选择附表类型")
-                return 
-            }
-            //偏好设置
-            $.ajax({
-                type:"GET",
-                url:"/sys/userSetting/add?type=1&modular=2&tableId="+userTableId,
-                dataType:"json",
-                contentType:"application/json",
-                success:function(res){
-                   
-                }
-            });
-            var editIndex = layer.open({
-                title : "增加附表",
-                type : 2,
-                content : "/finance/userTable/add?tableId="+data.id.toString()+"&userTableId="+userTableId+"&modular=1"+"&code="+data.code,
-                success : function(layero, index){
-                    setTimeout(function(){
-                        layer.tips('点击此处返回单据列表', '.layui-layer-setwin .layui-layer-close', {
-                            tips: 3
-                        });
-                    },500);
-                }
-            });
-            //改变窗口大小时，重置弹窗的高度，防止超出可视区域（如F12调出debug的操作）
-            $(window).resize(function(){
-                layer.full(editIndex);
-            });
-            layer.full(editIndex);
-        }
-
-        
     });
-    table.on('rowDouble(dispatchList)', function(obj){
+    table.on('rowDouble(deliverContractMainList)', function(obj){
         var data = obj.data;
         var editIndex = layer.open({
-            title : "运输计划详情",
+            title : "合同详情",
             type : 2,
-            content : "/deliver/dispatch/edit?id="+data.id,
+            content : "/client/deliverContractMain/edit?id="+data.id,
             success : function(layero, index){
                 setTimeout(function(){
-                    layer.tips('点击此处返回运输计划列表', '.layui-layer-setwin .layui-layer-close', {
+                    layer.tips('点击此处返回合同列表', '.layui-layer-setwin .layui-layer-close', {
                         tips: 3
                     });
                 },500);
@@ -229,13 +187,13 @@ layui.config({
         layer.full(editIndex);
     });
     t = {
-        elem: '#dispatch-table',
+        elem: '#deliverContractMain-table',
         even: true,
-        url:'/deliver/dispatch/list',
+        url:'/client/deliverContractMain/list',
         method:'post',
         toolbar: "#toolbarDemo" ,
         defaultToolbar: ['filter',  'print'],
-        page: { //支持传入 laypage 组件的所有参数（某些参数除外，如：jump/elem） - 详见文档
+        page: { //支持传退 laypage 组件的所有参数（某些参数除外，如：jump/elem） - 详见文档
             layout: ['limit', 'count', 'prev', 'page', 'next', 'skip'], //自定义分页布局
             //,curr: 5 //设定初始在第 5 页
             groups: 6, //只显示 1 个连续页码
@@ -247,28 +205,15 @@ layui.config({
         cols: [[
             {type:'checkbox'},
            /* {field:'id',        title: 'ID'   },*/
-            {field:'code',  title: '系统单号',    width:'10%'}, 
-            {field:'driverName',        title: '司机'   },
-            {field:'vehicleCode',        title: '车牌号' ,    width:'12%'  },
-            {field:'distributionTime',        title: '配送时间' ,    width:'13%'   },
-            {field:'lodaRate',  title: '装载率'}, 
-            {field:'dispatchAreaName',  title: '配送区域'}, 
-        //    {field:'trainNumber',        title: '车次'   },
-            {field:'dispatchVolume',        title: '体积(m³) '   },
-            {field:'dispatchWeight',        title: '重量(kg)'   },
-         //   {field:'trayNumber',        title: '件/托(kg)'   },
-            {field:'statusStr',        title: '状态'   },
-            {field:'dispactStatusStr',        title: '排单状态'   },
-            { field:'userTableCode' ,event:"userTable",title:'附表',templet: function(d){   
-                    if(d.userTable.code!=null){
-                        return  '<div><a> '+ d.userTable.code+' </a></div>'
-                    }else{
-                         return  '暂无'
-                    }
-                }
-            },
+            {field:'name',        title: '合同名称'   },
+            {field:'clientName',        title: '合同名称'   },
+            {field:'contractCode',        title: '合同编码'   },
+            {field:'startTime',  title: '开始时间',    width:'14%'}, 
+            {field:'overTime',  title: '结束时间',    width:'14%'}, 
             {field:'remarks',        title: '备注'   },
-            {title: '操作',fixed: 'right',  width:'15%',    align: 'center',toolbar: '#dispatchBar'}
+            {field:'createDate',  title: '创建时间',    width:'14%',templet:'<div>{{ layui.laytpl.toDateString(d.createDate) }}</div>',unresize: true}, //单元格内容水平居中
+            {field:'updateDate',  title: '修改时间',    width:'14%',templet:'<div>{{ layui.laytpl.toDateString(d.updateDate) }}</div>',unresize: true}, //单元格内容水平居中
+            {title: '操作',fixed: 'right',  width:'15%',    align: 'center',toolbar: '#deliverContractMainBar'}
         ]]/*,
         done: function () {
             $("[data-field='id']").css('display','none');
@@ -277,14 +222,13 @@ layui.config({
     table.render(t);
     var active={
           addUser : function(){
-            var continuity = $("#continuity")[0].checked;
             addIndex = layer.open({
-                title : "添加运输计划单",
+                title : "添加合同单",
                 type : 2,
-                content : "/deliver/dispatch/add",
+                content : "/client/deliverContractMain/add",
                 success : function(layero, addIndex){
                     setTimeout(function(){
-                        layer.tips('点击此处返回运输计划单列表', '.layui-layer-setwin .layui-layer-close', {
+                        layer.tips('点击此处返回合同单列表', '.layui-layer-setwin .layui-layer-close', {
                             tips: 3
                         });
                     },500);
@@ -300,54 +244,18 @@ layui.config({
             });
             layer.full(addIndex);
         },
-        addWaybill: function(){
-            var checkStatus = table.checkStatus('dispatch-table'),
-                data = checkStatus.data;
-            if(data.length > 0){
-                //验证运输计划得状态
-                for (var i = 0; i < data.length; i++) {
-                    if(data[i].status==1){
-                        layer.msg("有带确认得单据在选中列表中");
-                        return false;
-                    }
-                }
-                layer.confirm("你确定要录入这些运输计划到路单么？",{btn:['是的,我确定','我再想想']},
-                    function(){
-                        var deleteindex = layer.msg('操作中，请稍候',{icon: 16,time:false,shade:0.8});
-                        $.ajax({
-                            type:"POST",
-                            url:"/deliver/wayBill/add",
-                            dataType:"json",
-                            contentType:"application/json",
-                            data:JSON.stringify(data),
-                            success:function(res){
-                                layer.close(deleteindex);
-                                if(res.success){
-                                    layer.msg("操作成功",{time: 1000},function(){
-                                        table.reload('dispatch-table', t);
-                                    });
-                                }else{
-                                    layer.msg(res.message);
-                                }
-                            }
-                        });
-                    }
-                )
-            }else{
-                layer.msg("请选择需要录入的运输计划",{time:1000});
-            }
-        },
         //批量删除
         deleteSome : function(){
-            var checkStatus = table.checkStatus('dispatch-table'),
+            var checkStatus = table.checkStatus('deliverContractMain-table'),
                 data = checkStatus.data;
             if(data.length > 0){
-                layer.confirm("你确定要删除这些运输计划么？",{btn:['是的,我确定','我再想想']},
+                console.log(JSON.stringify(data));
+                layer.confirm("你确定要删除这些合同么？",{btn:['是的,我确定','我再想想']},
                     function(){
                         var deleteindex = layer.msg('删除中，请稍候',{icon: 16,time:false,shade:0.8});
                         $.ajax({
                             type:"POST",
-                            url:"/deliver/dispatch/deleteSome",
+                            url:"/client/deliverContractMain/deleteSome",
                             dataType:"json",
                             contentType:"application/json",
                             data:JSON.stringify(data),
@@ -355,7 +263,7 @@ layui.config({
                                 layer.close(deleteindex);
                                 if(res.success){
                                     layer.msg("删除成功",{time: 1000},function(){
-                                        table.reload('dispatch-table', t);
+                                        table.reload('deliverContractMain-table', t);
                                     });
                                 }else{
                                     layer.msg(res.message);
@@ -365,7 +273,7 @@ layui.config({
                     }
                 )
             }else{
-                layer.msg("请选择需要删除的运输计划",{time:1000});
+                layer.msg("请选择需要删除的合同",{time:1000});
             }
         }
     };
@@ -376,7 +284,7 @@ layui.config({
    
     //搜索
     form.on("submit(searchForm)",function(data){
-        table.reload('dispatch-table', {
+        table.reload('deliverContractMain-table', {
             page: {curr: 1},
             where: data.field
         });

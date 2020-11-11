@@ -22,6 +22,7 @@ import org.springframework.web.util.WebUtils;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.fasterxml.jackson.databind.RuntimeJsonMappingException;
 import com.lzhpo.admin.entity.User;
 import com.lzhpo.admin.service.UserService;
 import com.lzhpo.common.annotation.SysLog;
@@ -37,7 +38,7 @@ import com.lzhpo.finance.service.IUserTableService;
 import com.lzhpo.sys.service.IUserSettingService;
 /**
  * <p>
- * 录单(和计划表基本一样，是计划表得主表，和统计内容) 前端控制器
+ * 路单(和计划表基本一样，是计划表得主表，和统计内容) 前端控制器
  * </p>
  *
  * @author xdm
@@ -153,7 +154,11 @@ public class WayBillController {
 		case 2://有拆单未放一起
 			return ResponseEntity.failure("列表中有拆单未全部排入一个路单中");
 		default:
-			wayBillService.saveWayBill(dispatchs);
+			try {
+				wayBillService.saveWayBill(dispatchs);
+			} catch (RuntimeJsonMappingException e) {
+				return ResponseEntity.failure(e.getMessage());
+			}
 			return ResponseEntity.success("操作成功");
 		}
 		
@@ -205,7 +210,8 @@ public class WayBillController {
             return ResponseEntity.failure("修改提示信息（不能为空)");
         }
         WayBill oldWayBill =  wayBillService.getWayBillById(wayBill.getId());
-         wayBillService.updateWayBill(wayBill);
+        
+        wayBillService.updateWayBill(wayBill);
         return ResponseEntity.success("操作成功");
     }
 }

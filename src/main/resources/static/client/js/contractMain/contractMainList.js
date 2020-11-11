@@ -28,6 +28,11 @@ layui.use(['layer','form','table'], function() {
             layer.full(editIndex);
         }
         if(obj.event === "del"){
+             //檢查合同状态
+            if(data.isUse){
+                layer.msg("正在使用的合同无法删除");
+                return;
+            }
             layer.confirm("你确定要删除该合同么？",{btn:['是的,我确定','我再想想']},
                 function(){
                     $.post("/client/contractMain/delete",{"id":data.id},function (res){

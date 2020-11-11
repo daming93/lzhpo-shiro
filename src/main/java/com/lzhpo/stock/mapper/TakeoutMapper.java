@@ -3,6 +3,9 @@ package com.lzhpo.stock.mapper;
 import com.lzhpo.stock.entity.MathStockNumber;
 import com.lzhpo.stock.entity.Takeout;
 
+import java.util.List;
+import java.util.Set;
+
 import org.apache.ibatis.annotations.Param;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
@@ -17,4 +20,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  */
 public interface TakeoutMapper extends BaseMapper<Takeout> {
 	MathStockNumber selectMathTakeoutNumberByTakeoutId(@Param("takeoutId") String TakeoutId);
+	
+	List<Takeout> selectAllByDispatchIds(@Param("takeoutIds") Set<String> takeoutIds);
+	
 }

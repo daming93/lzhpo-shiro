@@ -1,4 +1,4 @@
-package com.lzhpo.deliver.entity;
+package com.lzhpo.client.entity;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -12,19 +12,31 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 /**
  * <p>
- * 合同收费项
+ * 
  * </p>
  *
  * @author xdm
- * @since 2020-08-18
+ * @since 2020-10-22
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@TableName("deliver_vehicle_contract_main_detail")
-public class VehicleContractMainDetail extends DataEntity<VehicleContractMainDetail> implements Serializable {
+@TableName("client_deliver_contract_main_detail")
+public class DeliverContractMainDetail extends DataEntity<DeliverContractMainDetail> implements Serializable {
 
     private static final long serialVersionUID = 1L;
+
+    /**
+     * 最小值
+     */
+    @TableField("min_number")
+    private BigDecimal minNumber;
+
+    /**
+     * 最大值
+     */
+    @TableField("max_number")
+    private BigDecimal maxNumber;
 
     /**
      * 金额
@@ -55,22 +67,30 @@ public class VehicleContractMainDetail extends DataEntity<VehicleContractMainDet
     private String areaId;
 
     /**
+     * 以重还是方结算类型(1重2方)
+     */
+    @TableField("consult_type")
+    private Integer consultType;
+
+    /**
      * 合同Id(主表id)
      */
     @TableField("contract_id")
     private String contractId;
-    
-    @TableField("min_number")
-    private BigDecimal minNumber;
-    
-    @TableField("max_number")
-    private BigDecimal maxNumber;
 
     /**
      * 收费项目id（预留）
      */
     @TableField("option_id")
     private String optionId;
+
+    /**
+     * 类型名
+     */
+    @TableField("type_name")
+    private String typeName;
+    
+    
     
     @TableField(exist=false)
     private String provinceName;
@@ -82,7 +102,46 @@ public class VehicleContractMainDetail extends DataEntity<VehicleContractMainDet
     private String areaName;
     
     
-    
+	public String getProvinceName() {
+		return provinceName;
+	}
+
+	public void setProvinceName(String provinceName) {
+		this.provinceName = provinceName;
+	}
+
+	public String getCityName() {
+		return cityName;
+	}
+
+	public void setCityName(String cityName) {
+		this.cityName = cityName;
+	}
+
+	public String getAreaName() {
+		return areaName;
+	}
+
+	public void setAreaName(String areaName) {
+		this.areaName = areaName;
+	}
+
+	public BigDecimal getMinNumber() {
+		return minNumber;
+	}
+
+	public void setMinNumber(BigDecimal minNumber) {
+		this.minNumber = minNumber;
+	}
+
+	public BigDecimal getMaxNumber() {
+		return maxNumber;
+	}
+
+	public void setMaxNumber(BigDecimal maxNumber) {
+		this.maxNumber = maxNumber;
+	}
+
 	public BigDecimal getMoney() {
 		return money;
 	}
@@ -123,6 +182,14 @@ public class VehicleContractMainDetail extends DataEntity<VehicleContractMainDet
 		this.areaId = areaId;
 	}
 
+	public Integer getConsultType() {
+		return consultType;
+	}
+
+	public void setConsultType(Integer consultType) {
+		this.consultType = consultType;
+	}
+
 	public String getContractId() {
 		return contractId;
 	}
@@ -139,48 +206,11 @@ public class VehicleContractMainDetail extends DataEntity<VehicleContractMainDet
 		this.optionId = optionId;
 	}
 
-	
-
-	public BigDecimal getMinNumber() {
-		return minNumber;
+	public String getTypeName() {
+		return typeName;
 	}
 
-	public void setMinNumber(BigDecimal minNumber) {
-		this.minNumber = minNumber;
+	public void setTypeName(String typeName) {
+		this.typeName = typeName;
 	}
-
-	public BigDecimal getMaxNumber() {
-		return maxNumber;
-	}
-
-	public void setMaxNumber(BigDecimal maxNumber) {
-		this.maxNumber = maxNumber;
-	}
-
-	public String getProvinceName() {
-		return provinceName;
-	}
-
-	public void setProvinceName(String provinceName) {
-		this.provinceName = provinceName;
-	}
-
-	public String getCityName() {
-		return cityName;
-	}
-
-	public void setCityName(String cityName) {
-		this.cityName = cityName;
-	}
-
-	public String getAreaName() {
-		return areaName;
-	}
-
-	public void setAreaName(String areaName) {
-		this.areaName = areaName;
-	}
-
-   
-
 }
