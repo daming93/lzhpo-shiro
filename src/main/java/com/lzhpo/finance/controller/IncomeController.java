@@ -73,6 +73,7 @@ public class IncomeController {
 		QueryWrapper<Income> IncomeWrapper = new QueryWrapper<>();
 		// 相当于del_flag = 0;
 		IncomeWrapper.eq("del_flag", false);
+		IncomeWrapper.orderByDesc("create_date");
 		if (!map.isEmpty()) {
 			String keys = (String) map.get("name");
 			if (StringUtils.isNotBlank(keys)) {

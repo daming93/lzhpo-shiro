@@ -215,7 +215,7 @@ public class WayBillServiceImpl extends ServiceImpl<WayBillMapper, WayBill> impl
     			income.setBasis(mainContract.getContractCode());
     			income.setOptionId(clientDeliverIncome);
     			income.setMoeny(sum);
-    			
+    			income.setBasicId(mainContract.getId());
     			String remark = client.getClientShortName()+"在"+income.getTableCode()+"中"+tmep+"合同编号为"+income.getBasis();
     			income.setRemarks(remark);
     			incomeList.add(income);

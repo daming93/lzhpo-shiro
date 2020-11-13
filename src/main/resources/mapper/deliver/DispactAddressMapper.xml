@@ -166,7 +166,7 @@
 					WHERE
 						t.split IS NULL
 					AND t.scheduling_status = 0
-					AND t. STATUS = 2
+					AND (t. STATUS = 2 or (t.picking_status!=0 and t.STATUS=3))
 					AND t.del_flag = 0
 					ORDER BY
 						client_code DESC,

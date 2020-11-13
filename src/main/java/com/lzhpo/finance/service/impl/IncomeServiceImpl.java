@@ -16,6 +16,7 @@ import com.fasterxml.jackson.databind.RuntimeJsonMappingException;
 import com.lzhpo.client.entity.ContractMain;
 import com.lzhpo.client.service.IContractMainService;
 import com.lzhpo.common.config.MySysUser;
+import com.lzhpo.common.init.CacheUtils;
 import com.lzhpo.finance.entity.Income;
 import com.lzhpo.finance.mapper.IncomeMapper;
 import com.lzhpo.finance.service.IIncomeService;
@@ -94,8 +95,11 @@ public class IncomeServiceImpl extends ServiceImpl<IncomeMapper, Income> impleme
 	public void takeoutIncomeMath(Takeout takeout)throws Exception {
 		//出库装卸费
 		String opId = "4c089061ca5243fd97f02213015d44e7";
+		Integer income_from_takeout =  CacheUtils.keyDict.get("income_from_takeout").getValue();
 		//找到客户对应在使用的合同
 		String usingContractId = contractMainService.getUsingContractId(takeout.getClientId());
+		
+		
 		if (StringUtils.isNotBlank(usingContractId)) {
 			ContractMain contractMain = contractMainService.getById(usingContractId);
 			BigDecimal money = new BigDecimal(0.0);
@@ -118,8 +122,12 @@ public class IncomeServiceImpl extends ServiceImpl<IncomeMapper, Income> impleme
 			income.setCode(generateNoService.nextCode("SR"));
 			income.setBasis(contractMain.getContractCode());
 			income.setClientId(contractMain.getClientId());
+			income.setBasicId(contractMain.getId());
 			income.setOptionId(opId);
 			income.setMoeny(money);
+			income.setTableFrom(income_from_takeout);
+			income.setTableId(takeout.getId());
+			income.setTableCode(takeout.getCode());
 			save(income);
 		}else{
 			throw new RuntimeJsonMappingException("该客户暂无正在使用的合同");
@@ -127,7 +135,7 @@ public class IncomeServiceImpl extends ServiceImpl<IncomeMapper, Income> impleme
 	}
 	@Override
 	public Storage storageIncomeMath(Storage storage) throws Exception {
-
+		Integer income_from_storage =  CacheUtils.keyDict.get("income_from_storage").getValue();
 		//入库装卸费
 		String opId = "4c089061ca5243fd97f02213015d44e6";
 		//没有的加
@@ -162,7 +170,11 @@ public class IncomeServiceImpl extends ServiceImpl<IncomeMapper, Income> impleme
 				income.setBasis(contractMain.getContractCode());
 				income.setClientId(contractMain.getClientId());
 				income.setOptionId(opId);
+				income.setBasicId(contractMain.getId());
 				income.setMoeny(money);
+				income.setTableFrom(income_from_storage);
+				income.setTableId(storage.getId());
+				income.setTableCode(storage.getCode());
 				save(income);
 				storage.setIncomeId(income.getId());
 			}
@@ -174,7 +186,7 @@ public class IncomeServiceImpl extends ServiceImpl<IncomeMapper, Income> impleme
 
 	@Override
 	public SaleReturn saleReturnIncomeMath(SaleReturn saleReturn) throws Exception {
-
+		Integer income_from_retrun =  CacheUtils.keyDict.get("income_from_retrun").getValue();
 		//入库装卸费
 		String opId = "4c089061ca5243fd97f02213015d44e6";
 		//没有的加
@@ -209,6 +221,10 @@ public class IncomeServiceImpl extends ServiceImpl<IncomeMapper, Income> impleme
 				income.setBasis(contractMain.getContractCode());
 				income.setClientId(contractMain.getClientId());
 				income.setOptionId(opId);
+				income.setBasicId(contractMain.getId());
+				income.setTableFrom(income_from_retrun);
+				income.setTableId(saleReturn.getId());
+				income.setTableCode(saleReturn.getSystemCode());
 				income.setMoeny(money);
 				save(income);
 				saleReturn.setIncomeId(income.getId());

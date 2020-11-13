@@ -37,6 +37,12 @@ public class Income extends DataEntity<Income> implements Serializable {
     private String basis;
 
     /**
+     * 依据的合同id
+     */
+    @TableField("basic_id")
+    private String basicId;
+    
+    /**
      * 费用产生人（一般是客户）
      */
     @TableField("client_id")
@@ -124,6 +130,14 @@ public class Income extends DataEntity<Income> implements Serializable {
 
 	public String getTypeStr() {
 		return typeStr;
+	}
+
+	public String getBasicId() {
+		return basicId;
+	}
+
+	public void setBasicId(String basicId) {
+		this.basicId = basicId;
 	}
 
 	public void setTypeStr(String typeStr) {

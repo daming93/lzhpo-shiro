@@ -94,6 +94,60 @@ layui.config({
             });
             layer.full(editIndex);
         }
+        if(obj.event === 'tableCode'){
+            var content ;
+            if(data.tableFrom==1){//路单
+                content = "/deliver/wayBill/edit?id="+data.tableId.toString();
+            }else if(data.tableFrom==2){//入库
+                content = "/stock/storage/edit?id="+data.tableId.toString();
+            }else if(data.tableFrom==3){//出库
+                content = "/stock/takeout/edit?id="+data.tableId.toString();
+            }else if(data.tableFrom==4){//退库
+                content = "/stock/saleReturn/edit?id="+data.tableId.toString();
+            }
+            var editIndex = layer.open({
+                title : "查看原表",
+                type : 2,
+                content : content,
+                success : function(layero, index){
+                    setTimeout(function(){
+                        layer.tips('点击此处返回单据列表', '.layui-layer-setwin .layui-layer-close', {
+                            tips: 3
+                        });
+                    },500);
+                }
+            });
+            //改变窗口大小时，重置弹窗的高度，防止超出可视区域（如F12调出debug的操作）
+            $(window).resize(function(){
+                layer.full(editIndex);
+            });
+            layer.full(editIndex);
+        }
+        if(obj.event === 'basis'){
+            var content ;
+            if(data.basis.indexOf("HT") != -1 ){//仓储合同
+                content = "/client/contractMain/edit?id="+data.basicId.toString();
+            }else if(data.basis.indexOf("PS") != -1 ){//配送合同
+                content = "/client/deliverContractMain/edit?id="+data.basicId.toString();
+            }
+            var editIndex = layer.open({
+                title : "查看原表",
+                type : 2,
+                content : content,
+                success : function(layero, index){
+                    setTimeout(function(){
+                        layer.tips('点击此处返回单据列表', '.layui-layer-setwin .layui-layer-close', {
+                            tips: 3
+                        });
+                    },500);
+                }
+            });
+            //改变窗口大小时，重置弹窗的高度，防止超出可视区域（如F12调出debug的操作）
+            $(window).resize(function(){
+                layer.full(editIndex);
+            });
+            layer.full(editIndex);
+        }
     })    
     t = {
         elem: '#income-table',
@@ -115,7 +169,22 @@ layui.config({
             {type:'checkbox'},
            /* {field:'id',        title: 'ID'   },*/
             {field:'code',        title: '编码'   },
-            {field:'basis',        title: '依据' ,    width:'15%'  },
+            { field:'basis' ,event:"basis",title:'依据',templet: function(d){   
+                    if(d.basicId!=null){
+                        return  '<div><a> '+ d.basis+' </a></div>'
+                    }else{
+                         return  '暂无'
+                    }
+                }
+            },
+            { field:'tableCode' ,event:"tableCode",title:'单号',templet: function(d){   
+                    if(d.tableCode!=null){
+                        return  '<div><a> '+ d.tableCode+' </a></div>'
+                    }else{
+                         return  '暂无'
+                    }
+                }
+            },
             {field:'clientName',        title: '客户名称' ,    width:'10%'   },
             { field:'optionName',title:'收费项目',align:'center',width:100},
             { field:'moeny',title:'费用',align:'center',width:100},
