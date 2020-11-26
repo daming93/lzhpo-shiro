@@ -3,6 +3,7 @@ package com.lzhpo.stock.service.impl;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -12,12 +13,16 @@ import org.springframework.transaction.annotation.Transactional;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.fasterxml.jackson.databind.RuntimeJsonMappingException;
+import com.lzhpo.client.service.IBasicdataService;
 import com.lzhpo.common.init.CacheUtils;
+import com.lzhpo.common.util.CommomUtil;
+import com.lzhpo.deliver.service.IAddressService;
 import com.lzhpo.finance.service.IIncomeService;
 import com.lzhpo.material.item.service.IClientitemService;
 import com.lzhpo.stock.entity.MaterialDepot;
 import com.lzhpo.stock.entity.MaterialOperations;
 import com.lzhpo.stock.entity.MathStockNumber;
+import com.lzhpo.stock.entity.ReceiptBill;
 import com.lzhpo.stock.entity.Takeout;
 import com.lzhpo.stock.entity.TakeoutDetail;
 import com.lzhpo.stock.entity.TakeoutOperations;
@@ -25,6 +30,7 @@ import com.lzhpo.stock.mapper.TakeoutMapper;
 import com.lzhpo.stock.service.IMaterialDepotService;
 import com.lzhpo.stock.service.IMaterialOperationsService;
 import com.lzhpo.stock.service.IMaterialService;
+import com.lzhpo.stock.service.IReceiptBillService;
 import com.lzhpo.stock.service.IStorageService;
 import com.lzhpo.stock.service.ITakeoutDetailService;
 import com.lzhpo.stock.service.ITakeoutOperationsService;
@@ -61,6 +67,12 @@ public class TakeoutServiceImpl extends ServiceImpl<TakeoutMapper, Takeout> impl
 	private IMaterialDepotService materialDepotService;
 	@Autowired
 	private IClientitemService clientitemService;
+	@Autowired
+	private IReceiptBillService receiptBillService;
+	@Autowired
+	private IBasicdataService basicdateService;
+	@Autowired
+	private IAddressService addressService;
 	
 	@Override
 	public long getTakeoutCount(String name) {
@@ -140,7 +152,23 @@ public class TakeoutServiceImpl extends ServiceImpl<TakeoutMapper, Takeout> impl
 
 	@Override
 	public Takeout getTakeoutById(String id) {
-		return baseMapper.selectById(id);
+		Takeout r = baseMapper.selectById(id);
+		if (StringUtils.isNotBlank(r.getClientId())) {
+			r.setClientName(basicdateService.getById(r.getClientId()).getClientShortName());
+		}
+		if (r.getStatus() != null) {
+			r.setStatusStr(CommomUtil.valueToNameInDict(r.getStatus(), "modify_status"));
+		}
+		if (r.getPickingStatus()!= null) {
+			r.setPickStatusStr(CommomUtil.valueToNameInDict(r.getPickingStatus(), "is_exsit_pick"));
+		}
+		if (r.getTransportationType() != null) {
+			r.setTransportationTypeStr(CommomUtil.valueToNameInDict(r.getTransportationType(), "transportation_type"));
+		}
+		if (StringUtils.isNotBlank(r.getAddressId())) {
+			r.setAddressName(addressService.getById(r.getAddressId()).getAddressName());
+		}
+		return r;
 	}
 
 	@Override
@@ -176,6 +204,15 @@ public class TakeoutServiceImpl extends ServiceImpl<TakeoutMapper, Takeout> impl
 		/**
 		 * 预留编辑代码
 		 */
+		//生成回单 出库单确认得时候应该生成回单 
+		ReceiptBill receiptBill = new ReceiptBill();
+		receiptBill.setRefId(takeout.getId());
+		receiptBill.setIsExistSlip(0);//送货单 这个时候仅有送货单
+		receiptBill.setIsExistReceipt(1);//验收单 无
+		receiptBill.setIsExistBack(1);//退单 无
+		receiptBill.setReceiptStatus(0);//等待路单进行更改其他回单状态
+		//在这生成得暂且有以上信息
+		receiptBillService.save(receiptBill);
 	}
 
 	@Override
@@ -206,6 +243,8 @@ public class TakeoutServiceImpl extends ServiceImpl<TakeoutMapper, Takeout> impl
 		}
 		takeout.setDelFlag(true);
 		baseMapper.updateById(takeout);
+		//删除回单
+		receiptBillService.deleteReceiptBillByTakeoutId(takeout.getId());
 	}
 
 	@Override

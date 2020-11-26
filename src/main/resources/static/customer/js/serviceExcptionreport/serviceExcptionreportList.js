@@ -1,3 +1,26 @@
+//时间控件
+layui.use('laydate', function(){
+  var laydate = layui.laydate;
+  
+  //执行一个laydate实例
+  laydate.render({
+    elem: '#takeoutTime' //指定元素
+     ,value: new Date()
+  });
+  var laydate2 = layui.laydate;
+  
+  //执行一个laydate实例
+  laydate2.render({
+    elem: '#timeStart' //指定元素
+  });
+
+ var laydate3 = layui.laydate;
+  //执行一个laydate实例
+  laydate3.render({
+    elem: '#timeEnd' //指定元素
+  });
+});
+
 layui.config({
                 base:"/static/layui/layui_exts/"
             }).use(['layer','form','table' ,'upload', 'excel'], function() {
@@ -10,12 +33,12 @@ layui.config({
         t; //表格变量
       
     //监听头工具栏事件
-    table.on('toolbar(incomeList)', function(obj) {
+    table.on('toolbar(serviceExcptionreportList)', function(obj) {
         var checkStatus = table.checkStatus(obj.config.id),
             data = checkStatus.data; //获取选中的数据
             switch (obj.event) {
                 case 'table_export':
-                    exportFile('income-table')
+                    exportFile('serviceExcptionreport-table')
                     break;
                 };
             });
@@ -51,7 +74,7 @@ layui.config({
                     }
                     $.ajax({
                             type:"POST",
-                            url:"/finance/income/list?limit=999999",
+                            url:"/customer/serviceExcptionreport/list?limit=999999",
                             dataType:"json",
                             contentType:'application/x-www-form-urlencoded; charset=UTF-8',
                             data:$('.layui-form').serialize(),
@@ -64,25 +87,24 @@ layui.config({
                                  //导出excel
                                 excel.exportExcel({
                                     sheet1: data
-                                }, '财务收入' + new Date().toLocaleString() + '.xlsx', 'xlsx');
+                                }, '客服日报' + new Date().toLocaleString() + '.xlsx', 'xlsx');
 
                             }
-                    });
-    }
+                        });
+                    }
 
 
-
-   //监听工具条
-    table.on('tool(incomeList)', function(obj){
+    //监听工具条
+    table.on('tool(serviceExcptionreportList)', function(obj){
         var data = obj.data;
         if(obj.event === 'edit'){
             var editIndex = layer.open({
-                title : "审计收入",
+                title : "编辑选项",
                 type : 2,
-                content : "/finance/income/edit?id="+data.id,
+                content : "/customer/serviceExcptionreport/edit?id="+data.id,
                 success : function(layero, index){
                     setTimeout(function(){
-                        layer.tips('点击此处返回收入列表', '.layui-layer-setwin .layui-layer-close', {
+                        layer.tips('点击此处返回选项列表', '.layui-layer-setwin .layui-layer-close', {
                             tips: 3
                         });
                     },500);
@@ -94,24 +116,31 @@ layui.config({
             });
             layer.full(editIndex);
         }
-        if(obj.event === 'tableCode'){
-            var content ;
-            if(data.tableFrom==1){//路单
-                content = "/deliver/wayBill/edit?id="+data.tableId.toString();
-            }else if(data.tableFrom==2){//入库
-                content = "/stock/storage/edit?id="+data.tableId.toString();
-            }else if(data.tableFrom==3){//出库
-                content = "/stock/takeout/edit?id="+data.tableId.toString();
-            }else if(data.tableFrom==4){//退库
-                content = "/stock/saleReturn/edit?id="+data.tableId.toString();
-            }
-            var editIndex = layer.open({
-                title : "查看原表",
+        if(obj.event === "del"){
+            layer.confirm("你确定要删除该选项么？",{btn:['是的,我确定','我再想想']},
+                function(){
+                    $.post("/customer/serviceExcptionreport/delete",{"id":data.id},function (res){
+                        if(res.success){
+                            layer.msg("删除成功",{time: 1000},function(){
+                                table.reload('serviceExcptionreport-table', t);
+                            });
+                        }else{
+                            layer.msg(res.message);
+                        }
+                    });
+                }
+            )
+        }
+    });
+     table.on('rowDouble(serviceExcptionreportList)', function(obj){
+        var data = obj.data;
+        var editIndex = layer.open({
+                title : "日报详情",
                 type : 2,
-                content : content,
+                content : "/customer/serviceExcptionreport/edit?id="+data.id,
                 success : function(layero, index){
                     setTimeout(function(){
-                        layer.tips('点击此处返回单据列表', '.layui-layer-setwin .layui-layer-close', {
+                        layer.tips('点击此处返回选项列表', '.layui-layer-setwin .layui-layer-close', {
                             tips: 3
                         });
                     },500);
@@ -122,37 +151,11 @@ layui.config({
                 layer.full(editIndex);
             });
             layer.full(editIndex);
-        }
-        if(obj.event === 'basis'){
-            var content ;
-            if(data.basis.indexOf("HT") != -1 ){//仓储合同
-                content = "/client/contractMain/edit?id="+data.basicId.toString();
-            }else if(data.basis.indexOf("PS") != -1 ){//配送合同
-                content = "/client/deliverContractMain/edit?id="+data.basicId.toString();
-            }
-            var editIndex = layer.open({
-                title : "查看原表",
-                type : 2,
-                content : content,
-                success : function(layero, index){
-                    setTimeout(function(){
-                        layer.tips('点击此处返回单据列表', '.layui-layer-setwin .layui-layer-close', {
-                            tips: 3
-                        });
-                    },500);
-                }
-            });
-            //改变窗口大小时，重置弹窗的高度，防止超出可视区域（如F12调出debug的操作）
-            $(window).resize(function(){
-                layer.full(editIndex);
-            });
-            layer.full(editIndex);
-        }
-    })    
+    });
     t = {
-        elem: '#income-table',
+        elem: '#serviceExcptionreport-table',
         even: true,
-        url:'/finance/income/list',
+        url:'/customer/serviceExcptionreport/list',
         method:'post',
         toolbar: "#toolbarDemo" ,
         defaultToolbar: ['filter',  'print'],
@@ -168,46 +171,83 @@ layui.config({
         cols: [[
             {type:'checkbox'},
            /* {field:'id',        title: 'ID'   },*/
-            {field:'code',        title: '编码'   },
-            { field:'basis' ,event:"basis",title:'依据',templet: function(d){   
-                    if(d.basicId!=null){
-                        return  '<div><a> '+ d.basis+' </a></div>'
-                    }else{
-                         return  '暂无'
-                    }
-                }
-            },
-            { field:'tableCode' ,event:"tableCode",title:'单号',templet: function(d){   
-                    if(d.tableCode!=null){
-                        return  '<div><a> '+ d.tableCode+' </a></div>'
-                    }else{
-                         return  '暂无'
-                    }
-                }
-            },
-            { field:'clientName',        title: '客户名称' ,    width:'10%'   },
-            { field:'optionName',title:'收费项目',align:'center',width:100},
-            { field:'moeny',title:'费用',align:'center',width:100},
-            { field:'auditMoeny',title:'审计金额',align:'center',width:100},
-            { field:'typeStr',title:'收费类型',align:'center',width:100},
-            { field:'auditMan',    title: '审计人'   },
-            { field:'remarks',    title: '备注'   },
-            { title: '操作',fixed: 'right',  width:'15%',    align: 'center',toolbar: '#incomeBar'}
+         {field:'clientName' ,title:'客户名称',sortable:true},
+            { field:'addressName',title:'门店',sortable:true},
+            { field:'takeoutTime' ,title:'发货时间',sortable:true},
+            { field:'timeStart',title:'开始时间',sortable:true},
+            { field:'timeEnd',title:'结束时间',sortable:true},
+            { field:'remarks',title:'处理过程',sortable:true},
+            { field:'handleResult',title:'处理结果',sortable:true},
+            { field:'abnormityTypeName',title:'异常类型',sortable:true},
+            { field:'excptionName',title:'异常原因',sortable:true},
+            { field:'responsibilityDeptName',title:'责任归属',sortable:true},
+            {title: '操作',fixed: 'right',  width:'15%',    align: 'center',toolbar: '#serviceExcptionreportBar'}
         ]]/*,
         done: function () {
             $("[data-field='id']").css('display','none');
         }*/
     };
     table.render(t);
-  
+    var active={
+        addUser : function(){
+            addIndex = layer.open({
+                title : "添加选项",
+                type : 2,
+                content : "/customer/serviceExcptionreport/add",
+                success : function(layero, addIndex){
+                    setTimeout(function(){
+                        layer.tips('点击此处返回选项列表', '.layui-layer-setwin .layui-layer-close', {
+                            tips: 3
+                        });
+                    },500);
+                }
+            });
+            //改变窗口大小时，重置弹窗的高度，防止超出可视区域（如F12调出debug的操作）
+            $(window).resize(function(){
+                layer.full(addIndex);
+            });
+            layer.full(addIndex);
+        },
+        //批量删除
+        deleteSome : function(){
+            var checkStatus = table.checkStatus('serviceExcptionreport-table'),
+                data = checkStatus.data;
+            if(data.length > 0){
+                console.log(JSON.stringify(data));
+                layer.confirm("你确定要删除这些选项么？",{btn:['是的,我确定','我再想想']},
+                    function(){
+                        var deleteindex = layer.msg('删除中，请稍候',{icon: 16,time:false,shade:0.8});
+                        $.ajax({
+                            type:"POST",
+                            url:"/customer/serviceExcptionreport/deleteSome",
+                            dataType:"json",
+                            contentType:"application/json",
+                            data:JSON.stringify(data),
+                            success:function(res){
+                                layer.close(deleteindex);
+                                if(res.success){
+                                    layer.msg("删除成功",{time: 1000},function(){
+                                        table.reload('serviceExcptionreport-table', t);
+                                    });
+                                }else{
+                                    layer.msg(res.message);
+                                }
+                            }
+                        });
+                    }
+                )
+            }else{
+                layer.msg("请选择需要删除的选项",{time:1000});
+            }
+        }
+    };
     $('.layui-inline .layui-btn').on('click', function(){
         var type = $(this).data('type');
         active[type] ? active[type].call(this) : '';
     });
-   
     //搜索
     form.on("submit(searchForm)",function(data){
-        table.reload('income-table', {
+        table.reload('serviceExcptionreport-table', {
             page: {curr: 1},
             where: data.field
         });

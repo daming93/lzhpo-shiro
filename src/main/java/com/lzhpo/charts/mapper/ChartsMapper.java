@@ -8,7 +8,6 @@ import com.lzhpo.charts.entity.Charts;
 import com.lzhpo.charts.entity.ClientCountWVQ;
 import com.lzhpo.charts.entity.DocumentQuantity;
 import com.lzhpo.charts.entity.WeightVolumeQuantity;
-import com.lzhpo.client.entity.Abnormity;
 
 /**
  * <p>
@@ -18,7 +17,7 @@ import com.lzhpo.client.entity.Abnormity;
  * @author xdm
  * @since 2020-06-09
  */
-public interface ChartsMapper extends BaseMapper<Abnormity> {
+public interface ChartsMapper extends BaseMapper<Charts> {
 	
 	public List<Charts> showBillCountAll(Map<String, Object> map);
 	

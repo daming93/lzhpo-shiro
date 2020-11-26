@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <meta charset="UTF-8">
+    <title>客服日报管理</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <link rel="stylesheet" th:href="@{/static/layui/css/layui.css}" media="all" />
+    <link rel="stylesheet" th:href="@{/static/admin/css/list.css}" media="all" />
+</head>
+<body class="childrenBody">
+<fieldset class="layui-elem-field">
+    <legend>选项检索</legend>
+    <div class="layui-field-box">
+        <form class="layui-form">
+            <div class="layui-inline">
+                 <select name="s_clientId" id="s_clientId" class="form-control1"  lay-filter="clientId" lay-search>
+                    <option value="">请选择客户</option>
+                    <option th:each="basic:${basicList}"  th:value="${basic.id}"  th:text="${basic.clientShortName}"></option>
+                </select>
+            </div>
+            <div class="layui-inline">
+                <select name="s_addressId" id="addressId"  class="form-control1"  lay-filter="addressId" lay-search>
+                    <option value="">请选择门店</option>
+                    <option th:each="basic:${addressList}"  th:value="${basic.id}" th:text="${basic.addressName}"></option>
+                </select>
+            </div>
+            <div class="layui-inline">
+                 <select name="s_abnormityTypeId" id="abnormityTypeId" class="form-control1"  lay-filter="abnormityTypeId" lay-search>
+                    <option value="">请选择异常类型</option>
+                    <option th:each="basic:${abnormitytypeList}"  th:value="${basic.id}"  th:text="${basic.name}"></option>
+                </select>
+            </div>
+            <div class="layui-inline">
+                     <label class="layui-form-label">责任归属</label>
+                    <div class="layui-input-block">
+                       <div style="width: 200px"  id="clientSelect"></div>
+                   </div>
+            </div> 
+            <br/>  <br/>  
+                <div class="layui-inline">
+                        <input type="text" class="layui-input layTime" id="timeStart"  name="s_timeStart"  placeholder="请输入开始日期">
+                </div>
+                <div class="layui-inline">
+                        <input type="text" class="layui-input layTime" id="timeEnd"  name="s_timeEnd"  placeholder="请输入截止日期">
+                </div>
+            <div class="layui-input-inline">
+                <a class="layui-btn" lay-submit="" lay-filter="searchForm">查询</a>
+            </div>
+
+            <shiro:hasPermission name="customer:serviceExcptionreport:add">
+            <div class="layui-inline">
+                <a class="layui-btn layui-btn-normal" data-type="addUser">添加客服日报</a>
+            </div>
+            </shiro:hasPermission>
+            <shiro:hasPermission name="customer:serviceExcptionreport:delete">
+            <div class="layui-inline">
+                <a class="layui-btn layui-btn-danger" data-type="deleteSome">批量删除</a>
+            </div>
+            </shiro:hasPermission>
+
+        </form>
+    </div>
+</fieldset>
+<script type="text/html" id="toolbarDemo">
+       <div class="layui-col-md2 layui-col-sm3 layui-col-xs6" style="text-align: left;padding-left: 10px;">
+            <div class="layui-input-inline yutons-btn-margin-right">
+               <span class="layui-btn yutons layui-btn-sm yutons-color-detail" lay-event="table_export">导出全部</span>
+            </div>
+        </div>
+</script>
+<div class="layui-form users_list">
+    <table class="layui-table" id="serviceExcptionreport-table" lay-filter="serviceExcptionreportList"></table>
+    <script type="text/html" id="serviceExcptionreportBar">
+    <shiro:hasPermission name="customer:serviceExcptionreport:edit">
+        <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+    </shiro:hasPermission>
+    <shiro:hasPermission name="customer:serviceExcptionreport:delete">
+        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+    </shiro:hasPermission>
+    </script>
+</div>
+<div id="page"></div>
+
+<script type="text/javascript" th:src="@{/static/layui/layui.js}"></script>
+<script type="text/javascript" th:src="@{/static/admin/js/tools.js}"></script>
+<script type="text/javascript" th:src="@{/static/customer/js/serviceExcptionreport/serviceExcptionreportList.js}"></script>
+<script type="text/javascript" th:src="@{/static/layui/xm-select.js}"></script>
+<script type="text/javascript" th:inline="javascript">
+     var clientSelect = xmSelect.render({
+            el: '#clientSelect', 
+            width:'400px',
+            name:"s_responsibilityDept",
+            prop: {
+                name: 'name',
+                value: 'id',
+            },
+            tips:"请选择责任归属",
+            filterable:true,
+            data: [[${resDeptList}]]
+        })
+
+</script>
+</body>
+</html>

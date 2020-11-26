@@ -36,6 +36,7 @@ import com.lzhpo.deliver.service.IWayBillService;
 import com.lzhpo.finance.entity.Income;
 import com.lzhpo.finance.service.IIncomeService;
 import com.lzhpo.stock.entity.Takeout;
+import com.lzhpo.stock.service.IReceiptBillService;
 import com.lzhpo.stock.service.ITakeoutService;
 import com.lzhpo.sys.service.IGenerateNoService;
 /**
@@ -74,6 +75,9 @@ public class WayBillServiceImpl extends ServiceImpl<WayBillMapper, WayBill> impl
 	
 	@Autowired
 	private IIncomeService incomeService ;
+	
+	@Autowired
+	private IReceiptBillService receiptBillService;
 	
 	
 	@Override
@@ -240,6 +244,13 @@ public class WayBillServiceImpl extends ServiceImpl<WayBillMapper, WayBill> impl
     		dispatch.setDispatchStatus(scheduling_status_yes);
     		dispatchService.updateById(dispatch);
 		}
+		// 待确认 1
+		Integer receipt_status_no = CacheUtils.keyDict.get("receipt_status_no").getValue();
+    	//通过之后改变回单状态可以被调度确认
+    	for (String takeout : tableIds) {
+			receiptBillService.changeStatusByTakeoutId(takeout,receipt_status_no);
+		}
+    	//撤销得时候需不需要回解 question	
         return wayBill;
     }
 
