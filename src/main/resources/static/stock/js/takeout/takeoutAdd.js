@@ -100,6 +100,8 @@ window.viewObj = {
 
         var tableIns;
 
+        var submitFlag = true;
+
         var takeoutIns = table.render({
                     elem: '#takeoutTable',
                     id: 'takeoutTable',
@@ -497,7 +499,12 @@ window.viewObj = {
         });
         $("form").keypress(function(e) {
              if(e.keyCode==10&&e.ctrlKey) {
-                $("#addtakeout").click();
+                if(submitFlag){
+                    $("#addtakeout").click();
+                    submitFlag=false;
+                }else{
+                    layer.msg("冷静一下！",{time:1000});
+                }
             }
         });
         //注册按钮事件
@@ -548,7 +555,9 @@ window.viewObj = {
 //提交数据代码
         form.on('submit(addtakeout)',function(data){
         activeByType('save');    //更新行记录对象
-      
+        setTimeout(function(){ //无论是坏都要改状态
+                    submitFlag = true;
+                },1000);
         data.field.detailSet = table.cache['takeoutTable'];  
         var loadIndex = layer.load(2, {
             shade: [0.3, '#333']
@@ -560,7 +569,6 @@ window.viewObj = {
             contentType:"application/json",
             data:JSON.stringify(data.field),
             success:function(res){
-                layer.close(loadIndex);
                 if(res.success){
                     parent.layer.msg("单据添加成功！",{time:1000},function(){
                         var continuity = $("#continuity").val();
@@ -600,10 +608,15 @@ window.viewObj = {
                           // 刷新父页面
                            parent.location.reload(); 
                         }
+                        layer.close(loadIndex);
+                        submitFlag = false;//成功这个页面就再也不能提交了
                     });
+
                 }else{
                     layer.msg(res.message);
                 }
+      
+                 
             }
         });
         return false;

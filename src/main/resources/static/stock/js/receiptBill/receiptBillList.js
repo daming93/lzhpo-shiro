@@ -19,28 +19,27 @@ layui.use(['layer','form','table'], function() {
         },
         width: $(parent.window).width()-223,
         cols: [[
-            {type:'checkbox'},
+            { type:'checkbox'},
             { field:'clientName',title:'客户名称',align:'center',width:100,templet:'<div>{{  d.takeout.clientName }}</div>'},
             { field:'takeout.deliveryTime',title:'发货时间',align:'center',width:110,templet:'<div>{{  d.takeout.deliveryTime }}</div>'},
             { field:'takeout.takeoutTime',title:'配送时间',align:'center',width:110,templet:'<div>{{  d.takeout.takeoutTime }}</div>'},
             { field:'takeout.clientCode',title:'客户单号',align:'center',width:100,templet:'<div>{{  d.takeout.clientCode }}</div>'},
             { field:'takeout.addressName',title:'送达方',align:'center',width:150,templet:'<div>{{  d.takeout.addressName }}</div>'},
             { field:'takeout.number',title:'数量',align:'center',width:70,templet:'<div>{{  d.takeout.number }}</div>'},
-            {field:'isExistSlip',title:'送货单',align:'center',width:70,templet:'#isExistSlip'},
-            {field:'isExistReceipt',title:'验收单',align:'center',width:70,templet:'#isExistReceipt'},
-            {field:'isExistBack',title:'退单',align:'center',width:70,templet:'#isExistBack'},
-            {field:'receiptStatusName',title:'回单状态',align:'center',width:70},
-            {field:'deliveryReceiptTime',title:'调度回单时间',align:'center',width:170},
-            {field:'receiptTime',title:'回单时间',align:'center',width:170},
+            { field:'isExistSlip',title:'送货单',align:'center',width:70,templet:'#isExistSlip'},
+            { field:'isExistReceipt',title:'验收单',align:'center',width:70,templet:'#isExistReceipt'},
+            { field:'isExistBack',title:'退单',align:'center',width:70,templet:'#isExistBack'},
+            { field:'receiptStatusName',title:'回单状态',align:'center',width:70},
+            { field:'deliveryReceiptTime',title:'调度回单时间',align:'center',width:170},
+            { field:'receiptTime',title:'回单时间',align:'center',width:170},
             { field:'abnormityTypeName',title:'异常类型',align:'center',width:100},
             { field:'abnormityName',title:'异常原因',align:'center',width:100},
-            {field:'remarks',title:'备注',align:'center',width:100},
-            {field:'createDate',  title: '创建时间',width:'14%', templet:'<span>{{ layui.laytpl.toDateString(d.createDate) }}</span>'}, //单元格内容水平居中
-            {fixed: 'right', align: 'center',  title: '操作',toolbar: '#receiptBillBar',width:200}
+            { field:'remarks',title:'备注',align:'center',width:100},
+            { field:'createDate',  title: '创建时间',width:'14%', templet:'<span>{{ layui.laytpl.toDateString(d.createDate) }}</span>'}, //单元格内容水平居中
+            { fixed:'right', align: 'center',  title: '操作',toolbar: '#receiptBillBar',width:200}
         ]]
     };
     table.render(t);
-
     //监听工具条
     table.on('tool(receiptBillList)', function(obj){
         var data = obj.data;
@@ -71,7 +70,6 @@ layui.use(['layer','form','table'], function() {
                         }else{
                             layer.msg(res.message);
                         }
-
                     });
                 }
             );
@@ -108,10 +106,7 @@ layui.use(['layer','form','table'], function() {
                 }
             );
         }
-
-        
     });
-
     //功能按钮
     var active={
         

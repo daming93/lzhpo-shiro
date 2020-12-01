@@ -79,6 +79,12 @@ window.viewObj = {
               tableData=result.data;
             }
         });
+
+        $("form").keypress(function(e) {
+             if(e.keyCode==10&&e.ctrlKey) {
+                layer.msg("该页面无法如此操作",{time:1000});
+            }
+        });
         //数据表格实例化           
         var tbWidth = $("#tableRes").width();
         var layTableId = "layTable";
@@ -93,7 +99,6 @@ window.viewObj = {
             limit: 2000, // 数据表格默认全部显示
             cols: [[
                 {title: '序号', type: 'numbers'},
-
                 { field:'itemId',title:'系统物料编号',align:'center',width:160,templet: function(d){
                     var options = viewObj.renderSelectOptions(viewObj.itemsData, {valueField: "id", textField: "code", selectedValue: d.itemId});
                     return '<a lay-event="itemId"></a><select name="itemId"  lay-filter="itemId"><option  value="">请选择</option>' + options + '</select>';
@@ -102,10 +107,6 @@ window.viewObj = {
                 { field:'depot',title:'储位',align:'center',width:130,templet: function(d){
                     var options = viewObj.renderSelectOptions(viewObj.depotsData, {valueField: "code", textField: "code", selectedValue: d.depot});
                     return '<a lay-event="depot"></a><select name="depot" lay-filter="depot"><option  value="">请选择</option>' + options + '</select>';
-                }},
-                { field:'tray',title:'托盘',align:'center',width:130,templet: function(d){
-                    var options = viewObj.renderSelectOptions(viewObj.trayListData, {valueField: "code", textField: "code", selectedValue: d.tray});
-                    return '<a lay-event="tray"></a><select name="tray" lay-filter="tray"><option  value="">请选择</option>' + options + '</select>';
                 }},
                 { field:'batch',title:'批次',align:'center',width:100,edit: 'select',event:'date',data_field: "dBeginDate"},
                 { field:'wholeNum',title:'数量(整)',edit: 'select',event:'wholeNum',align:'center',width:80},

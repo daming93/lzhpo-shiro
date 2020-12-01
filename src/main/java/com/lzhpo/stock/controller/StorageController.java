@@ -301,18 +301,11 @@ public class StorageController {
 	@ResponseBody
 	@SysLog("保存编辑数据")
 	public ResponseEntity edit(@RequestBody Storage storage) {
-		// if(StringUtils.isBlank(storage.getId())){
-		// return ResponseEntity.failure("修改提示信息（不能为空)");
-		// }
-		// if(StringUtils.isBlank(storage.getName())){
-		// return ResponseEntity.failure("单据名称不能为空");
-		// }
-		// Storage oldStorage = storageService.getStorageById(storage.getId());
-		// if(!oldStorage.getName().equals(storage.getName())){
-		// if( storageService.getStorageCount(storage.getName())>0){
-		// return ResponseEntity.failure("修改提示信息（不能重复)");
-		// }
-		// }
+		Integer modify_status_await = CacheUtils.keyDict.get("modify_status_await").getValue();
+		
+		if(!modify_status_await.equals(storageService.getById(storage.getId()).getStatus())){
+			return ResponseEntity.failure("该单据不在可编辑状态无法编辑");
+		}
 		try {
 			storageService.updateStorage(storage);
 		}catch (RuntimeJsonMappingException e) {

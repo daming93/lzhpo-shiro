@@ -99,15 +99,6 @@
                 </select>
             </div> 
         </div>
-        <div class="layui-inline">
-            <label class="layui-form-label">托盘</label>
-            <div class="layui-input-block">
-                <select name="tray"  class="form-control1" id="tray" lay-filter="tray" lay-search>
-                    <option value="">请选择</option>
-                    <option th:each="basic:${trayList}" th:value="${basic.id}"  th:text="${basic.code}"></option>
-                </select>
-            </div>  
-        </div>
     </div>
      <div class="layui-form-item">
            <div class="layui-inline">

@@ -104,10 +104,6 @@ window.viewObj = {
                     var options = viewObj.renderSelectOptions(viewObj.depotsData, {valueField: "code", textField: "code", selectedValue: d.depot});
                     return '<a lay-event="depot"></a><select name="depot" lay-filter="depot"><option  value="">请选择</option>' + options + '</select>';
                 }},
-                { field:'tray',title:'托盘',align:'center',width:130,templet: function(d){
-                    var options = viewObj.renderSelectOptions(viewObj.trayListData, {valueField: "code", textField: "code", selectedValue: d.tray});
-                    return '<a lay-event="tray"></a><select name="tray" lay-filter="tray"><option  value="">请选择</option>' + options + '</select>';
-                }},
                 { field:'batch',title:'批次',align:'center',width:100,edit: 'select',event:'date',data_field: "dBeginDate"},
                 { field:'wholeNum',title:'数量(整)',edit: 'select',event:'wholeNum',align:'center',width:80},
                 { field:'scatteredNum',title:'数量(零)',edit: 'select',event:'wholeNum',align:'center',width:80},

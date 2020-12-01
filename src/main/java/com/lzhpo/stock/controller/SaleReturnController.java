@@ -250,6 +250,10 @@ public class SaleReturnController {
 	@ResponseBody
 	@SysLog("保存编辑数据")
 	public ResponseEntity edit(@RequestBody SaleReturn saleReturn) {
+		Integer modify_status_await = CacheUtils.keyDict.get("modify_status_await").getValue();
+		if(!modify_status_await.equals(saleReturnService.getById(saleReturn.getId()).getStatus())){
+			return ResponseEntity.failure("该单据不在可编辑状态无法编辑");
+		}
 		try {
 			saleReturnService.updateSaleReturn(saleReturn);
 		}catch (RuntimeJsonMappingException e) {

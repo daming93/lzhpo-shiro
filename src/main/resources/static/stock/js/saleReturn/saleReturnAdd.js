@@ -80,6 +80,8 @@ window.viewObj = {
 
        
         var $ = layui.$, table = layui.table, form = layui.form, layer = layui.layer,upload = layui.upload;
+
+        var submitFlag = true;
         $("#clientId").parent().find('input:first').click();
         $("#clientId").parent().find('input:first').focus();    
         //回车操作
@@ -117,12 +119,17 @@ window.viewObj = {
             }
 
         });
+     
         $("form").keypress(function(e) {
              if(e.keyCode==10&&e.ctrlKey) {
-                $("#addsaleReturn").click();
+                if(submitFlag){
+                    $("#addsaleReturn").click();
+                    submitFlag=false;
+                }else{
+                    layer.msg("冷静一下！",{time:1000});
+                }
             }
         });
-       
         //数据表格实例化           
         var tbWidth = $("#tableRes").width();
         var layTableId = "layTable";
@@ -140,7 +147,6 @@ window.viewObj = {
                     { field:'systemCode',title:'系统物料编号',align:'center',width:100},
                     { field:'name',title:'品名',align:'center',width:200},
                     { field:'depot',title:'储位',align:'center',width:100},
-                    { field:'tray',title:'托盘',align:'center',width:100},
                     { field:'batch',title:'批次',align:'center',width:100},
                     { field:'wholeNum',title:'数量(整)',align:'center',width:100},
                     { field:'scatteredNum',title:'数量(零)',align:'center',width:100},
@@ -376,18 +382,14 @@ window.viewObj = {
              $("#depot").parent().find('input:first').focus();
         });
         form.on('select(depot)', function(data){
-             $("#tray").parent().find('input:first').click();
-             $("#tray").parent().find('input:first').focus();
+            $("#wholeNumber").focus();
         });
-        form.on('select(tray)', function(data){
-             $("#wholeNumber").focus();
-        });
-      
-        
 //提交数据代码
         form.on('submit(addsaleReturn)',function(data){
         activeByType('save');    //更新行记录对象
-      
+        setTimeout(function(){ //无论是坏都要改状态
+                    submitFlag = true;
+                },1000);
         data.field.detailSet = table.cache[layTableId];  
         var loadIndex = layer.load(2, {
             shade: [0.3, '#333']
@@ -412,7 +414,7 @@ window.viewObj = {
                             if(flag){
                                 //有权限 
                                  var editIndex = layer.open({
-                                    title : "编辑出库",
+                                    title : "编辑退库",
                                     type : 2,
                                     content : "/stock/saleReturn/edit?id="+id,
                                     success : function(layero, index){
@@ -438,10 +440,13 @@ window.viewObj = {
                           // 刷新父页面
                            parent.location.reload(); 
                         }
+                        layer.close(loadIndex);
+                        submitFlag = false;//成功这个页面就再也不能提交了
                     });
                 }else{
                     layer.msg(res.message);
                 }
+           
             }
         });
         return false;
