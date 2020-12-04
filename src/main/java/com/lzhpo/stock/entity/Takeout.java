@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -202,7 +203,7 @@ public class Takeout extends DataEntity<Takeout> implements Serializable {
     private String addressName;
     
     @TableField(exist = false)
-    private Set<TakeoutDetail> detailSet;
+    private List<TakeoutDetail> detailSet;
     
     @TableField(exist = false)
     private String transportationTypeStr;
@@ -278,12 +279,11 @@ public class Takeout extends DataEntity<Takeout> implements Serializable {
 		this.statusStr = statusStr;
 	}
 
-
-	public Set<TakeoutDetail> getDetailSet() {
+	public List<TakeoutDetail> getDetailSet() {
 		return detailSet;
 	}
 
-	public void setDetailSet(Set<TakeoutDetail> detailSet) {
+	public void setDetailSet(List<TakeoutDetail> detailSet) {
 		this.detailSet = detailSet;
 	}
 

@@ -3,6 +3,7 @@ package com.lzhpo.stock.entity;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Set;
 
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -140,7 +141,7 @@ public class SaleReturn extends DataEntity<SaleReturn> implements Serializable {
     private String statusStr;
 
     @TableField(exist = false)
-    private Set<SaleReturnDetail> detailSet;
+    private List<SaleReturnDetail> detailSet;
     
     /**
      * 客户名称
@@ -188,11 +189,11 @@ public class SaleReturn extends DataEntity<SaleReturn> implements Serializable {
 		this.statusStr = statusStr;
 	}
 
-	public Set<SaleReturnDetail> getDetailSet() {
+	public List<SaleReturnDetail> getDetailSet() {
 		return detailSet;
 	}
 
-	public void setDetailSet(Set<SaleReturnDetail> detailSet) {
+	public void setDetailSet(List<SaleReturnDetail> detailSet) {
 		this.detailSet = detailSet;
 	}
 

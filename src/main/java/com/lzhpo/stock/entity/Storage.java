@@ -3,6 +3,7 @@ package com.lzhpo.stock.entity;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Set;
 
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -122,7 +123,7 @@ public class Storage extends DataEntity<Storage> implements Serializable {
     private String statusStr;
 
     @TableField(exist = false)
-    private Set<StorageDetail> detailSet;
+    private List<StorageDetail> detailSet;
     
 	public Integer getScatteredNum() {
 		return scatteredNum;
@@ -132,11 +133,11 @@ public class Storage extends DataEntity<Storage> implements Serializable {
 		this.scatteredNum = scatteredNum;
 	}
 
-	public Set<StorageDetail> getDetailSet() {
+	public List<StorageDetail> getDetailSet() {
 		return detailSet;
 	}
 
-	public void setDetailSet(Set<StorageDetail> detailSet) {
+	public void setDetailSet(List<StorageDetail> detailSet) {
 		this.detailSet = detailSet;
 	}
 

@@ -82,7 +82,9 @@ public class MaterialManageController {
 	
 	
     @GetMapping(value = "list")
-    public String list(){
+    public String list(ModelMap modelMap){
+    	List<Basicdata> basicDatas = basicdateService.selectAll();
+    	modelMap.put("basicDatas", basicDatas);
         return "warehouse/materialManage/listMaterialManage";
     }
 	

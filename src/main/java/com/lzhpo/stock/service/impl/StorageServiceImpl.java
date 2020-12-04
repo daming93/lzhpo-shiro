@@ -86,7 +86,7 @@ public class StorageServiceImpl extends ServiceImpl<StorageMapper, Storage> impl
 		storage.setCode(generateNoService.nextCode("RK"));
 		// 子表保存
 		baseMapper.insert(storage);
-		Set<StorageDetail> detailSet = storage.getDetailSet();
+		List<StorageDetail> detailSet = storage.getDetailSet();
 		for (StorageDetail storageDetail : detailSet) {
 			// 根据品项找到物料对应的信息
 			// Clientitem item =
@@ -128,7 +128,7 @@ public class StorageServiceImpl extends ServiceImpl<StorageMapper, Storage> impl
 		storage.setStatus(modify_status_revocation);
 		// 删除有关子表
 		detailService.deleteStorageDetailById(storage.getId());
-		Set<StorageDetail> detailSet = storage.getDetailSet();
+		List<StorageDetail> detailSet = storage.getDetailSet();
 		for (StorageDetail storageDetail : detailSet) {
 			// 根据品项找到物料对应的信息
 			// 先加入库存

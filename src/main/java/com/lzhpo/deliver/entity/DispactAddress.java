@@ -122,8 +122,18 @@ public class DispactAddress extends DataEntity<DispactAddress> implements Serial
     @TableField(exist=false)
     private  String typeStr;
     
-
+    @TableField(exist=false)
+    private  Integer isExistHandleAbnormity;//0 存在 1不存在
     
+    
+	public Integer getIsExistHandleAbnormity() {
+		return isExistHandleAbnormity;
+	}
+
+	public void setIsExistHandleAbnormity(Integer isExistHandleAbnormity) {
+		this.isExistHandleAbnormity = isExistHandleAbnormity;
+	}
+
 	public String getTypeStr() {
 		return typeStr;
 	}

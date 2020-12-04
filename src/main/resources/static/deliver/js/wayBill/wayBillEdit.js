@@ -105,13 +105,34 @@ layui.use(['form','jquery','table','layer'],function(){
                             { field:'countiesId',title:'区id',align:'center',hide:true,width:100},
                             { field:'type',title:'类型id',align:'center',hide:true,width:100},
                             { field:'id',title:'id',align:'center',hide:true,width:100},
+                            {title: '操作',fixed: 'right',  width:'15%',    align: 'center',toolbar: '#billBar'}
                            
                     ]],
                     done: function(res, curr, count){
                         
                     }
                 });
-
+   table.on('tool(billTable)', function(obj){
+    var wayBillId = $("#wayBillId").val();
+        var data = obj.data;
+        console.log(data);
+            if(obj.event === 'handleAbnormity'){
+                var editIndex = layer.open({
+                    title : "申报异常",
+                       type : 2,
+                    offset: 'rt',
+                    area: ['410px','800px'],
+                    content : "/stock/handleAbnormity/add?takeoutId="+data.tableId.toString()+"&wayBillId="+wayBillId,
+                    success : function(layero, index){
+                        setTimeout(function(){
+                            layer.tips('点击此处返回路单列表', '.layui-layer-setwin .layui-layer-close', {
+                                tips: 3
+                            });
+                        },500);
+                    }
+                });
+            }
+        });
 
 
                  

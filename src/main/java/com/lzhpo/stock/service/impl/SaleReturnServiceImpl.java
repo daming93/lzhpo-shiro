@@ -83,7 +83,7 @@ public class SaleReturnServiceImpl extends ServiceImpl<SaleReturnMapper, SaleRet
 		// 入库单号
 		saleReturn.setSystemCode(generateNoService.nextCode("XT"));
 		baseMapper.insert(saleReturn);
-		Set<SaleReturnDetail> detail = saleReturn.getDetailSet();
+		List<SaleReturnDetail> detail = saleReturn.getDetailSet();
 		for (SaleReturnDetail saleReturnDetail : detail) {
 			saleReturnDetail.setSalesReturnId(saleReturn.getId());
 			saleReturnDetailService.save(saleReturnDetail);
@@ -120,7 +120,7 @@ public class SaleReturnServiceImpl extends ServiceImpl<SaleReturnMapper, SaleRet
 		saleReturn.setStatus(modify_status_revocation);
 		// 删除有关子表
 		saleReturnDetailService.deleteSaleReturnDetailByReturnId(saleReturn.getId());
-		Set<SaleReturnDetail> detail = saleReturn.getDetailSet();
+		List<SaleReturnDetail> detail = saleReturn.getDetailSet();
 		for (SaleReturnDetail saleReturnDetail : detail) {
 			// 根据品项找到物料对应的信息
 			// 先加入库存

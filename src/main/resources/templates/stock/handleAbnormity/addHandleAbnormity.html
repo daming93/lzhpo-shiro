@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <meta charset="utf-8">
+    <title>异常申报</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <link rel="stylesheet" th:href="@{/static/layui/css/layui.css}" media="all" />
+    <style type="text/css">
+        .layui-form-item .layui-inline{ min-width:15%; float:left; margin-right:0 }
+        .layui-form-item .handleAbnormity-box {
+            position: relative;
+        }
+         html, body
+        {
+            width: 100%;
+            height: 70%;
+        }
+    </style>
+</head>
+<body class="childrenBody">
+<form class="layui-form">
+    <input name="wayBillId" type="hidden" th:value="${wayBill.id}">
+    <input name="takeoutId" type="hidden" th:value="${takeout.id}">
+    <input name="abnormityTypeName" id="abnormityTypeName" type="hidden" >
+    <input name="abnormityName" id="excptionName"  type="hidden" >
+    <div class="layui-form-item">
+        <div class="layui-inline">
+            <label class="layui-form-label">客户单号</label>
+            <div class="layui-input-block">
+                <input type="text" class="layui-input" disabled  th:value="${takeout.clientCode}">
+            </div>
+        </div> 
+    </div>
+    <div class="layui-form-item">
+           <div class="layui-inline">
+             <label class="layui-form-label">路单单号</label>
+            <div class="layui-input-block">
+                <input type="text" class="layui-input" disabled  th:value="${wayBill.code}">
+            </div>
+        </div> 
+    </div>
+  <div class="layui-form-item">
+        <div class="layui-inline">
+            <label class="layui-form-label">异常类型</label>
+            <div class="layui-input-block">
+                <select name="abnormityTypeId" id="abnormityTypeId" lay-verify="required" class="form-control1"  lay-filter="abnormityTypeId" lay-search>
+                    <option value="">请选择</option>
+                    <option th:each="basic:${abnormitytypeList}"  th:value="${basic.id}" lay-verify="required" th:text="${basic.name}"></option>
+                </select>
+            </div>
+        </div>
+  </div>
+  <div class="layui-form-item">    
+        <div class="layui-inline">
+            <label class="layui-form-label">异常原因</label>
+            <div class="layui-input-block">
+                <select name="abnormityId" id="excptionId" class="form-control1"  lay-verify="required" lay-filter="excptionId" lay-search>
+                </select>
+
+            </div>
+        </div>
+    </div>
+    <div class="layui-form-item">
+           <div class="layui-inline">
+            <label class="layui-form-label">是否处理</label>
+            <input type="radio" name="disposeStatus" value="1" title="√" checked>
+            <input type="radio" name="disposeStatus" value="0" title="×" >
+        </div> 
+    </div>
+    <div class="layui-form-item">
+      <label class="layui-form-label">备注</label>
+        <div class="layui-input-block" >
+            <textarea placeholder="备注(不超过200字)" name="remarks" class="layui-textarea"></textarea>
+        </div>
+    </div>
+    <div class="layui-form-item" >
+
+        <div class="layui-input-block">
+            <button class="layui-btn" lay-submit="" lay-filter="addhandleAbnormity">确认修改</button>
+            <button class="layui-btn layui-btn-primary">放弃修改</button>
+        </div>
+    </div>
+</form>
+<script type="text/javascript" th:src="@{/static/layui/layui.js}"></script>
+<script type="text/javascript" th:src="@{/static/stock/js/handleAbnormity/handleAbnormityAdd.js}"></script>
+</body>
+</html>

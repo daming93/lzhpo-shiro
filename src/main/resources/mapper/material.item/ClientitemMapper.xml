@@ -27,7 +27,7 @@
 			from 
 			(
 				SELECT
-					*
+					item_id,SUM(available_num) available_num
 				FROM
 					material_item_clientitem c
 				WHERE

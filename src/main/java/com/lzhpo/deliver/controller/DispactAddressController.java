@@ -30,6 +30,7 @@ import com.lzhpo.deliver.entity.DispactAddress;
 import com.lzhpo.deliver.entity.Dispatch;
 import com.lzhpo.deliver.service.IDispactAddressService;
 import com.lzhpo.deliver.service.IDispatchService;
+import com.lzhpo.stock.service.IHandleAbnormityService;
 import com.lzhpo.sys.service.ITerritoryService;
 /**
  * <p>
@@ -47,7 +48,10 @@ public class DispactAddressController {
 
 	@Autowired
     private IDispatchService dispatchService;
- 	
+
+	@Autowired
+    private IHandleAbnormityService handleAbnormityService;
+    
     @Autowired
     UserService userService;
 
@@ -159,6 +163,13 @@ public class DispactAddressController {
         	String proviceName = "";
         	String city = "";
         	String area = "";
+        	if(r.getTableId()!=null){
+        		if(handleAbnormityService.getHandleAbnormityCount(r.getTableId())>0){
+        			r.setIsExistHandleAbnormity(0);//存在
+        		}else{
+        			r.setIsExistHandleAbnormity(1);//不存在处理异常
+        		}
+        	}
         	if(r.getProvinceId()!=null){
         		proviceName = territoryService.getById(r.getProvinceId()).getName();
         	}

@@ -101,7 +101,7 @@ public class TakeoutServiceImpl extends ServiceImpl<TakeoutMapper, Takeout> impl
 		takeout.setSchedulingStatus(scheduling_status_no);
 		baseMapper.insert(takeout);
 
-		Set<TakeoutDetail> detailSet = takeout.getDetailSet();
+		List<TakeoutDetail> detailSet = takeout.getDetailSet();
 
 		for (TakeoutDetail takeoutDetail : detailSet) {
 			// 根据品项找到物料对应的信息

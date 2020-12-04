@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <meta charset="utf-8">
+    <title>拆分单据</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <link rel="stylesheet" th:href="@{/static/layui/css/layui.css}" media="all" />
+    <style type="text/css">
+        .layui-form-item .layui-inline{ min-width:15%; float:left; margin-right:0 }
+        .layui-form-item .receiptBill-box {
+            position: relative;
+        }
+         html, body
+        {
+            width: 100%;
+            height: 70%;
+        }
+    </style>
+</head>
+<body class="childrenBody">
+<form class="layui-form">
+   <input name="id" type="hidden" th:value="${receiptBill.id}">
+    <input name="type" type="hidden" th:value="${type}">
+     <div class="layui-form-item">
+           <div class="layui-inline">
+             <label class="layui-form-label">客户单号</label>
+            <div class="layui-input-block">
+                <input type="text" class="layui-input" disabled  th:value="${receiptBill.takeout.clientCode}">
+            </div>
+        </div> 
+    </div>
+    <div class="layui-form-item">
+           <div class="layui-inline">
+            <label class="layui-form-label">配送单</label>
+            <input type="radio" name="isExistSlip" value="0" title="√" th:checked="${receiptBill.isExistSlip eq 0}">
+            <input type="radio" name="isExistSlip" value="1" title="×" th:checked="${receiptBill.isExistSlip eq 1}">
+        </div> 
+    </div>
+    <div class="layui-form-item">
+           <div class="layui-inline">
+            <label class="layui-form-label">验收单</label>
+            <input type="radio" name="isExistReceipt" value="0" title="√" th:checked="${receiptBill.isExistReceipt eq 0}">
+            <input type="radio" name="isExistReceipt" value="1" title="×" th:checked="${receiptBill.isExistReceipt eq 1}">
+        </div> 
+    </div>
+   <div class="layui-form-item">
+        <div class="layui-inline">
+            <label class="layui-form-label">异常类型</label>
+            <div class="layui-input-block">
+                <select name="abnormityTypeId" id="abnormityTypeId" class="form-control1"  lay-filter="abnormityTypeId" lay-search>
+                    <option value="">请选择</option>
+                    <option th:each="basic:${abnormitytypeList}" th:selected="${receiptBill.abnormityTypeId eq basic.id}" th:value="${basic.id}" lay-verify="required" th:text="${basic.name}"></option>
+                </select>
+
+            </div>
+        </div>
+    </div>
+    <div class="layui-form-item">    
+        <div class="layui-inline">
+            <label class="layui-form-label">异常原因</label>
+            <div class="layui-input-block">
+                <select name="abnormityId" id="abnormityId" class="form-control1"  lay-filter="abnormityId" lay-search>
+                     <option th:value="${receiptBill.abnormityId}" selected th:text="${receiptBill.abnormityName}"></option>
+                </select>
+
+            </div>
+        </div>
+    </div>
+    <div class="layui-form-item">
+      <label class="layui-form-label">备注</label>
+        <div class="layui-input-block" >
+            <textarea placeholder="备注(不超过200字)" name="remarks" th:text="${receiptBill.remarks}" class="layui-textarea"></textarea>
+        </div>
+    </div>
+    <div class="layui-form-item" >
+
+        <div class="layui-input-block">
+            <button class="layui-btn" lay-submit="" lay-filter="editreceiptBill">确认修改</button>
+            <button class="layui-btn layui-btn-primary">放弃修改</button>
+        </div>
+    </div>
+</form>
+<script type="text/javascript" th:src="@{/static/layui/layui.js}"></script>
+<script type="text/javascript" th:src="@{/static/stock/js/receiptBill/receiptBillEdit.js}"></script>
+</body>
+</html>
