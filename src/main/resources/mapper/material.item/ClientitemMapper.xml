@@ -36,7 +36,7 @@
 			) a
 			LEFT JOIN (
 				SELECT
-					item_id,SUM(available_num) available_num
+					 item_id,SUM(available_num) available_num
 				FROM
 					stock_material
 				WHERE
