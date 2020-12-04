@@ -160,11 +160,15 @@ window.viewObj = {
                 var clientId =  $("#clientId").val();// 客户Id
                 if(!number){ 
                     number = 0;
+                }else{
+                    number = parseInt(number);
                 }
                 if(!wholeNumber){
                     wholeNumber = 0;
-                }
+                }else{
                    //验证
+                   wholeNumber = parseInt(wholeNumber);
+                }
                 if(!(/^[0-9]\d*$/.test(number))){
                     layer.msg("请输入正确的零数量！");
                     return;
@@ -198,19 +202,44 @@ window.viewObj = {
                         if(isWhole&&number>sumScatteredNum){
 
                          //如果零数量超了并且 是 整客户 即 不允许拆箱 就直接返回 
-                            layer.msg("该客户正在使用的合同是整出客户，不允许拆零，先零数量超过库存");
+                            layer.msg("该客户正在使用的合同是整出客户，不允许拆零，现在零数量超过库存");
                             return;
                         }
-                        if(isWhole){//零数量合适
+                        if(number<=sumScatteredNum){//零数量合适
                             if(wholeNum>sumWholeNum){
                                 layer.msg("整数量超过库存");
                                 return;
                             }
-                            //在不拆零得情况下怎么做
+                              //在不拆零得情况下怎么做
                             //先看怎么出零得
                             //现在零数量够，应该按批次先出 看 列表中哪些有零数量 记录 其中得下标位置
                             var tempScatteredNum = number; //剩余零数量
                             var tempwholeNumber = wholeNum;
+                        }    
+                        else{
+                            var numZ = zero(wholeNum,number,rateTemp);
+                             if(numZ>sum){
+                                 layer.msg("请输入正确的数量！(不得大于库存数量)");
+                                 return;
+                            }
+                            //拆零就是转换下比例
+                            var needAddWhole = parseInt(number/rateTemp);//取整数就是转换的数字
+
+                            var tempScatteredNum = number%rateTemp; //剩余零数量
+                            var tempwholeNumber = parseInt(wholeNum) +parseInt(needAddWhole) ;
+                            //然后处理原数组 先拆一箱零数出来
+                              for(j = 0,len=oldData.length; j < len; j++) {
+                                   //拆一个整数不为0的箱子出来
+                                    var tempNumber = oldData[ j].wholeNum;//临时行数量
+                                    if(tempNumber>0){
+                                        oldData[ j].wholeNum= oldData[ j].wholeNum-1;
+                                        oldData[ j].scatteredNum = oldData[ j].scatteredNum +parseInt(rateTemp);
+                                        layer.msg("发生拆零行为");
+                                        break;//拆零行为只发生一次
+                                    }
+                              }
+                        }    
+
                             var scatteredArr =  new Array();
                             var wholeArr =  new Array();
                             var wholeDataArr =  new Array();
@@ -266,7 +295,6 @@ window.viewObj = {
                             }
                              var tempAllArr =  array_union(wholeArr, scatteredArr);//组合数组
                              var allArr = new Array();
-                                                          //把这两个数组进行一个组合
                              for(j = 0,len=tempAllArr.length; j < len; j++) {
                                 var arrTemp  ={};
                                 arrTemp.index = tempAllArr[j];
@@ -301,54 +329,55 @@ window.viewObj = {
                                     }    
                                 }
                              }
-                        }else{
-                            var numZ = zero(wholeNum,number,rateTemp);
-                            if(numZ>sum){
-                                layer.msg("请输入正确的数量！(不得大于库存数量)");
-                                return;
-                            }
-                            var tempSum = numZ;//已使用数量
-                            var tempWhole =    wholeNum;
-                            var tempScattnumber =    number;     
-                            var arr = new Array();
-                            for(j = 0,len=oldData.length; j < len; j++) {
-                                var tempNumber = oldData[ j].availableNum;//临时行数量
-                                if(tempSum-tempNumber>=0){//如果大于本行数量
-                                    tempSum = tempSum-tempNumber;
-                                    tempWhole = tempWhole - oldData[ j].wholeNum;
-                                    tempScattnumber = tempScattnumber - oldData[ j].scatteredNum;
-                                    var newRow = oldData[ j];
-                                    newRow.number = newRow.availableNum;
-                                    newRow.batch = newRow.batchNumber;
-                                    newRow.material = newRow.id;//编制格式
-                                    active.addRow(newRow,'takeoutTable');
-                                    arr.push(oldData[j].id);
-                                }else{
-                                    if(tempSum<=0){
-                                        break;
-                                    }
-                                    var newRow = {
-                                         id : oldData[j].id,
-                                         number : tempSum,
-                                         systemCode:oldData[j].systemCode,
-                                         itemName:oldData[j].itemName,
-                                         depot:oldData[j].depot,
-                                         batch:oldData[j].batchNumber,
-                                         rate:oldData[j].rate,
-                                         itemId:oldData[j].itemId,
-                                         material:oldData[j].id,
-                                         wholeNum:tempWhole,
-                                         scatteredNum:tempScattnumber
-                                    }
+                       // }
+                       // else{//需要拆零的情况
+                            // var numZ = zero(wholeNum,number,rateTemp);
+                            // if(numZ>sum){
+                            //     layer.msg("请输入正确的数量！(不得大于库存数量)");
+                            //     return;
+                            // }
+                            // var tempSum = numZ;//已使用数量
+                            // var tempWhole =    wholeNum;
+                            // var tempScattnumber =    number;     
+                            // var arr = new Array();
+                            // for(j = 0,len=oldData.length; j < len; j++) {
+                            //     var tempNumber = oldData[ j].availableNum;//临时行数量
+                            //     if(tempSum-tempNumber>=0){//如果大于本行数量
+                            //         tempSum = tempSum-tempNumber;
+                            //         tempWhole = tempWhole - oldData[ j].wholeNum;
+                            //         tempScattnumber = tempScattnumber - oldData[ j].scatteredNum;
+                            //         var newRow = oldData[ j];
+                            //         newRow.number = newRow.availableNum;
+                            //         newRow.batch = newRow.batchNumber;
+                            //         newRow.material = newRow.id;//编制格式
+                            //         active.addRow(newRow,'takeoutTable');
+                            //         arr.push(oldData[j].id);
+                            //     }else{
+                            //         if(tempSum<=0){
+                            //             break;
+                            //         }
+                            //         var newRow = {
+                            //              id : oldData[j].id,
+                            //              number : tempSum,
+                            //              systemCode:oldData[j].systemCode,
+                            //              itemName:oldData[j].itemName,
+                            //              depot:oldData[j].depot,
+                            //              batch:oldData[j].batchNumber,
+                            //              rate:oldData[j].rate,
+                            //              itemId:oldData[j].itemId,
+                            //              material:oldData[j].id,
+                            //              wholeNum:tempWhole,
+                            //              scatteredNum:tempScattnumber
+                            //         }
                                    
-                                    arr.push(oldData[j].id);
-                                    active.addRow(newRow,'takeoutTable');
-                                    tempSum = -1;
-                                    break;
-                                }
+                            //         arr.push(oldData[j].id);
+                            //         active.addRow(newRow,'takeoutTable');
+                            //         tempSum = -1;
+                            //         break;
+                            //     }
                                
-                            }
-                        }
+                            // }
+                    //    }
                         
                         for(j = 0,len=oldData.length; j < len; j++) {//全部删除 
                             active.removeEmptyTableCache(oldData[0].id,'layTable');

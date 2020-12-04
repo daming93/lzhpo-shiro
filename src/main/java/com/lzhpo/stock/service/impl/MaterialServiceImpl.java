@@ -110,12 +110,14 @@ public class MaterialServiceImpl extends ServiceImpl<MaterialMapper, Material> i
 			throw new RuntimeJsonMappingException("库存数量不足");
 		}else{
 			material.setAvailableNum(num);
-			if(material.getScatteredNum()<scatteredNum){
-				wholeNum+=number/item.getUnitRate()+1;
-				material.setScatteredNum(material.getScatteredNum()+item.getUnitRate());
+			if(material.getScatteredNum()<scatteredNum){//发生了拆零行为
+				material.setWholeNum(material.getWholeNum()-wholeNum-1);
+				material.setScatteredNum(material.getScatteredNum()+item.getUnitRate()-scatteredNum);
+			}else{
+				material.setWholeNum(material.getWholeNum()-wholeNum);
+				material.setScatteredNum(material.getScatteredNum()-scatteredNum);
 			}
-			material.setWholeNum(material.getWholeNum()-wholeNum);
-			material.setScatteredNum(material.getScatteredNum()-scatteredNum);
+		
 			material.setLockCode(material.getLockCode()+number);
 			//返回一个List 其中放着 对应的储位code 和 对应 数量
 			//分配从储位中拿走的数量
