@@ -1,5 +1,6 @@
 package com.lzhpo.stock.service.impl;
 
+import com.lzhpo.common.init.CacheUtils;
 import com.lzhpo.stock.entity.MaterialDepot;
 import com.lzhpo.stock.mapper.MaterialDepotMapper;
 import com.lzhpo.stock.service.IMaterialDepotService;
@@ -117,6 +118,12 @@ public class MaterialDepotServiceImpl extends ServiceImpl<MaterialDepotMapper, M
 	@Override
 	public List<MaterialDepot> getListByMaterialAndNumber(String materialId, Integer number, Integer wholeNum,Integer scatteredNum,String depotCode,Integer rate)
 			throws Exception {
+		//未拆零
+		Integer takeout_detail_split_no = CacheUtils.keyDict.get("takeout_detail_split_no").getValue();
+		
+		//拆零
+		Integer takeout_detail_split_yes = CacheUtils.keyDict.get("takeout_detail_split_yes").getValue();
+		
 		List<MaterialDepot> resultList = new ArrayList<MaterialDepot>();
 		if (depotCode == null) {
 			// 有物料 有数量
@@ -165,11 +172,14 @@ public class MaterialDepotServiceImpl extends ServiceImpl<MaterialDepotMapper, M
 					materialDepot.setScatteredNum(materialDepot.getScatteredNum()+rate- scatteredNum);
 					wholeNum = 0;//制空
 					scatteredSurplus = -1;//需要拆零 第一个就拆了 
+					mDepot.setSpilt(takeout_detail_split_yes);
 				}else if(wholeNumSum>=0){
+					mDepot.setSpilt(takeout_detail_split_no);
 					mDepot.setWholeNum(wholeNum);
 					materialDepot.setWholeNum(wholeNumSum);
 					wholeNum = 0;//制空
 				}else{//这就是不够得时候
+					mDepot.setSpilt(takeout_detail_split_no);
 					mDepot.setWholeNum(materialDepot.getWholeNum());
 					wholeNum = wholeNum - materialDepot.getWholeNum(); // 不够用
 					materialDepot.setWholeNum(0);

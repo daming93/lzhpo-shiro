@@ -47,7 +47,18 @@ public class MaterialDepot extends DataEntity<MaterialDepot> implements Serializ
     @TableField("scattered_num")
     private Integer scatteredNum;
     
+    @TableField(exist=false)
+    private Integer spilt ;//用于标记此单是否拆单
     
+    
+	public Integer getSpilt() {
+		return spilt;
+	}
+
+	public void setSpilt(Integer spilt) {
+		this.spilt = spilt;
+	}
+
 	public Integer getWholeNum() {
 		return wholeNum;
 	}

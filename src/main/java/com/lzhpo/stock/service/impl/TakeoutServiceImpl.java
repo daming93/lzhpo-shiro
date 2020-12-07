@@ -130,6 +130,7 @@ public class TakeoutServiceImpl extends ServiceImpl<TakeoutMapper, Takeout> impl
 					takeoutDetail.setWholeNum(materialDepot.getWholeNum());
 					takeoutDetail.setScatteredNum(materialDepot.getScatteredNum());
 					takeoutDetail.setId(UUID.randomUUID().toString());
+					takeoutDetail.setSplit(materialDepot.getSpilt());
 					takeoutDetailService.save(takeoutDetail);
 				}
 			} catch (RuntimeJsonMappingException e) {
@@ -221,9 +222,16 @@ public class TakeoutServiceImpl extends ServiceImpl<TakeoutMapper, Takeout> impl
 	public void deleteTakeout(Takeout takeoutWeb) {
 		//撤销出库
 		Integer trunover_type_takeout_back = CacheUtils.keyDict.get("trunover_type_takeout_back").getValue();
+		//拆零
+		Integer takeout_detail_split_yes = CacheUtils.keyDict.get("takeout_detail_split_yes").getValue();
 		Takeout takeout = getTakeoutById(takeoutWeb.getId());
 		List<TakeoutDetail> detailSet = takeoutDetailService.selecttakeoutDetailBytakeoutId(takeoutWeb.getId());
 		for (TakeoutDetail takeoutDetail : detailSet) {
+			//看有没有拆单，有拆单就零整转换一下
+			if(takeout_detail_split_yes.equals(takeoutDetail.getSplit())){
+				takeoutDetail.setWholeNum(takeoutDetail.getWholeNum()+1);//返回拆零，就是把（拆零只会拆一箱零数）把一个转换率的零数转成一个整数
+				takeoutDetail.setScatteredNum(takeoutDetail.getScatteredNum()-clientitemService.getById(takeoutDetail.getItemId()).getUnitRate());
+			}
 			// 先加出库存
 			materialSerivice.unlockMaterial(takeoutDetail.getMaterial(), takeoutDetail.getWholeNum(),takeoutDetail.getScatteredNum(),
 					clientitemService.getById(takeoutDetail.getItemId()).getUnitRate());

@@ -163,11 +163,11 @@ window.viewObj = {
                 }else{
                     number = parseInt(number);
                 }
-                if(!wholeNumber){
-                    wholeNumber = 0;
+                if(!wholeNum){
+                    wholeNum = 0;
                 }else{
                    //验证
-                   wholeNumber = parseInt(wholeNumber);
+                   wholeNum = parseInt(wholeNum);
                 }
                 if(!(/^[0-9]\d*$/.test(number))){
                     layer.msg("请输入正确的零数量！");
@@ -216,7 +216,7 @@ window.viewObj = {
                             var tempScatteredNum = number; //剩余零数量
                             var tempwholeNumber = wholeNum;
                         }    
-                        else{
+                        else{//需求零数量超过库存零数量，先进行整零转换，然后与需要库存量比，然后在看是否拆零
                             var numZ = zero(wholeNum,number,rateTemp);
                              if(numZ>sum){
                                  layer.msg("请输入正确的数量！(不得大于库存数量)");
@@ -226,9 +226,12 @@ window.viewObj = {
                             var needAddWhole = parseInt(number/rateTemp);//取整数就是转换的数字
 
                             var tempScatteredNum = number%rateTemp; //剩余零数量
-                            var tempwholeNumber = parseInt(wholeNum) +parseInt(needAddWhole) ;
-                            //然后处理原数组 先拆一箱零数出来
-                              for(j = 0,len=oldData.length; j < len; j++) {
+                            //其实在这部再去看零数够不够用 不够用在拆箱
+                            if(tempScatteredNum>sumScatteredNum){
+                                //这里就是还不够用的样子
+                                var tempwholeNumber = parseInt(wholeNum) +parseInt(needAddWhole) ;
+                                //然后处理原数组 先拆一箱零数出来
+                                for(j = 0,len=oldData.length; j < len; j++) {
                                    //拆一个整数不为0的箱子出来
                                     var tempNumber = oldData[ j].wholeNum;//临时行数量
                                     if(tempNumber>0){
@@ -237,7 +240,11 @@ window.viewObj = {
                                         layer.msg("发生拆零行为");
                                         break;//拆零行为只发生一次
                                     }
-                              }
+                                }
+                            }else{
+                                var tempwholeNumber = needAddWhole;
+                            }
+                            
                         }    
 
                             var scatteredArr =  new Array();
@@ -247,7 +254,6 @@ window.viewObj = {
                             // 然后按此法找到 整数量
                             for(j = 0,len=oldData.length; j < len; j++) {
                                 var tempNumber = oldData[ j].scatteredNum;//临时行数量
-                                
                                 if(tempNumber>0){
                                    if(tempScatteredNum-tempNumber>=0){//如果大于本行数量
                                         var arrScattereStr = {index:j,scatteredNum:tempNumber};
@@ -269,21 +275,21 @@ window.viewObj = {
                                    // break;
                                 }
                             }
-                            for(j = 0,len=oldData.length; j < len; j++) {    
-                                var tempWholeArrNumber = oldData[ j].wholeNum;//临时行数量
+                            for(jk = 0,len=oldData.length; jk < len; jk++) {    
+                                var tempWholeArrNumber = oldData[ jk].wholeNum;//临时行数量
 
                                 if(tempWholeArrNumber>0){
                                     if(tempwholeNumber-tempWholeArrNumber>=0){//如果大于本行数量
-                                        var arrWholeStr = {index:j,wholeNum:tempWholeArrNumber};
-                                        wholeArr.push(j);
+                                        var arrWholeStr = {index:jk,wholeNum:tempWholeArrNumber};
+                                        wholeArr.push(jk);
                                         wholeDataArr.push(arrWholeStr);
                                         tempwholeNumber = tempwholeNumber - tempWholeArrNumber;
                                     }else{
                                         if(tempwholeNumber<=0){
                                             break;
                                         }else{
-                                            var arrWholeStr = {index:j,wholeNum:tempwholeNumber};
-                                            wholeArr.push(j);
+                                            var arrWholeStr = {index:jk,wholeNum:tempwholeNumber};
+                                            wholeArr.push(jk);
                                             wholeDataArr.push(arrWholeStr);
                                             break;
                                         } 
@@ -496,7 +502,7 @@ window.viewObj = {
                     ]],
                     done: function(res, curr, count){
                         if(count>0){
-                            rateTemp = res.data[0].rate;
+                            rateTemp = parseInt(res.data[0].rate);
                             var systemCode = res.data[0].systemCode;
                             var oldData = table.cache['takeoutTable'];  
                             for(var i=oldData.length-1, row; i >=0; i--){

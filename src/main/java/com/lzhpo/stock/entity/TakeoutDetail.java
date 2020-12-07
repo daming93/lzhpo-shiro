@@ -107,9 +107,21 @@ public class TakeoutDetail extends DataEntity<TakeoutDetail> implements Serializ
     @TableField("scattered_num")
     private Integer scatteredNum;
     
+    /**
+     * 0(未拆零)1(已拆)
+     */
+    private Integer split;//这里的用处是在撤销单据的时候还原拆零这一项
     
     
     
+	public Integer getSplit() {
+		return split;
+	}
+
+	public void setSplit(Integer split) {
+		this.split = split;
+	}
+
 	public Integer getMaxWholeNumber() {
 		return maxWholeNumber;
 	}
