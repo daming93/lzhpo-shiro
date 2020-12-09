@@ -173,6 +173,21 @@ layui.use('laydate', function(){
         var loadIndex = layer.load(2, {
             shade: [0.3, '#333']
         });
+         //这里验证 如果不是调账 其他就是必填项
+        if($("#adjustment").val()!=1){
+            if(!$("#transportationType").val()){
+                layer.msg("收入类型必填");
+                return false;
+            }
+            if(!$("#deliverType").val()){
+                layer.msg("配送类型必填");
+                return false;
+            }
+            if(!$("#addressId").val()){
+                layer.msg("配送地址必填");
+                return false;
+            }
+        }
         $.ajax({
             type:"POST",
             url:"/stock/takeout/edit",

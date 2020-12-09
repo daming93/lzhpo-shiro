@@ -78,12 +78,12 @@
                 <input type="text" class="layui-input" value="1.00" id="transportationTypeHoliday"  name="transportationTypeHoliday" lay-verify="number" placeholder="请输入节日倍率">
             </div> 
         </div>
-        <div class="layui-inline">
+        <!-- <div class="layui-inline">
             <label class="layui-form-label">托运倍率</label>
             <div class="layui-input-block">
-                <input type="text" class="layui-input" value="1.00" id="transportationTypeConsign"  name="transportationTypeConsign" lay-verify="number" placeholder="请输入节日倍率">
+                <input type="text" class="layui-input" value="1.00" id="transportationTypeConsign"  name="transportationTypeConsign" lay-verify="number" placeholder="请输入托运倍率">
             </div> 
-        </div>
+        </div> -->
     </div>
     <div class="layui-inline">
         <div class="layui-inline">
@@ -128,7 +128,15 @@
                 </select>
             </div> 
         </div>
-      
+        <div class="layui-inline">
+            <label class="layui-form-label">收入方式</label>
+                     <div class="layui-input-block">
+                        <select name="moneyType" id="moneyType" class="form-control1"  lay-filter="moneyType" lay-search>
+                            <option value="">请选择</option>
+                            <option th:each="basic:${moneyType}"  th:value="${basic.value}" th:text="${basic.name}"></option>
+                        </select>
+                    </div> 
+         </div>
     </div>
      <div class="layui-form-item">
             <div class="layui-inline">
@@ -144,7 +152,7 @@
                     </div> 
          </div>
          <div class="layui-inline">
-            <label class="layui-form-label">单价</label>
+            <label class="layui-form-label">金额</label>
                      <div class="layui-input-block">
                         <input type="text" class="layui-input layTime" lay-filter="number" id="number"   placeholder="请输入">
                     </div> 

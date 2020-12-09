@@ -132,6 +132,68 @@ layui.use(['form','jquery','table','layer'],function(){
                     }
                 });
             }
+            if(obj.event === 'lookAbnormity'){
+                var editIndex = layer.open({
+                    title : "查看异常",
+                       type : 2,
+                    offset: 'rt',
+                    area: ['410px','800px'],
+                    content : "/stock/handleAbnormity/edit?id="+data.handleAbnormity.id,
+                    success : function(layero, index){
+                        setTimeout(function(){
+                            layer.tips('点击此处返回路单列表', '.layui-layer-setwin .layui-layer-close', {
+                                tips: 3
+                            });
+                        },500);
+                    }
+                });
+            }
+            if(obj.event === 'editAbnormity'){
+                var editIndex = layer.open({
+                    title : "审核异常",
+                       type : 2,
+                    offset: 'rt',
+                    area: ['410px','800px'],
+                    content : "/stock/handleAbnormity/edit?id="+data.handleAbnormity.id,
+                    success : function(layero, index){
+                        setTimeout(function(){
+                            layer.tips('点击此处返回路单列表', '.layui-layer-setwin .layui-layer-close', {
+                                tips: 3
+                            });
+                        },500);
+                    }
+                });
+            }
+            if(obj.event === "back"){
+                layer.confirm("你确定要退回该异常吗？",{btn:['是的,我确定','我再想想']},
+                    function(){
+                        $.post("/stock/handleAbnormity/back",{"id":data.handleAbnormity.id},function (res){
+                            if(res.success){
+                                layer.msg("退回成功",{time: 1000},function(){
+                                    table.reload('billTable', t);
+                                });
+                            }else{
+                                layer.msg(res.message);
+                            }
+                        });
+                    }
+                )
+            }
+             if(obj.event === "delete"){
+                layer.confirm("你确定要删除该异常吗？",{btn:['是的,我确定','我再想想']},
+                    function(){
+                        $.post("/stock/handleAbnormity/delete",{"id":data.handleAbnormity.id},function (res){
+                            if(res.success){
+                                layer.msg("退回成功",{time: 1000},function(){
+                                    table.reload('billTable', t);
+                                });
+                            }else{
+                                layer.msg(res.message);
+                            }
+                        });
+                    }
+                )
+            }
         });
 
 

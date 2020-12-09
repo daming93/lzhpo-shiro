@@ -53,7 +53,35 @@
             <div id="billTableRes" class="table-overlay">
                 <table id="billTable"  lay-data="{id: 'billTable'}" lay-filter="billTable" class="layui-table"></table>
                     <script type="text/html" id="billBar">
+                        <shiro:hasPermission name="stock:handleAbnormity:add">
+                        {{# if (d.isExistHandleAbnormity==1){ }}
                         <a class="layui-btn layui-btn-xs" lay-event="handleAbnormity">异常</a>
+                        {{# } }}
+                        </shiro:hasPermission>
+                         {{# if (d.isExistHandleAbnormity==0){ }}
+                        <a class="layui-btn layui-btn-xs" lay-event="lookAbnormity">查看</a>
+                        {{# } }}
+                        <shiro:hasPermission name="stock:handleAbnormity:edit">
+                        {{# if (d.isExistHandleAbnormity==0){ }}
+                            {{# if (d.handleAbnormity.auditStatus == 0){ }}
+                            <a class="layui-btn layui-btn-xs layui-btn-danger" lay-event="editAbnormity">审核</a>
+                            {{# } }}
+                        {{# } }}
+                        </shiro:hasPermission>
+                        <shiro:hasPermission name="stock:handleAbnormity:back">
+                        {{# if (d.isExistHandleAbnormity==0){ }}
+                            {{# if (d.handleAbnormity.auditStatus == 1){ }}
+                        <a class="layui-btn layui-btn-xs layui-btn-danger" lay-event="back">退回异常</a>
+                            {{# } }}
+                        {{# } }}
+                        </shiro:hasPermission>
+                        <shiro:hasPermission name="stock:handleAbnormity:delete">
+                        {{# if (d.isExistHandleAbnormity==0){ }}
+                            {{# if (d.handleAbnormity.auditStatus == 0){ }}
+                            <a class="layui-btn layui-btn-xs layui-btn-danger" lay-event="delete">删除</a>
+                            {{# } }}
+                        {{# } }}
+                        </shiro:hasPermission>
                     </script>
             </div>
 

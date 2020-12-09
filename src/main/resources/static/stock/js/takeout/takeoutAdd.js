@@ -521,10 +521,31 @@ window.viewObj = {
             }
         });
        form.on('select(adjustment)', function(data){
-               $("#transportationType").parent().find('input:first').click();
-               $("#transportationType").parent().find('input:first').focus();
+            if(data.value==1){
+                //如果是调账
+                 $('#transportationType').attr('disabled', 'disabled'); 
+                 $('#deliverType').attr('disabled', 'disabled'); 
+                 $('#addressId').attr('disabled', 'disabled'); 
+                 form.render('select'); 
+                 $("#transportationType").parent().find('input:first').click();
+                 $("#transportationType").parent().find('input:first').focus(); 
+                 $("#itemId").parent().find('input:first').click();
+                $("#itemId").parent().find('input:first').focus();
+            }else{
+                $('#transportationType').removeAttr("disabled");
+                $('#deliverType').removeAttr("disabled");
+                $('#addressId').removeAttr("disabled");
+                form.render('select');
+                $("#transportationType").parent().find('input:first').click();
+                $("#transportationType").parent().find('input:first').focus(); 
+            }
+               
         });
         form.on('select(transportationType)', function(data){
+               $("#deliverType").parent().find('input:first').click();
+               $("#deliverType").parent().find('input:first').focus();
+        });
+         form.on('select(deliverType)', function(data){
                $("#addressId").parent().find('input:first').click();
                $("#addressId").parent().find('input:first').focus();
         });
@@ -593,6 +614,22 @@ window.viewObj = {
         setTimeout(function(){ //无论是坏都要改状态
                     submitFlag = true;
                 },1000);
+        //这里验证 如果不是调账 其他就是必填项
+        if($("#adjustment").val()!=1){
+            if(!$("#transportationType").val()){
+                layer.msg("收入类型必填");
+                return false;
+            }
+            if(!$("#deliverType").val()){
+                layer.msg("配送类型必填");
+                return false;
+            }
+            if(!$("#addressId").val()){
+                layer.msg("配送地址必填");
+                return false;
+            }
+        }
+
         data.field.detailSet = table.cache['takeoutTable'];  
         var loadIndex = layer.load(2, {
             shade: [0.3, '#333']

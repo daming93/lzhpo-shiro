@@ -190,6 +190,7 @@ public class DeliverContractMainController {
 		modelMap.put("provinceList", territoryService.list(query));
 		modelMap.put("clientList", basicdataService.selectAll());
 		modelMap.put("freightType", CacheUtils.allDicts.get("freight_type"));
+		modelMap.put("moneyType", CacheUtils.allDicts.get("money_type"));
 		return "client/deliverContractMain/addDeliverContractMain";
 	}
 
@@ -252,6 +253,7 @@ public class DeliverContractMainController {
 		modelMap.put("provinceList", territoryService.list(query));
 		modelMap.put("clientList", basicdataService.selectAll());
 		modelMap.put("freightType", CacheUtils.allDicts.get("freight_type"));
+		modelMap.put("moneyType", CacheUtils.allDicts.get("money_type"));
 		return "client/deliverContractMain/editDeliverContractMain";
 	}
 

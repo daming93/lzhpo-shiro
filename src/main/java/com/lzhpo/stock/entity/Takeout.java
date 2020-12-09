@@ -95,6 +95,13 @@ public class Takeout extends DataEntity<Takeout> implements Serializable {
     private Integer number;
 
     /**
+     * 配送类型 //0市内 1 外阜 2自提
+     */
+    @TableField("deliver_type")
+    private Integer deliverType;
+
+    
+    /**
      * 实际数量
      */
     @TableField("actual_amount")
@@ -128,7 +135,7 @@ public class Takeout extends DataEntity<Takeout> implements Serializable {
     private Integer towStatus;
 
     /**
-     * 运输方式（1正常2加急3节假日4自提5外埠6托运）
+     * 运输方式（1正常2加急3节假日）
      */
     @TableField("transportation_type")
     private Integer transportationType;
@@ -212,9 +219,14 @@ public class Takeout extends DataEntity<Takeout> implements Serializable {
      */
     private Integer split;
     
-    
-    
-    
+	public Integer getDeliverType() {
+		return deliverType;
+	}
+
+	public void setDeliverType(Integer deliverType) {
+		this.deliverType = deliverType;
+	}
+
 	public String getTransportationTypeStr() {
 		return transportationTypeStr;
 	}

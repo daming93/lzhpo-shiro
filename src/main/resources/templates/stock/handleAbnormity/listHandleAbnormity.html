@@ -20,89 +20,38 @@
     <div class="layui-field-box">
         <form class="layui-form">
             <div class="layui-inline" style="width: 15%">
-                <input type="text" value="" name="s_key" placeholder="可以输入登录名/邮箱/手机号" class="layui-input search_input">
-            </div>
-            <div class="layui-input-inline">
-                <select name="s_type">
-                    <option value="">用户类型</option>
-                    <option value="stock">后台用户</option>
-                    <option value="page">前台用户</option>
-                </select>
+                <input type="text" value="" name="s_key" placeholder="客户单号" class="layui-input search_input">
             </div>
             <div class="layui-inline">
                 <a class="layui-btn" lay-submit="" lay-filter="searchForm">查询</a>
             </div>
-            <shiro:hasPermission name="stock:receiptBill:add">
-            <div class="layui-inline">
-                <a class="layui-btn layui-btn-normal" data-type="addreceiptBill">添加用户</a>
-            </div>
-            </shiro:hasPermission>
-            <shiro:hasPermission name="stock:receiptBill:delete">
-            <div class="layui-inline">
-                <a class="layui-btn layui-btn-danger" data-type="deleteSome">批量删除</a>
-            </div>
-            </shiro:hasPermission>
         </form>
     </div>
 </fieldset>
-<div class="layui-form receiptBills_list">
-    <table class="layui-table" id="receiptBillTable" lay-filter="receiptBillList"></table>
-
-    <script type="text/html" id="isExistSlip">
-        {{#  if(d.isExistSlip == 0){ }}
-        <span class="layui-badge layui-bg-green">√</span>
-        {{#  } else { }}
-        <span class="layui-badge layui-bg-gray">×</span>
-        {{#  } }}
-    </script>
-
-   <script type="text/html" id="isExistReceipt">
-        {{#  if(d.isExistReceipt == 0){ }}
-        <span class="layui-badge layui-bg-green">√</span>
-        {{#  } else { }}
-        <span class="layui-badge layui-bg-gray">×</span>
-        {{#  } }}
-    </script>
-
-    <script type="text/html" id="isExistBack">
-        {{#  if(d.isExistBack == 0){ }}
-        <span class="layui-badge layui-bg-green">√</span>
-        {{#  } else { }}
-        <span class="layui-badge layui-bg-gray">×</span>
-        {{#  } }}
-    </script>
-
-    <script type="text/html" id="receiptBillBar">
-        <shiro:hasPermission name="stock:receiptBill:fristEdit">
-        {{#  if(d.receiptStatus == 1){ }}
-        <a class="layui-btn layui-btn-xs" lay-event="fristEdit">调度确认</a>
-        {{#  } }}
-        </shiro:hasPermission>
-        <shiro:hasPermission name="stock:receiptBill:finalEdit">
-        {{#  if(d.receiptStatus == 2){ }}
-        <a class="layui-btn layui-btn-xs" lay-event="finalEdit">营管确认</a>
-        {{#  } }}
-        </shiro:hasPermission>
-        <shiro:hasPermission name="stock:receiptBill:fristBack">
-        {{#  if(d.receiptStatus == 2){ }}
-        <a class="layui-btn layui-btn-xs" lay-event="fristBack">调度撤销</a>
-        {{#  } }}
-        </shiro:hasPermission>
-         <shiro:hasPermission name="stock:receiptBill:finalBack">
-        {{#  if(d.receiptStatus == 3){ }}
-        <a class="layui-btn layui-btn-xs" lay-event="finalBack">营管撤销</a>
-        {{#  } }}
-        </shiro:hasPermission>
-        <shiro:hasPermission name="stock:receiptBill:addBack">
-        {{#  if(d.isExistBack == 0){ }}
-        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="addBack">添加退单</a>
-        {{#  } }}
-        </shiro:hasPermission>
+<div class="layui-form handleAbnormitys_list">
+    <table class="layui-table" id="handleAbnormityTable" lay-filter="handleAbnormityList"></table>
+    <script type="text/html" id="handleAbnormityBar">
+                        <a class="layui-btn layui-btn-xs" lay-event="lookAbnormity">查看</a>
+                        <shiro:hasPermission name="stock:handleAbnormity:edit">
+                            {{# if (d.auditStatus == 0){ }}
+                            <a class="layui-btn layui-btn-xs layui-btn-warm" lay-event="editAbnormity">审核</a>
+                            {{# } }}
+                        </shiro:hasPermission>
+                        <shiro:hasPermission name="stock:handleAbnormity:back">
+                            {{# if (d.auditStatus == 1){ }}
+                        <a class="layui-btn layui-btn-xs layui-btn-danger" lay-event="back">退回异常</a>
+                            {{# } }}
+                        </shiro:hasPermission>
+                        <shiro:hasPermission name="stock:handleAbnormity:delete">
+                            {{# if (d.auditStatus == 0){ }}
+                            <a class="layui-btn layui-btn-xs layui-btn-danger" lay-event="delete">删除</a>
+                            {{# } }}
+                        </shiro:hasPermission>
     </script>
 </div>
 <div id="page"></div>
 <script type="text/javascript" th:src="@{/static/layui/layui.js}"></script>
 <script type="text/javascript" th:src="@{/static/admin/js/tools.js}"></script>
-<script type="text/javascript" th:src="@{/static/stock/js/receiptBill/receiptBillList.js}"></script>
+<script type="text/javascript" th:src="@{/static/stock/js/handleAbnormity/handleAbnormityList.js}"></script>
 </body>
 </html>

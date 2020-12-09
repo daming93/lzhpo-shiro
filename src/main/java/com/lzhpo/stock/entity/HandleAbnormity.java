@@ -4,12 +4,16 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.time.LocalDateTime;
+
+import org.springframework.web.jsf.FacesContextUtils;
+
 import com.baomidou.mybatisplus.annotation.TableField;
 import java.io.Serializable;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 import com.lzhpo.common.base.DataEntity;
+import com.lzhpo.deliver.entity.WayBill;
 /**
  * <p>
  * 异常处理表
@@ -96,6 +100,28 @@ public class HandleAbnormity extends DataEntity<HandleAbnormity> implements Seri
 
     @TableField("abnormity_name")
     private String abnormityName;
+
+    @TableField(exist=false)
+    private Takeout takeout;
+    
+    @TableField(exist=false)
+    private WayBill wayBill;
+    
+	public Takeout getTakeout() {
+		return takeout;
+	}
+
+	public void setTakeout(Takeout takeout) {
+		this.takeout = takeout;
+	}
+
+	public WayBill getWayBill() {
+		return wayBill;
+	}
+
+	public void setWayBill(WayBill wayBill) {
+		this.wayBill = wayBill;
+	}
 
 	public String getWayBillId() {
 		return wayBillId;

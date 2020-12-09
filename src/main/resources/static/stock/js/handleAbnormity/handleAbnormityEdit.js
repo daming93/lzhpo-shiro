@@ -28,7 +28,7 @@ layui.use(['form','jquery','layer'],function(){
             $("#excptionName").val(data.elem[data.elem.selectedIndex].text);
         });
    
-    form.on("submit(addhandleAbnormity)",function(data){
+    form.on("submit(edithandleAbnormity)",function(data){
      
         var loadIndex = layer.load(2, {
             shade: [0.3, '#333']
@@ -40,8 +40,7 @@ layui.use(['form','jquery','layer'],function(){
             contentType:"application/json",
             data:JSON.stringify(data.field),
             success:function(res){
-                layer.close(loadIndex);
-                if(res.success){
+                 if(res.success){
                     parent.layer.msg("编辑成功！",{time:1000},function(){
                         //刷新父页面
                         parent.location.reload();

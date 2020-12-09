@@ -82,8 +82,12 @@ window.viewObj = {
              });
    
         });
-         form.on('select(countiesId)', function(data){
-             $("#minNumber").focus();
+        form.on('select(countiesId)', function(data){
+             $("#moneyType").parent().find('input:first').click();
+             $("#moneyType").parent().find('input:first').focus();
+        }); 
+         form.on('select(moneyType)', function(data){
+            $("#minNumber").focus(); 
         }); 
         $("#minNumber").keypress(function(e) {
             if (e.which == 13) {
@@ -136,6 +140,8 @@ window.viewObj = {
                     { field:'provinceName',title:'省',align:'center',width:100},
                     { field:'cityName',title:'市',align:'center',width:100},
                     { field:'areaName',title:'区',align:'center',width:100},
+                    { field:'moneyType',title:'收入方式值',align:'center',hide:true,width:100},
+                    { field:'moneyTypeName',title:'收入方式',align:'center',width:100},
                     { field:'minNumber',title:'最小值',align:'center',width:100},
                     { field:'maxNumber',title:'最大值',align:'center',width:100},
                     { field:'money',title:'单价',align:'center',width:100},
@@ -171,6 +177,8 @@ window.viewObj = {
                 var money = $("#number").val().trim();
                 var type = $("#detailType").val();
                 var typeName = $("#detailType").find("option:selected").text();
+                var moneyType = $("#moneyType").val();
+                var moneyTypeName = $("#moneyType").find("option:selected").text();
                 //验证
                 if(!( /^\d+(\.\d{0,2})?$/.test(minNumber))){
                     layer.msg("请输入正确最小值！(两位小数)");
@@ -193,7 +201,10 @@ window.viewObj = {
                     layer.msg("请选择类型！");
                     return;
                 }
-            
+                if(!moneyType){
+                    layer.msg("请选择收入方式！");
+                    return;
+                }
                 var newRow = {
                     provinceId:provinceId,
                     provinceName:provinceName,
@@ -205,6 +216,8 @@ window.viewObj = {
                     maxNumber:maxNumber,
                     type:type,
                     typeName:typeName,
+                    moneyType:moneyType,
+                    moneyTypeName:moneyTypeName,
                     money:money //合计
                 };
                 oldData.push(newRow);

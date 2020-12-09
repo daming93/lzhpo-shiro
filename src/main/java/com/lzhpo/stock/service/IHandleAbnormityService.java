@@ -35,6 +35,8 @@ public interface IHandleAbnormityService extends IService<HandleAbnormity> {
 	//撤销审核
 	void backAudit(String id);
 
+	HandleAbnormity getHandleAbnormityByTakeoutId(String tableId);
 	
-	
+	//获取满足某个条件的记录 以便不插入重复记录
+	long getHandleAbnormityCountBywaybillId(String waybillId);
 }

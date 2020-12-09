@@ -73,6 +73,12 @@ public class DeliverContractMainDetail extends DataEntity<DeliverContractMainDet
     private Integer consultType;
 
     /**
+     * 结算类型(0单价 1 固收）
+     */
+    @TableField("money_type")
+    private Integer moneyType;
+    
+    /**
      * 合同Id(主表id)
      */
     @TableField("contract_id")
@@ -90,7 +96,11 @@ public class DeliverContractMainDetail extends DataEntity<DeliverContractMainDet
     @TableField("type_name")
     private String typeName;
     
-    
+    /**
+     * 类型名
+     */
+    @TableField("money_type_name")
+    private String moneyTypeName;
     
     @TableField(exist=false)
     private String provinceName;
@@ -102,6 +112,23 @@ public class DeliverContractMainDetail extends DataEntity<DeliverContractMainDet
     private String areaName;
     
     
+    
+	public Integer getMoneyType() {
+		return moneyType;
+	}
+
+	public void setMoneyType(Integer moneyType) {
+		this.moneyType = moneyType;
+	}
+
+	public String getMoneyTypeName() {
+		return moneyTypeName;
+	}
+
+	public void setMoneyTypeName(String moneyTypeName) {
+		this.moneyTypeName = moneyTypeName;
+	}
+
 	public String getProvinceName() {
 		return provinceName;
 	}

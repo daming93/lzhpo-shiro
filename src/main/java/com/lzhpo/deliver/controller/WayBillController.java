@@ -35,6 +35,7 @@ import com.lzhpo.deliver.entity.WayBill;
 import com.lzhpo.deliver.service.IWayBillService;
 import com.lzhpo.finance.service.ITableService;
 import com.lzhpo.finance.service.IUserTableService;
+import com.lzhpo.stock.service.IHandleAbnormityService;
 import com.lzhpo.sys.service.IUserSettingService;
 /**
  * <p>
@@ -61,6 +62,9 @@ public class WayBillController {
 	
 	@Autowired
     private ITableService tableService;
+	
+	@Autowired
+	private IHandleAbnormityService handleAbnormityService;
     @GetMapping(value = "list")
     public String list(ModelMap modelMap){
     	// 自定义附表
@@ -171,6 +175,9 @@ public class WayBillController {
         if(StringUtils.isBlank(id)){
             return ResponseEntity.failure("角色ID不能为空");
         }
+        if(handleAbnormityService.getHandleAbnormityCountBywaybillId(id)>0){
+            return ResponseEntity.failure("该单据存在异常,不能解散");
+        }
         WayBill wayBill = wayBillService.getWayBillById(id);
         wayBillService.deleteWayBill(wayBill);
         return ResponseEntity.success("操作成功");
@@ -183,6 +190,11 @@ public class WayBillController {
     public ResponseEntity deleteSome(@RequestBody List<WayBill> wayBills){
         if(wayBills == null || wayBills.size()==0){
             return ResponseEntity.failure("请选择需要删除的角色");
+        }
+        for (WayBill r : wayBills){
+        	if(handleAbnormityService.getHandleAbnormityCountBywaybillId(r.getId())>0){
+                return ResponseEntity.failure("该单据("+r.getCode()+")存在异常,不能解散");
+            }
         }
         for (WayBill r : wayBills){
             wayBillService.deleteWayBill(r);

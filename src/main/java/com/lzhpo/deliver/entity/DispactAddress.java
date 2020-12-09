@@ -7,6 +7,7 @@ import java.time.LocalDate;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.lzhpo.common.base.DataEntity;
+import com.lzhpo.stock.entity.HandleAbnormity;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -125,7 +126,29 @@ public class DispactAddress extends DataEntity<DispactAddress> implements Serial
     @TableField(exist=false)
     private  Integer isExistHandleAbnormity;//0 存在 1不存在
     
+    @TableField(exist=false)
+    private  String handleAbnormityId;
     
+    @TableField(exist=false)
+    private HandleAbnormity handleAbnormity;
+    
+	public String getHandleAbnormityId() {
+		return handleAbnormityId;
+	}
+	public void setHandleAbnormityId(String handleAbnormityId) {
+		this.handleAbnormityId = handleAbnormityId;
+	}
+
+
+	public HandleAbnormity getHandleAbnormity() {
+		return handleAbnormity;
+	}
+
+
+	public void setHandleAbnormity(HandleAbnormity handleAbnormity) {
+		this.handleAbnormity = handleAbnormity;
+	}
+
 	public Integer getIsExistHandleAbnormity() {
 		return isExistHandleAbnormity;
 	}

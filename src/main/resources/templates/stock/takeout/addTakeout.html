@@ -83,11 +83,20 @@
             </div>  
         </div>
         <div class="layui-inline">
-            <label class="layui-form-label">运输方式</label>
+            <label class="layui-form-label">收入类型</label>
             <div class="layui-input-block">
                 <select name="transportationType" id="transportationType" class="form-control1" lay-verify="" lay-filter="transportationType" lay-search>
-                    <option value="">请选择运输方式</option>
+                    <option value="">请选择收入类型</option>
                     <option th:each="basic:${transportationTypeList}" th:value="${basic.value}" lay-verify="required" th:text="${basic.name}"></option>
+                </select>
+            </div>  
+        </div>
+        <div class="layui-inline">
+            <label class="layui-form-label">配送类型</label>
+            <div class="layui-input-block">
+                <select name="deliverType" id="deliverType" class="form-control1" lay-verify="" lay-filter="deliverType" lay-search>
+                    <option value="">请选择配送类型</option>
+                    <option th:each="basic:${deliverTypeList}" th:value="${basic.value}" lay-verify="required" th:text="${basic.name}"></option>
                 </select>
             </div>  
         </div>
@@ -199,8 +208,7 @@
 <script type="text/javascript" th:src="@{/static/layui/js/jquery-1.10.2.min.js}">
  
 </script>
-<script type="text/javascript" th:src="@{/static/layui/js/initials.js}"></script>
-<script type="text/javascript" th:src="@{/static/layui/js/pinyin.js}"></script>
+
 <script type="text/javascript">
     $(function(){
        

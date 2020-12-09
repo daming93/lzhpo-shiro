@@ -166,6 +166,7 @@ public class DispactAddressController {
         	if(r.getTableId()!=null){
         		if(handleAbnormityService.getHandleAbnormityCount(r.getTableId())>0){
         			r.setIsExistHandleAbnormity(0);//存在
+        			r.setHandleAbnormity(handleAbnormityService.getHandleAbnormityByTakeoutId(r.getTableId()));
         		}else{
         			r.setIsExistHandleAbnormity(1);//不存在处理异常
         		}

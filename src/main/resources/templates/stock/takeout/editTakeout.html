@@ -79,25 +79,28 @@
         </div>
     </div>
  <div class="layui-form-item">
-        <div class="layui-inline">
-            <label class="layui-form-label">系统单号</label>
+    <div class="layui-inline">
+            <label class="layui-form-label">收入类型</label>
             <div class="layui-input-block">
-                <input type="text" class="layui-input" disabled th:value="${takeout.code}" id="code" name="code" lay-verify="required" placeholder="请输入系统单号"  >
+                <select name="transportationType" id="transportationType" th:disabled="${takeout.adjustment eq 1}" class="form-control1"  lay-filter="transportationType" lay-search>
+                    <option value="">请选择收入类型</option>
+                    <option th:each="basic:${transportationTypeList}" th:selected="${takeout.transportationType eq basic.value}" th:value="${basic.value}" lay-verify="required" th:text="${basic.name}"></option>
+                </select>
             </div>  
         </div>
-     <div class="layui-inline">
-            <label class="layui-form-label">运输方式</label>
+         <div class="layui-inline">
+            <label class="layui-form-label">配送类型</label>
             <div class="layui-input-block">
-                <select name="transportationType" id="transportationType" class="form-control1" lay-verify="required" lay-filter="transportationType" lay-search>
-                    <option value="">请选择运输方式</option>
-                    <option th:each="basic:${transportationTypeList}" th:selected="${takeout.transportationType eq basic.value}" th:value="${basic.value}" lay-verify="required" th:text="${basic.name}"></option>
+                <select name="deliverType" id="deliverType" class="form-control1"  th:disabled="${takeout.adjustment eq 1}"lay-verify="" lay-filter="deliverType" lay-search>
+                    <option value="">请选择配送类型</option>
+                    <option th:each="basic:${deliverTypeList}"  th:selected="${takeout.deliverType eq basic.value}" th:value="${basic.value}" lay-verify="required" th:text="${basic.name}"></option>
                 </select>
             </div>  
         </div>
          <div class="layui-inline">
             <label class="layui-form-label">配送地址</label>
             <div class="layui-input-block">
-                <select name="addressId" id="addressId" class="form-control1" lay-verify="required" lay-filter="addressId" lay-search>
+                <select name="addressId" id="addressId" class="form-control1" th:disabled="${takeout.adjustment eq 1}" lay-filter="addressId" lay-search>
                     <option value="">请选择配送地址</option>
                     <option th:each="basic:${addressList}"  th:selected="${takeout.addressId eq basic.id}"th:value="${basic.id}"  lay-verify="required" th:text="${basic.addressName}"></option>
                 </select>
@@ -109,7 +112,15 @@
                 <input type="text" class="layui-input layTime" id="deliveryTime"  th:value="${takeout.deliveryTime}"  name="deliveryTime" lay-verify="required" placeholder="请输入配送时间">
             </div>
         </div>
-    </div>    
+    </div> 
+ <div class="layui-form-item">
+        <div class="layui-inline">
+            <label class="layui-form-label">系统单号</label>
+            <div class="layui-input-block">
+                <input type="text" class="layui-input" disabled th:value="${takeout.code}" id="code" name="code" lay-verify="required" placeholder="请输入系统单号"  >
+            </div>  
+        </div>
+</div>              
  <div class="layui-form-item">
     <section class="layui-col-md10" style="margin: 0 auto; float: none;">
     <div class="layui-card">

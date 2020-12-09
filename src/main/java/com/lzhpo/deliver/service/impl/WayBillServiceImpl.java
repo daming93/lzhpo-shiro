@@ -93,6 +93,12 @@ public class WayBillServiceImpl extends ServiceImpl<WayBillMapper, WayBill> impl
     @Transactional(rollbackFor = Exception.class)
     @CacheEvict(value = "WayBills", allEntries = true)
     public WayBill saveWayBill( List<Dispatch> dispatchs) {
+    	Integer freight_type_number =  CacheUtils.keyDict.get("freight_type_number").getValue();
+		Integer freight_type_volume =  CacheUtils.keyDict.get("freight_type_volume").getValue();
+		Integer freight_type_weight =  CacheUtils.keyDict.get("freight_type_weight").getValue();
+		Integer freight_type_salesvolume =  CacheUtils.keyDict.get("freight_type_salesvolume").getValue();
+		Integer money_type_regular =  CacheUtils.keyDict.get("money_type_regular").getValue();//固收
+		Integer money_type_unit =  CacheUtils.keyDict.get("money_type_unit").getValue();//单价
     	String clientDeliverIncome = "4c089061ca5243fd97f02213015d44e9";//客户运费 预设
     	WayBill wayBill =  new WayBill();
     	//现在我们需要知道得是很多总和 和 平均值
@@ -148,13 +154,10 @@ public class WayBillServiceImpl extends ServiceImpl<WayBillMapper, WayBill> impl
     		DeliverContractMain mainContract = deliverContractMainService.getById(main);
     		//由于不知道采取的是什么类型的计费方式，所以我们要把重件方货值都拿出来去找，找到为止，找不到提醒用户无改范围的报价
     		//件数
-    		Integer freight_type_number =  CacheUtils.keyDict.get("freight_type_number").getValue();
-    		
+    	
     		DeliverContractMainDetail detail = deliverContractMainDetailService//这个range 是要求类型的 type //件数先按总数来
     				.selectDetailMoneyByInfo(main, address.getProvinceId(), address.getCityId(), address.getCountiesId(), takeout.getTotal(),freight_type_number);
-    		Integer freight_type_volume =  CacheUtils.keyDict.get("freight_type_volume").getValue();
-    		Integer freight_type_weight =  CacheUtils.keyDict.get("freight_type_weight").getValue();
-    		Integer freight_type_salesvolume =  CacheUtils.keyDict.get("freight_type_salesvolume").getValue();
+    		
     		if(detail==null){//没找到件数 找体积
     			detail = deliverContractMainDetailService
         				.selectDetailMoneyByInfo(main, address.getProvinceId(), address.getCityId(), address.getCountiesId(), takeout.getVolume(),freight_type_volume);
@@ -178,7 +181,7 @@ public class WayBillServiceImpl extends ServiceImpl<WayBillMapper, WayBill> impl
     			BigDecimal sum = new BigDecimal(1);
     			//还要乘以系数 //就是看配送方式
     			Integer tranType = takeout.getTransportationType();
-    			BigDecimal coefficient = new BigDecimal(0);//系数
+    			BigDecimal coefficient = new BigDecimal(1);//系数
     			switch (tranType) {
 				case 2://加急
 					coefficient = mainContract.getTransportationTypeUrgent();
@@ -194,33 +197,51 @@ public class WayBillServiceImpl extends ServiceImpl<WayBillMapper, WayBill> impl
 				}
     			switch (type) {
 				case 1://件数
-					sum = detail.getMoney().multiply(new BigDecimal(takeout.getTotal())).multiply(coefficient);
-					tmep=tmep+"件数"+"计算过程("+takeout.getTotal()+"*"+detail.getMoney()+"[单价]"+"*"+coefficient+"[系数]="+sum+")收取 "+sum+"(元)" ;
+					if(money_type_unit.equals(detail.getMoneyType())){
+						sum = detail.getMoney().multiply(new BigDecimal(takeout.getTotal())).multiply(coefficient);
+						tmep=tmep+"件数"+"计算过程("+takeout.getTotal()+"*"+detail.getMoney()+"[单价]"+"*"+coefficient+"[系数]="+sum+")收取 "+sum+"(元)" ;
+					}else{
+						sum = detail.getMoney().multiply(coefficient);;
+						tmep=tmep+"件数"+"计算过程("+detail.getMoney()+"[固收]"+"*"+coefficient+"[系数]="+sum+")收取 "+sum+"(元)" ;
+					}
 					break;
 				case 2://方数
-					sum = detail.getMoney().multiply(takeout.getVolume()).multiply(coefficient);
-					tmep=tmep+"方数"+"计算过程("+takeout.getVolume()+"*"+detail.getMoney()+"[单价]"+"*"+coefficient+"[系数]="+sum+")收取 "+sum+"(元)";
+					if(money_type_unit.equals(detail.getMoneyType())){
+						sum = detail.getMoney().multiply(takeout.getVolume()).multiply(coefficient);
+						tmep=tmep+"方数"+"计算过程("+takeout.getVolume()+"*"+detail.getMoney()+"[单价]"+"*"+coefficient+"[系数]="+sum+")收取 "+sum+"(元)";
+					}else{
+						sum = detail.getMoney().multiply(coefficient);;
+						tmep=tmep+"方数"+"计算过程("+detail.getMoney()+"[固收]"+"*"+coefficient+"[系数]="+sum+")收取 "+sum+"(元)" ;
+					}
 					break;
 				case 3://重量
-					sum = detail.getMoney().multiply(takeout.getWeight()).multiply(coefficient);
-					tmep=tmep+"重量"+"计算过程("+takeout.getWeight()+"*"+detail.getMoney()+"[单价]"+"*"+coefficient+"[系数]="+sum+")收取 "+sum+"(元)";
+					if(money_type_unit.equals(detail.getMoneyType())){
+						sum = detail.getMoney().multiply(takeout.getWeight()).multiply(coefficient);
+						tmep=tmep+"重量"+"计算过程("+takeout.getWeight()+"*"+detail.getMoney()+"[单价]"+"*"+coefficient+"[系数]="+sum+")收取 "+sum+"(元)";
+					}else{
+						sum = detail.getMoney().multiply(coefficient);;
+						tmep=tmep+"重量"+"计算过程("+detail.getMoney()+"[固收]"+"*"+coefficient+"[系数]="+sum+")收取 "+sum+"(元)" ;
+					}
 					break;
 				default://销售额
-					sum = detail.getMoney().multiply(takeout.getMoney()).multiply(coefficient);
-					tmep=tmep+"销售额"+"计算过程("+takeout.getMoney()+"*"+detail.getMoney()+"[百分比]"+"*"+coefficient+"[系数]="+sum+")收取 "+sum+"(元)";
+					if(money_type_unit.equals(detail.getMoneyType())){
+						sum = detail.getMoney().multiply(takeout.getMoney()).multiply(coefficient);
+						tmep=tmep+"销售额"+"计算过程("+takeout.getMoney()+"*"+detail.getMoney()+"[百分比]"+"*"+coefficient+"[系数]="+sum+")收取 "+sum+"(元)";
+					}else{
+						sum = detail.getMoney().multiply(coefficient);;
+						tmep=tmep+"销售额"+"计算过程("+detail.getMoney()+"[固收]"+"*"+coefficient+"[系数]="+sum+")收取 "+sum+"(元)" ;
+					}
 					break;
 				}
-    			
     			//如果要记下来以什么形式记下来
     			//所有的都通过才去设置Income
-    		
     			income.setTableCode(wayBill.getCode());
     			income.setClientId(clientId);
     			income.setBasis(mainContract.getContractCode());
     			income.setOptionId(clientDeliverIncome);
     			income.setMoeny(sum);
     			income.setBasicId(mainContract.getId());
-    			String remark = client.getClientShortName()+"在"+income.getTableCode()+"中"+tmep+"合同编号为"+income.getBasis();
+    			String remark = client.getClientShortName()+"在"+income.getTableCode()+"中"+tmep+"合同编号为"+income.getBasis()+"计算范围为"+detail.getTypeName()+detail.getMinNumber()+"到"+detail.getMaxNumber();
     			income.setRemarks(remark);
     			incomeList.add(income);
     		}

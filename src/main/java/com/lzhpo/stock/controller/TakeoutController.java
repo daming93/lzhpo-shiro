@@ -205,6 +205,7 @@ public class TakeoutController {
 		//配送方式 CacheUtils. transportation_type
 		List<Dictionary> transportationTypeList =   CacheUtils.allDicts.get("transportation_type");
 		modelMap.put("transportationTypeList", transportationTypeList);
+		modelMap.put("deliverTypeList",  CacheUtils.allDicts.get("deliver_type"));
 		modelMap.put("trayList", trayList);
 		modelMap.put("continuity", continuity);
 		return "stock/takeout/addTakeout";
@@ -277,6 +278,7 @@ public class TakeoutController {
 		modelMap.put("transportationTypeList", transportationTypeList);
 		List<Address> addressList = addressService.selectAll();
 		modelMap.put("addressList", addressList);
+		modelMap.put("deliverTypeList",  CacheUtils.allDicts.get("deliver_type"));
 		return "stock/takeout/editTakeout";
 	}
 
