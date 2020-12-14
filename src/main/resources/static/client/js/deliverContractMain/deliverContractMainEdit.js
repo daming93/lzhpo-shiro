@@ -18,7 +18,6 @@ layui.use('laydate', function(){
   //执行一个laydate实例
   laydate2.render({
     elem: '#overTime' //指定元素
-    
   });
 });
 window.viewObj = {

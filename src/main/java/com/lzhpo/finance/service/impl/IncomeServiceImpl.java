@@ -92,7 +92,7 @@ public class IncomeServiceImpl extends ServiceImpl<IncomeMapper, Income> impleme
     }
 
 	@Override
-	public void takeoutIncomeMath(Takeout takeout)throws Exception {
+	public Takeout takeoutIncomeMath(Takeout takeout)throws Exception {
 		//出库装卸费
 		String opId = "4c089061ca5243fd97f02213015d44e7";
 		Integer income_from_takeout =  CacheUtils.keyDict.get("income_from_takeout").getValue();
@@ -129,9 +129,11 @@ public class IncomeServiceImpl extends ServiceImpl<IncomeMapper, Income> impleme
 			income.setTableId(takeout.getId());
 			income.setTableCode(takeout.getCode());
 			save(income);
+			takeout.setIncomeId(income.getId());
 		}else{
 			throw new RuntimeJsonMappingException("该客户暂无正在使用的合同");
 		}
+		return takeout;
 	}
 	@Override
 	public Storage storageIncomeMath(Storage storage) throws Exception {
@@ -234,4 +236,5 @@ public class IncomeServiceImpl extends ServiceImpl<IncomeMapper, Income> impleme
 		}
 		return saleReturn;
 	}
+
 }

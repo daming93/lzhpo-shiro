@@ -98,7 +98,9 @@
 <fieldset class="layui-elem-field">
     <legend>选项检索</legend>
     <div class="layui-field-box">
-           
+            <div class="layui-inline">
+                <label class="layui-form-label">系统单号</label>
+            </div>
             <div class="layui-inline">
                 <input type="text" value="" name="s_code" placeholder="系统单号" class="layui-input search_input">
             </div>
@@ -119,6 +121,34 @@
             </div>
             <div class="layui-input-inline">
                 <a class="layui-btn" lay-submit="" lay-filter="searchForm">查询</a>
+            </div>
+            <br/>
+
+            <div class="layui-inline">
+                <label class="layui-form-label">送达区域</label>
+            </div>
+            <div class="layui-inline">
+                    <select name="s_deliverType" id="deliverType" class="form-control1"  >
+                        <option value=""></option>
+                        <option value="0">市内</option>
+                        <option value="1">外埠</option>
+                    </select>
+            </div>
+             <div class="layui-inline">
+                <select name="s_provinceId" id="provinceId" class="form-control1"  lay-filter="provinceId"  lay-search>
+                    <option value="">请选择省</option>
+                    <option th:each="basic:${provinceList}"  th:value="${basic.id}" th:text="${basic.name}"></option>
+                </select>
+            </div>
+            <div class="layui-inline">
+                    <select name="s_cityId" id="cityId"  class="form-control1"  lay-filter="cityId" lay-search>
+                        <option value="">请选择市</option>
+                    </select>
+            </div>
+               <div class="layui-inline">
+                    <select name="s_countiesId" id="countiesId"  class="form-control1"   lay-filter="countiesId"  lay-search>
+                        <option value="">请选择区</option>
+                    </select>
             </div>
         <!--   <shiro:hasPermission name="deliver:dispatch:delete">
                 <div class="layui-inline">

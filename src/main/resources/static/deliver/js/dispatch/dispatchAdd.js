@@ -48,7 +48,33 @@ layui.use('laydate', function(){
                 }
               
         })        
-
+      form.on('select(provinceId)', function(data){
+            $("#cityId").empty();
+            $("#countiesId").empty();
+                //data.value 得到被选中的值
+                 var url = '/sys/territory/selectCityByProvinceCode?id=' + data.value;
+                 $.get(url,function(data){
+                    $("#cityId").empty();
+                    $("#cityId").append(new Option("请选择",""));
+                    $.each(data,function(index,item){
+                        $("#cityId").append(new Option(item.name,item.id));
+                    });
+                    layui.form.render("select");
+                 });
+        });
+        form.on('select(cityId)', function(data){
+                //data.value 得到被选中的值
+            $("#countiesId").empty();
+                 var url = '/sys/territory/selectAreaByCityCode?id=' + data.value;
+                 $.get(url,function(data){
+                    $("#countiesId").empty();
+                    $("#countiesId").append(new Option("请选择",""));
+                    $.each(data,function(index,item){
+                        $("#countiesId").append(new Option(item.name,item.id));
+                    });
+                    layui.form.render("select");
+                 });
+        }); 
         var dispatchWidth = $("#dispatchTable").width();
 
         var tableIns;

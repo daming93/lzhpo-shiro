@@ -194,6 +194,10 @@ public class Takeout extends DataEntity<Takeout> implements Serializable {
      */
     @TableField("picking_time")
     private LocalDateTime pickingTime;
+    
+    @TableField("income_id")
+    private String incomeId;
+    
     /**
      * 拣货单打印次数
      */
@@ -219,6 +223,14 @@ public class Takeout extends DataEntity<Takeout> implements Serializable {
      */
     private Integer split;
     
+	public String getIncomeId() {
+		return incomeId;
+	}
+
+	public void setIncomeId(String incomeId) {
+		this.incomeId = incomeId;
+	}
+
 	public Integer getDeliverType() {
 		return deliverType;
 	}

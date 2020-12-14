@@ -264,7 +264,11 @@ public class SaleReturnServiceImpl extends ServiceImpl<SaleReturnMapper, SaleRet
 		operations.setType(stock_type_back);
 		operations.setOperationId(saleReturn.getId());// 撤销入库的时候操作就是入库单id
 		saleReturnOperationsService.save(operations);
-		// 还有计算入库装卸费 （待完成） 撤销该费用
+		// 还有计算退库装卸费  撤销该费用
+		if(incomeService.getById(saleReturn)!=null){
+			incomeService.deleteIncome(incomeService.getById(saleReturn));//有输入就删除没有就不用管
+		}
+		saleReturn.setIncomeId("无");//
 		saleReturn.setStatus(modify_status_await);
 		baseMapper.updateById(saleReturn);
 	}

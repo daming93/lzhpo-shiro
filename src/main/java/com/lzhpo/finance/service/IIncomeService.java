@@ -37,9 +37,10 @@ public interface IIncomeService extends IService<Income> {
 	//分页查询数据在父类
 
 	//出库装卸费计算
-	void takeoutIncomeMath(Takeout takeout) throws Exception;
+	Takeout takeoutIncomeMath(Takeout takeout) throws Exception;
 	
 	Storage storageIncomeMath(Storage storage)throws Exception;
 	
 	SaleReturn saleReturnIncomeMath(SaleReturn saleReturn)throws Exception;
+	
 }

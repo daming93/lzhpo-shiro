@@ -264,7 +264,11 @@ public class StorageServiceImpl extends ServiceImpl<StorageMapper, Storage> impl
 		operations.setType(stock_type_back);
 		operations.setOperationId(storage.getId());// 撤销入库的时候操作就是入库单id
 		storageOperationsService.save(operations);
-		// 还有计算入库装卸费 （待完成） 撤销该费用
+		// 还有计算入库装卸费  撤销该费用
+		if(incomeService.getById(storage)!=null){
+			incomeService.deleteIncome(incomeService.getById(storage));//有输入就删除没有就不用管
+		}
+		storage.setIncomeId("无");//
 		storage.setStatus(modify_status_await);
 		baseMapper.updateById(storage);
 	}

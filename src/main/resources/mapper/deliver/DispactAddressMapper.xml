@@ -67,6 +67,15 @@
 					AND scheduling_status = 0
 					AND STATUS = 2
 					AND del_flag = 0
+					<if test="provinceId != null and provinceId != ''">  
+	               		and receive_province_id = '${provinceId}'
+	            	</if>
+	            	<if test="cityId != null and cityId != ''">  
+	               		and receive_city_id = '${cityId}'
+	            	</if>
+	            	<if test="countiesId != null and countiesId != ''">  
+	               		and receive_area_id = '${countiesId}'
+	            	</if>
 					ORDER BY
 						client_code DESC,
 						CODE ASC
@@ -132,6 +141,8 @@
 							)
 						)
 					AND del_flag = 0
+					AND deliver_type!=2 /* 不是自提 */
+					AND adjustment!=1  /* 不是调账 */
 				)
 				UNION ALL
 					SELECT
@@ -168,6 +179,20 @@
 					AND t.scheduling_status = 0
 					AND (t. STATUS = 2 or (t.picking_status!=0 and t.STATUS=3))
 					AND t.del_flag = 0
+					AND deliver_type!=2 /* 不是自提 */
+					AND adjustment!=1  /* 不是调账 */
+					<if test="deliverType != null and deliverType != ''">  
+	               		and deliver_type = ${deliverType}
+	            	</if>
+	            	<if test="provinceId != null and provinceId != ''">  
+	               		and ad.province_id = '${provinceId}'
+	            	</if>
+	            	<if test="cityId != null and cityId != ''">  
+	               		and ad.city_id = '${cityId}'
+	            	</if>
+	            	<if test="countiesId != null and countiesId != ''">  
+	               		and ad.counties_id = '${countiesId}'
+	            	</if>
 					ORDER BY
 						client_code DESC,
 						CODE ASC

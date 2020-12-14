@@ -311,6 +311,7 @@ public class StorageController {
 		}catch (RuntimeJsonMappingException e) {
 			return ResponseEntity.failure(e.getMessage());
 		}catch (Exception e) {
+			e.printStackTrace();
 			return ResponseEntity.failure("系统异常请联系管理员");
 		}
 		

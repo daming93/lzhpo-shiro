@@ -198,9 +198,14 @@ public class TakeoutServiceImpl extends ServiceImpl<TakeoutMapper, Takeout> impl
 		operations.setType(stock_type_sure);
 		operations.setOperationId(takeout.getId());// 新建出库的时候操作就是出库单id
 		operationService.save(operations);
-		
-		//生成拣货单得code
-		takeout.setPickingCode(generateNoService.nextCode("JH"));
+		//调账
+		Integer transportation_type_adjustment =  CacheUtils.keyDict.get("transportation_type_adjustment").getValue();
+		if(!transportation_type_adjustment.equals(takeout.getAdjustment())){//不是调账就计算费用
+			//调账就不用生成拣货单和 不拣货也不产生费用
+		}else{
+			//生成拣货单得code
+			takeout.setPickingCode(generateNoService.nextCode("JH"));
+		}
 		baseMapper.updateById(takeout);
 		/**
 		 * 预留编辑代码
@@ -277,8 +282,13 @@ public class TakeoutServiceImpl extends ServiceImpl<TakeoutMapper, Takeout> impl
 		operations.setOperationId(takeout.getId());// 撤销出库的时候操作就是出库单id
 		operationService.save(operations);
 		takeout.setStatus(modify_status_await);
-		
+		// 还有计算入库装卸费  撤销该费用
+		if(incomeService.getById(takeout)!=null){
+			incomeService.deleteIncome(incomeService.getById(takeout));//有输入就删除没有就不用管
+		}
+		takeout.setIncomeId("无");
 		baseMapper.updateById(takeout);
+		
 	}
 
 	@Override
@@ -294,9 +304,6 @@ public class TakeoutServiceImpl extends ServiceImpl<TakeoutMapper, Takeout> impl
 		Takeout takeout = getTakeoutById(id);
 		takeout.setPickingStatus(is_exsit_pick_yes);
 		takeout.setStatus(modify_status_lock);
-		updateById(takeout);
-		//记录操作
-		operationService.saveOpByIdAndType(takeout.getId(), stock_type_pick, takeout.getPickingCode());
 		//算出库装卸费
 		try {
 			incomeService.takeoutIncomeMath(takeout);
@@ -305,7 +312,9 @@ public class TakeoutServiceImpl extends ServiceImpl<TakeoutMapper, Takeout> impl
 		}catch (Exception e) {
 			e.printStackTrace();
 		}
-		
+		updateById(takeout);
+		//记录操作
+		operationService.saveOpByIdAndType(takeout.getId(), stock_type_pick, takeout.getPickingCode());
 	}
 
 	@Override

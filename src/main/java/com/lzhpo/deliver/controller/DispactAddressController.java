@@ -31,6 +31,7 @@ import com.lzhpo.deliver.entity.Dispatch;
 import com.lzhpo.deliver.service.IDispactAddressService;
 import com.lzhpo.deliver.service.IDispatchService;
 import com.lzhpo.stock.service.IHandleAbnormityService;
+import com.lzhpo.sys.entity.Territory;
 import com.lzhpo.sys.service.ITerritoryService;
 /**
  * <p>
@@ -213,9 +214,7 @@ public class DispactAddressController {
 
     @GetMapping("add")
     public String add(ModelMap modelMap){
-        /**
-	*自定义传入add页面的数据
-	*/
+    	
         return "deliver/dispactAddress/addDispactAddress";
     }
 
@@ -254,9 +253,7 @@ public class DispactAddressController {
     @GetMapping("edit")
     public String edit(String id,ModelMap modelMap){
        DispactAddress dispactAddress =  dispactAddressService.getDispactAddressById(id);
-       /**
-       *自定义代码
-       */
+
         Map<String,Object> map = new HashMap();
         modelMap.put("dispactAddress", dispactAddress);
       

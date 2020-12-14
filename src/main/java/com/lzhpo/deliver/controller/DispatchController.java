@@ -36,6 +36,8 @@ import com.lzhpo.deliver.service.IDriverService;
 import com.lzhpo.deliver.service.IVehicleService;
 import com.lzhpo.finance.service.ITableService;
 import com.lzhpo.finance.service.IUserTableService;
+import com.lzhpo.sys.entity.Territory;
+import com.lzhpo.sys.service.ITerritoryService;
 import com.lzhpo.sys.service.IUserSettingService;
 
 /**
@@ -69,7 +71,8 @@ public class DispatchController {
 	
 	@Autowired
     private ITableService tableService;
-	
+	@Autowired
+	private ITerritoryService territoryService;
 	@GetMapping(value = "list")
 	public String list(ModelMap modelMap){
     	// 自定义附表
@@ -149,6 +152,9 @@ public class DispatchController {
 		modelMap.put("vehicleList", vehicleList);
 		List<Driver> driverList = driverService.selectAll();
 		modelMap.put("driverList", driverList);
+		QueryWrapper<Territory> query = new QueryWrapper<>();
+		query.eq("level", 1);
+		modelMap.put("provinceList", territoryService.list(query));
 		return "deliver/dispatch/addDispatch";
 	}
 
@@ -196,7 +202,9 @@ public class DispatchController {
 		List<Driver> driverList = driverService.selectAll();
 		modelMap.put("driverList", driverList);
 		modelMap.put("dispatch", dispatch);
-
+		QueryWrapper<Territory> query = new QueryWrapper<>();
+		query.eq("level", 1);
+		modelMap.put("provinceList", territoryService.list(query));
 		return "deliver/dispatch/editDispatch";
 	}
 
