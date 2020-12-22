@@ -32,7 +32,7 @@ layui.use('laydate', function(){
   
   //执行一个laydate实例
   laydate.render({
-    elem: '#saleReturnTime' //指定元素
+    elem: '#directReturnTime' //指定元素
       ,value: new Date()
   });
 
@@ -52,6 +52,7 @@ window.viewObj = {
         }],
         typeData:null,
         optionData:null,
+        depotsData:JSON.parse(document.getElementById('depots').value),
         renderSelectOptions: function(data, settings){
             settings =  settings || {};
             var valueField = settings.valueField || 'value',
@@ -123,122 +124,144 @@ window.viewObj = {
         $("form").keypress(function(e) {
              if(e.keyCode==10&&e.ctrlKey) {
                 if(submitFlag){
-                    $("#addsaleReturn").click();
+                    $("#adddirectReturn").click();
                     submitFlag=false;
                 }else{
                     layer.msg("冷静一下！",{time:1000});
                 }
             }
         });
+        var takeoutId =     document.getElementById("takeoutId").value;   
+        var type =  document.getElementById("type").value;  
+        var tableData=new Array(); // 用于存放表格数据
+        $.ajax({
+          url: "/stock/takeout/selectDetail?takeoutId="+takeoutId+"&limit=2000"
+          ,type:"get"
+          ,async:false
+          ,dataType:"json"
+          , success: function(result){
+              tableData=result.data;
+               type =  document.getElementById("type").value;  
+                for (var i = 0; i < tableData.length; i++) {
+                    //添加个属性
+                    tableData[i].systemCode =  tableData[i].itemCode;
+                    tableData[i].name =  tableData[i].itemName;
+                    tableData[i].maxWholeNumber =  tableData[i].wholeNum;
+                    tableData[i].maxScatteredNumber =  tableData[i].scatteredNum;
+                    tableData[i].maxNumber = tableData[i].number;
+                    if(type==1){
+                        tableData[i].wholeNum = 0;
+                        tableData[i].scatteredNum =0;
+                        tableData[i].number = 0;
+                    }
+                }
+                console.log(tableData);
+            }
+        });
         //数据表格实例化           
         var tbWidth = $("#tableRes").width();
-        var layTableId = "layTable";
+        var layTableId = "dataTable";
         var tableIns = table.render({
             elem: '#dataTable',
-            id: layTableId,
-            data: null,
-       //     width: tbWidth,
+            id: 'dataTable',
+            data:tableData,
+            width: tbWidth,
             page: false,
             loading: true,
             even: false, //不开启隔行背景
-            limit: Number.MAX_VALUE, // 数据表格默认全部显示
+            limit: 2000, // 数据表格默认全部显示
             cols: [[
-                    {title: '序号', type: 'numbers'},
-                    { field:'systemCode',title:'系统物料编号',align:'center',width:100},
-                    { field:'name',title:'品名',align:'center',width:200},
-                    { field:'depot',title:'储位',align:'center',width:100},
-                    { field:'batch',title:'批次',align:'center',width:100},
-                    { field:'wholeNum',title:'数量(整)',align:'center',width:100},
-                    { field:'scatteredNum',title:'数量(零)',align:'center',width:100},
-                    { field:'number',title:'数量(合计)',align:'center',width:60},
-                    { field:'rate',title:'换算率',align:'center',width:50,templet: function(d){
+                {title: '序号', type: 'numbers'},
+
+                { field:'itemCode',title:'系统物料编号',align:'center',width:160},
+                { field:'itemName',title:'品牌系列',align:'center',width:200},
+                { field:'depot',title:'储位',align:'center',width:130,templet: function(d){
+                    var options = viewObj.renderSelectOptions(viewObj.depotsData, {valueField: "code", textField: "code", selectedValue: d.depot});
+                    return '<a lay-event="depot"></a><select name="depot" lay-filter="depot"><option  value="">请选择</option>' + options + '</select>';
+                }},
+                { field:'batch',title:'批次',align:'center',width:100},
+                { field:'wholeNum',title:'整',align:'center',edit: 'select',width:60},
+                { field:'scatteredNum',title:'零',align:'center',edit: 'select',width:60},
+                { field:'number',title:'合计',align:'center',width:80},
+                { field:'maxWholeNumber',title:'出库整数',align:'center',width:80},
+
+                { field:'maxScatteredNumber',title:'出库零数',align:'center',width:80},
+                { field:'maxNumber',title:'合计',align:'center',width:80,},
+                { field:'rate',title:'换算率',align:'center',width:100,templet: function(d){
                                 return '1*'+d.rate;
                             }},
-                    { field:'itemId',title:'品项id',align:'center',hide:true,width:100},
-                    {field: 'tempId', title: '操作', width:150,templet: function(d){
-                        return '<a class="layui-btn layui-btn-xs layui-btn-danger" lay-event="del" lay-id="'+ d.tempId +'">移除</a>';
-                    }}
+                { field:'itemId',title:'品项id',align:'center',hide:true,width:100},
+                {field: 'id', title: '操作', width:70,templet: function(d){
+                    return '<a class="layui-btn layui-btn-xs layui-btn-danger" lay-event="del" lay-id="'+ d.id +'"><i class="layui-icon layui-icon-delete"></i>移除</a>';
+                }}
             ]],
             done: function(res, curr, count){
-
+               
             }
         });
-        
+            //监听单元格编辑
+         table.on('edit(dataTable)', function(obj){
+            var value = obj.value //得到修改后的值
+            ,data = obj.data //得到所在行所有键值
+            ,field = obj.field; //得到字段
+          
+
+            //  获取单元格编辑之前td的选择器
+            var selector = obj.tr.selector+' td[data-field="'+obj.field+'"] div';
+            // 单元格编辑之前的值
+            var oldtext = $(selector).text();
+          
+            if(field=="wholeNum"){
+                if(!(/(^[1-9]\d*$)/.test(value))){
+                    $(obj.tr.selector + ' td[data-field="' + obj.field + '"] input').val(oldtext);
+                    layer.msg("只能输入正整数！");
+                     obj.update({
+                          wholeNum:oldtext,
+                        });
+                    return;
+                }
+                var tempNumber = parseInt(value)*obj.data.rate+parseInt(obj.data.scatteredNum);
+                if(tempNumber-parseInt(obj.data.maxNumber)>0){
+                  $(obj.tr.selector + ' td[data-field="' + obj.field + '"] input').val(oldtext);
+                     obj.update({
+                      wholeNum:oldtext,
+                    });
+                   layer.msg("超过出库数");
+                   return;
+                }
+                obj.update({
+                      wholeNum:value,
+                      number: parseInt(value)*obj.data.rate+parseInt(obj.data.scatteredNum),
+                    });
+            }
+            if(field=="scatteredNum"){
+                if(!(/(^[1-9]\d*$)/.test(value))){
+                      $(obj.tr.selector + ' td[data-field="' + obj.field + '"] input').val(oldtext);
+                    layer.msg("只能输入正整数！");
+                     obj.update({
+                          scatteredNum:oldtext,
+                        });
+                    return;
+                }
+               var tempNumber =  parseInt(obj.data.wholeNum)*obj.data.rate+parseInt(value);
+                if(tempNumber-parseInt(obj.data.maxNumber)>0){
+                $(obj.tr.selector + ' td[data-field="' + obj.field + '"] input').val(oldtext);
+                  obj.update({
+                      scatteredNum:oldtext,
+                    });
+                   layer.msg("超过出库数");
+                      
+                   return;
+                }
+                obj.update({
+                      scatteredNum:value,
+                      number: parseInt(obj.data.wholeNum)*obj.data.rate+parseInt(value),
+                    });
+            }
+          });
         //定义事件集合
         var active = {
-            addRow: function(){ //添加一行
-                var oldData = table.cache[layTableId];
-                if(!oldData){
-                    oldData = [];
-                }
-                var _itemCode = $("#itemId").val();
-                var _itemCodeName = $("#itemId").find("option:selected").text();
-                var number = $("#number").val().trim();
-                var wholeNumber = $("#wholeNumber").val().trim();//整数量
-                var batch = $("#batch").val();
-                var depot = $("#depot").find("option:selected").text();
-                var tray = $("#tray").find("option:selected").text();
-                var depot1 = $("#depot").val();
-                var tray1 = $("#tray").val();
-                if(!number){
-                    number = 0;
-                }
-                if(!wholeNumber){
-                    wholeNumber = 0;
-                }
-                //验证
-                if(!(/^[0-9]\d*$/.test(number))){
-                    layer.msg("请输入正确的零数量！");
-                    return;
-                }
-                 //验证
-                if(!(/^[0-9]\d*$/.test(wholeNumber))){
-                    layer.msg("请输入正确的整数量！");
-                    return;
-                }
-                if(!_itemCode||_itemCodeName==_itemCode){
-                    layer.msg("请选择物料代码！");
-                    return;
-                }
-                if(!batch||batch==""){
-                    layer.msg("请输入批次号！");
-                    return;
-                }
-                if(!(/^(\d{4})\-(\d{2})\-(\d{2})$/.test(batch))){
-                    layer.msg("请输入正确的时间格式(如2020-02-02)");
-                    return;
-                }
-
-                if(!depot1||depot1==-1||depot1==depot){
-                    layer.msg("请选择正确的储位号！");
-                    return;
-                }
-                if(!tray1||tray1==-1||tray1==tray){
-                    tray = "";
-                }
-                var url = '/item/clientitem/getById?itemId=' + _itemCode;
-                $.get(url,function(data){
-                   //获取物料信息
-                    var newRow = {
-                       systemCode:_itemCodeName,
-                        name:data.name,
-                        brand:data.brand,
-                        depot:depot,
-                        tray:tray,
-                        batch:batch,
-                        wholeNum:wholeNumber,
-                        scatteredNum:number,
-                        number:zero(wholeNumber,number,data.unitRate) ,//合计
-                        rate:data.unitRate,
-                        tempId:new Date(),
-                        itemId:_itemCode
-                    };
-                    oldData.push(newRow);
-                    tableIns.reload({
-                        data : oldData
-                    });
-                });
-            },
+           
             updateRow: function(obj){
                 var oldData = table.cache[layTableId];              
                 for(var i=0, row; i < oldData.length; i++){
@@ -293,110 +316,22 @@ window.viewObj = {
             var type = $(this).data('type');
             activeByType(type);
         });
+     
         
-        //监听select下拉选中事件
-        form.on('select(type)', function(data){
-            var elem = data.elem; //得到select原始DOM对象
-            $(elem).prev("a[lay-event='type']").trigger("click");
-        });
-        //监听select下拉选中事件
-        form.on('select(optionId)', function(data){
-            var elem = data.elem; //得到select原始DOM对象
-            $(elem).prev("a[lay-event='optionId']").trigger("click");
-        });
-         //监听工具条
-        table.on('tool(dataTable)', function (obj) {
-            var data = obj.data, event = obj.event, tr = obj.tr; //获得当前行 tr 的DOM对象;
-            switch(event){
-                case "type":
-                    //console.log(data);
-                    var select = tr.find("select[name='type']");
-                    if(select){                     
-                        var selectedVal = select.val();
-                        if(!selectedVal){
-                            layer.tips("请选择一个分类", select.next('.layui-form-select'), { tips: [3, '#FF5722'] }); //吸附提示
-                        }
-                        $.extend(obj.data, {'type': selectedVal});
-                        activeByType('updateRow', obj.data);    //更新行记录对象
-                    }
-                    break;
-                 case "optionId":
-                    //console.log(data);
-                    var select = tr.find("select[name='optionId']");
-                    if(select){                     
-                        var selectedVal = select.val();
-                        if(!selectedVal){
-                            layer.tips("请选择一个分类", select.next('.layui-form-select'), { tips: [3, '#FF5722'] }); //吸附提示
-                        }
-                        $.extend(obj.data, {'optionId': selectedVal});
-                        activeByType('updateRow', obj.data);    //更新行记录对象
-                    }
-                    break;    
-                case "money":
-                    var stateVal = tr.find("input[name='money']").val();
-                    $.extend(obj.data, {'money': stateVal}) 
-                    activeByType('updateRow', obj.data);    //更新行记录对象
-                    break;                      
-                case "del":
-                    layer.confirm('真的删除行么？', function(index){
-                      obj.del(); //删除对应行（tr）的DOM结构，并更新缓存
-                      layer.close(index);
-                      activeByType('removeEmptyTableCache');
-                    });
-                    break; 
-                 case "checkTest":
-                    $(obj.tr).find(".layui-table-edit").keyup(function () {
-                        var $input = $(this), val = $input.val();
-                        $input.val(clearNoNum(val));
-                    });
-                    break;                         
-            }
-        });
-        //select 联动
-        form.on('select(clientId)', function(data){
-            //清空表单
-            
-             //data.value 得到被选中的值
-             var url = '/item/clientitem/getByClientIdAll?clientId=' + data.value;
-             $.get(url,function(data){
-                $("#itemId").empty();
-                $("#itemId").append(new Option("请选择",""));
-                $.each(data,function(index,item){
-                    $("#itemId").append(new Option(item.code,item.id));
-                });
-                layui.form.render("select");
-             });
-             url = '/warehouse/depot/getByClientId?clientId=' + data.value;
-             $.get(url,function(data){
-                $("#depot").empty();
-                $("#depot").append(new Option("请选择",""));
-                $.each(data,function(index,item){
-                    $("#depot").append(new Option(item.code,item.id));
-                });
-                layui.form.render("select");
-             });
-            $("#clientCode").focus();
-        });
-        form.on('select(itemId)', function(data){
-             $("#depot").parent().find('input:first').click();
-             $("#depot").parent().find('input:first').focus();
-        });
-        form.on('select(depot)', function(data){
-            $("#wholeNumber").focus();
-        });
 //提交数据代码
-        form.on('submit(addsaleReturn)',function(data){
+        form.on('submit(adddirectReturn)',function(data){
         activeByType('save');    //更新行记录对象
         setTimeout(function(){ //无论是坏都要改状态
                     submitFlag = true;
                 },1000);
         data.field.detailSet = table.cache[layTableId];  
+        console.log(data.field);
         var loadIndex = layer.load(2, {
             shade: [0.3, '#333']
         });
         $.ajax({
             type:"POST",
-            url:"/stock/saleReturn/add",
+            url:"/stock/directReturn/add",
             dataType:"json",
             contentType:"application/json",
             data:JSON.stringify(data.field),
@@ -416,7 +351,7 @@ window.viewObj = {
                                  var editIndex = layer.open({
                                     title : "编辑退库",
                                     type : 2,
-                                    content : "/stock/saleReturn/edit?id="+id,
+                                    content : "/stock/directReturn/edit?id="+id,
                                     success : function(layero, index){
                                         setTimeout(function(){
                                             layer.tips('点击此处返回出库列表', '.layui-layer-setwin .layui-layer-close', {
@@ -431,7 +366,7 @@ window.viewObj = {
                                 });
                                 layer.full(editIndex);
                             }else{
-                                 var node = parent.document.getElementById("addsaleReturn");
+                                 var node = parent.document.getElementById("adddirectReturn");
                              //调用该元素的Click事件
                                 node.click();//连续录单
                             }

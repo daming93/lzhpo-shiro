@@ -55,7 +55,9 @@
                     <script type="text/html" id="billBar">
                         <shiro:hasPermission name="stock:handleAbnormity:add">
                         {{# if (d.isExistHandleAbnormity==1){ }}
+                             {{# if (d.type==2||d.type==4){ }}<!--库存单据生成异常之后走退单 -->
                         <a class="layui-btn layui-btn-xs" lay-event="handleAbnormity">异常</a>
+                             {{# } }}
                         {{# } }}
                         </shiro:hasPermission>
                          {{# if (d.isExistHandleAbnormity==0){ }}

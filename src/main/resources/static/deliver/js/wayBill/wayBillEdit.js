@@ -115,7 +115,6 @@ layui.use(['form','jquery','table','layer'],function(){
    table.on('tool(billTable)', function(obj){
     var wayBillId = $("#wayBillId").val();
         var data = obj.data;
-        console.log(data);
             if(obj.event === 'handleAbnormity'){
                 var editIndex = layer.open({
                     title : "申报异常",

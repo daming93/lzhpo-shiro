@@ -100,6 +100,45 @@ layui.use(['layer','form','table'], function() {
                     }
                 )
             }
+           if(obj.event === 'littleBack'){
+            var editIndex = layer.open({
+                title : "少项直退",
+                type : 2,
+                content : "/stock/directReturn/add?type=1&takeoutId="+data.takeoutId+"&handAbnormityId="+data.id,
+                success : function(layero, index){
+                    setTimeout(function(){
+                        layer.tips('点击此处返回退库列表', '.layui-layer-setwin .layui-layer-close', {
+                            tips: 3
+                        });
+                    },500);
+                }
+            });
+            //改变窗口大小时，重置弹窗的高度，防止超出可视区域（如F12调出debug的操作）
+            $(window).resize(function(){
+                layer.full(editIndex);
+            });
+            layer.full(editIndex);
+        }
+        if(obj.event === 'moreBack'){
+            var editIndex = layer.open({
+                title : "多项直退",
+                type : 2,
+                content : "/stock/directReturn/add?type=2&takeoutId="+data.takeoutId+"&handAbnormityId="+data.id,
+                success : function(layero, index){
+                    setTimeout(function(){
+                        layer.tips('点击此处返回退库列表', '.layui-layer-setwin .layui-layer-close', {
+                            tips: 3
+                        });
+                    },500);
+                }
+            });
+            //改变窗口大小时，重置弹窗的高度，防止超出可视区域（如F12调出debug的操作）
+            $(window).resize(function(){
+                layer.full(editIndex);
+            });
+            layer.full(editIndex);
+        }
+
     });
     //功能按钮
     var active={

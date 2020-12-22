@@ -39,4 +39,6 @@ public interface IHandleAbnormityService extends IService<HandleAbnormity> {
 	
 	//获取满足某个条件的记录 以便不插入重复记录
 	long getHandleAbnormityCountBywaybillId(String waybillId);
+	
+	HandleAbnormity changeStatusByIdAndStatus(String id,Integer status);
 }

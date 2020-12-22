@@ -20,6 +20,7 @@ import com.lzhpo.common.init.CacheUtils;
 import com.lzhpo.finance.entity.Income;
 import com.lzhpo.finance.mapper.IncomeMapper;
 import com.lzhpo.finance.service.IIncomeService;
+import com.lzhpo.stock.entity.DirectReturn;
 import com.lzhpo.stock.entity.SaleReturn;
 import com.lzhpo.stock.entity.Storage;
 import com.lzhpo.stock.entity.Takeout;
@@ -235,6 +236,57 @@ public class IncomeServiceImpl extends ServiceImpl<IncomeMapper, Income> impleme
 			throw new RuntimeJsonMappingException("该客户暂无正在使用的合同");
 		}
 		return saleReturn;
+	}
+
+	@Override
+	public DirectReturn directReturnIncomeMath(DirectReturn directReturn) throws Exception {
+		Integer income_from_retrun =  CacheUtils.keyDict.get("income_from_retrun").getValue();
+		//入库装卸费
+		String opId = "4c089061ca5243fd97f02213015d44e6";
+		//没有的加
+		//找到客户对应在使用的合同
+		String usingContractId = contractMainService.getUsingContractId(directReturn.getClientId());
+		if (StringUtils.isNotBlank(usingContractId)) {
+			ContractMain contractMain = contractMainService.getById(usingContractId);
+			BigDecimal money = new BigDecimal(0.0);
+			BigDecimal handingStorageMoney = contractMain.getHandingStorageMoney();
+			//有合同看他装卸类型是怎算的
+			switch (contractMain.getHandingType()) {
+			case 1:// 按件
+				money = handingStorageMoney.multiply(new BigDecimal(directReturn.getTotal()));
+				break;
+			case 2:// 按体积
+				money = handingStorageMoney.multiply(directReturn.getVolume());
+				break;
+			case 3:// 按重量
+				money = handingStorageMoney.multiply(directReturn.getWeight());
+				break;	
+			default:
+				break;
+			}
+			
+			if (StringUtils.isNotBlank(directReturn.getIncomeId())) {//有的更新 就更新钱
+				Income income = getById(directReturn.getIncomeId());
+				income.setMoeny(money);
+				updateById(income);
+			}else{
+				Income income = new Income();
+				income.setCode(generateNoService.nextCode("SR"));
+				income.setBasis(contractMain.getContractCode());
+				income.setClientId(contractMain.getClientId());
+				income.setOptionId(opId);
+				income.setBasicId(contractMain.getId());
+				income.setTableFrom(income_from_retrun);
+				income.setTableId(directReturn.getId());
+				income.setTableCode(directReturn.getSystemCode());
+				income.setMoeny(money);
+				save(income);
+				directReturn.setIncomeId(income.getId());
+			}
+		}else{
+			throw new RuntimeJsonMappingException("该客户暂无正在使用的合同");
+		}
+		return directReturn;
 	}
 
 }

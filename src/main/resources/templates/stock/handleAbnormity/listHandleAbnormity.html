@@ -37,11 +37,18 @@
                             <a class="layui-btn layui-btn-xs layui-btn-warm" lay-event="editAbnormity">审核</a>
                             {{# } }}
                         </shiro:hasPermission>
+                        {{# if (d.auditStatus == 1){ }}
                         <shiro:hasPermission name="stock:handleAbnormity:back">
-                            {{# if (d.auditStatus == 1){ }}
                         <a class="layui-btn layui-btn-xs layui-btn-danger" lay-event="back">退回异常</a>
-                            {{# } }}
                         </shiro:hasPermission>
+                        <!-- 多项直退 和 少项直退 -->
+                        {{# if (d.status == 0){ }}
+                        <shiro:hasPermission name="stock:directReturn:add">
+                        <a class="layui-btn layui-btn-xs layui-btn-warm" lay-event="moreBack">多项直退</a>
+                        <a class="layui-btn layui-btn-xs"  lay-event="littleBack">少项直退</a>
+                        </shiro:hasPermission>
+                          {{# } }}
+                        {{# } }}
                         <shiro:hasPermission name="stock:handleAbnormity:delete">
                             {{# if (d.auditStatus == 0){ }}
                             <a class="layui-btn layui-btn-xs layui-btn-danger" lay-event="delete">删除</a>

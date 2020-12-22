@@ -11,7 +11,7 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 /**
  * <p>
- * 销退操作表
+ * 直退操作表
  * </p>
  *
  * @author xdm
@@ -20,8 +20,8 @@ import lombok.experimental.Accessors;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@TableName("stock_sale_return_operations")
-public class SaleReturnOperations extends DataEntity<SaleReturnOperations> implements Serializable {
+@TableName("stock_direct_return_operations")
+public class DirectReturnOperations extends DataEntity<DirectReturnOperations> implements Serializable {
 
     private static final long serialVersionUID = 1L;
 

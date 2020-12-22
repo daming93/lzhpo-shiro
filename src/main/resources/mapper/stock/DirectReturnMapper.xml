@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.lzhpo.stock.mapper.SaleReturnMapper">
+<mapper namespace="com.lzhpo.stock.mapper.DirectReturnMapper">
 <select id="selectMathReturnNumberByReturnId" resultType="com.lzhpo.stock.entity.MathStockNumber" parameterType="java.lang.String">
 		SELECT
 			o.returnId,
@@ -14,7 +14,7 @@
 		FROM
 			(
 				SELECT
-					d.sales_return_id returnId,
+					d.direct_return_id returnId,
 					s. system_code,
 					d.item_id item_id,
 					i. NAME,
@@ -25,11 +25,11 @@
 					CEILING(sum(d.number) / i.unit_rate) * i.item_volume volume,
 					CEILING(sum(d.number) / i.unit_rate) / i.tray tray
 				FROM
-					stock_sale_return_detail d
+					stock_direct_return_detail d
 				LEFT JOIN material_item_clientitem i ON d.item_id = i.id
-				LEFT JOIN stock_sale_return s ON d.sales_return_id = s.id
+				LEFT JOIN stock_direct_return s ON d.direct_return_id = s.id
 				GROUP BY
-					d.sales_return_id,
+					d.direct_return_id,
 					d.item_id
 			) o where o.returnId = #{returnId}
 		GROUP BY

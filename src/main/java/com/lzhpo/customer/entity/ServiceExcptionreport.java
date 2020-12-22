@@ -1,6 +1,7 @@
 package com.lzhpo.customer.entity;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -33,6 +34,8 @@ public class ServiceExcptionreport extends DataEntity<ServiceExcptionreport> imp
 
     @TableField("client_name")
     private String clientName;
+    
+    private BigDecimal time;
 
     /**
      * 出库时间
@@ -260,6 +263,16 @@ public class ServiceExcptionreport extends DataEntity<ServiceExcptionreport> imp
 
 	public void setResponsibilityDept(String responsibilityDept) {
 		this.responsibilityDept = responsibilityDept;
+	}
+
+
+	public BigDecimal getTime() {
+		return time;
+	}
+
+
+	public void setTime(BigDecimal time) {
+		this.time = time;
 	}
 
 

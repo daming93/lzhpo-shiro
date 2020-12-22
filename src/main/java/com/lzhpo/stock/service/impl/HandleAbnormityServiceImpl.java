@@ -48,6 +48,8 @@ public class HandleAbnormityServiceImpl extends ServiceImpl<HandleAbnormityMappe
 		// 未审核 audit_status_no
 		Integer audit_status_no = CacheUtils.keyDict.get("audit_status_no").getValue();
 		handleAbnormity.setAuditStatus(audit_status_no);
+		Integer handle_abnormity_status_wait = CacheUtils.keyDict.get("handle_abnormity_status_wait").getValue();
+		handleAbnormity.setStatus(handle_abnormity_status_wait);//待选择
 		baseMapper.insert(handleAbnormity);
 		return handleAbnormity;
 	}
@@ -113,6 +115,14 @@ public class HandleAbnormityServiceImpl extends ServiceImpl<HandleAbnormityMappe
 		wrapper.eq("del_flag", false);
 		wrapper.eq("way_bill_id", waybillId);
 		return baseMapper.selectCount(wrapper);
+	}
+
+	@Override
+	public HandleAbnormity changeStatusByIdAndStatus(String id, Integer status) {
+		HandleAbnormity entity = getById(id);
+		entity.setStatus(status);
+		baseMapper.updateById(entity);
+		return entity;
 	}
 
 }

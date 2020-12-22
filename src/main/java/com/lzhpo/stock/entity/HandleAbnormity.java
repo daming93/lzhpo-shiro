@@ -107,8 +107,22 @@ public class HandleAbnormity extends DataEntity<HandleAbnormity> implements Seri
     @TableField(exist=false)
     private WayBill wayBill;
     
+    /**
+     * 修改状态(1待选择，2直退，3二次配送）
+     */
+    private Integer status;
+
+    
 	public Takeout getTakeout() {
 		return takeout;
+	}
+
+	public Integer getStatus() {
+		return status;
+	}
+
+	public void setStatus(Integer status) {
+		this.status = status;
 	}
 
 	public void setTakeout(Takeout takeout) {
