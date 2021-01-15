@@ -241,7 +241,7 @@ window.viewObj = {
                     layer.msg("请输入正确最大值！(两位小数)");
                     return;
                 }
-                if(minNumber>maxNumber){
+                if(parseInt(minNumber)>parseInt(maxNumber)){
                     layer.msg("最大值应该大于最小值！");
                     return;
                 }
@@ -270,7 +270,8 @@ window.viewObj = {
                     typeName:typeName,
                     moneyType:moneyType,
                     moneyTypeName:moneyTypeName,
-                    money:money //合计
+                    money:money, //合计
+                     tempId:new Date().getTime()
                 };
                 oldData.push(newRow);
                 tableIns.reload({

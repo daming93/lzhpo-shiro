@@ -61,7 +61,7 @@
 		<if test="flag == 3" >
 			from_code,item_id
 		</if>	
-		
+		order by create_date desc
 		<if test="start != null" >
 			<if test="limit != null" >
 				LIMIT #{start,jdbcType=INTEGER},#{limit,jdbcType=INTEGER}
