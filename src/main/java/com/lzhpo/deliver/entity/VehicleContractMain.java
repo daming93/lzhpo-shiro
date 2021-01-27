@@ -1,6 +1,7 @@
 package com.lzhpo.deliver.entity;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Set;
 
@@ -80,10 +81,53 @@ public class VehicleContractMain extends DataEntity<VehicleContractMain> impleme
     @TableField("file_name")
     private String fileName;
     
-
+    /**
+     * 难点费用
+     */
+    @TableField("difficult_point_price")
+    private BigDecimal difficultPointPrice;
+    
+    /**
+     * 点费单价
+     */
+    @TableField("point_price")
+    private BigDecimal pointPrice;
+    
+    /**
+     * 最小计算点数
+     */
+    @TableField("min_point")
+    private Integer minPoint;
+    
 	@TableField(exist = false)
     private Set<VehicleContractMainDetail> detailSet;
 	
+
+
+	
+	public BigDecimal getDifficultPointPrice() {
+		return difficultPointPrice;
+	}
+
+	public void setDifficultPointPrice(BigDecimal difficultPointPrice) {
+		this.difficultPointPrice = difficultPointPrice;
+	}
+
+	public BigDecimal getPointPrice() {
+		return pointPrice;
+	}
+
+	public void setPointPrice(BigDecimal pointPrice) {
+		this.pointPrice = pointPrice;
+	}
+
+	public Integer getMinPoint() {
+		return minPoint;
+	}
+
+	public void setMinPoint(Integer minPoint) {
+		this.minPoint = minPoint;
+	}
 
 	public Set<VehicleContractMainDetail> getDetailSet() {
 		return detailSet;

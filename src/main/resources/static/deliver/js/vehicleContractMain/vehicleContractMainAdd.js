@@ -25,7 +25,13 @@ window.viewObj = {
 
        
         var $ = layui.$, table = layui.table, form = layui.form, layer = layui.layer,upload = layui.upload;
-   
+        form.verify({
+            int:function(value, item){
+                if(!(/(^[0-9]\d*$)/.test(num))){
+                    return "只能输入自然数！";
+                }
+            }
+        })
         //回车操作
    
         form.on('select(provinceId)', function(data){

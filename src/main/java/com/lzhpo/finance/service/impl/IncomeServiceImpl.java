@@ -21,6 +21,7 @@ import com.lzhpo.finance.entity.Income;
 import com.lzhpo.finance.mapper.IncomeMapper;
 import com.lzhpo.finance.service.IIncomeService;
 import com.lzhpo.stock.entity.DirectReturn;
+import com.lzhpo.stock.entity.LineTakeout;
 import com.lzhpo.stock.entity.SaleReturn;
 import com.lzhpo.stock.entity.Storage;
 import com.lzhpo.stock.entity.Takeout;
@@ -287,6 +288,51 @@ public class IncomeServiceImpl extends ServiceImpl<IncomeMapper, Income> impleme
 			throw new RuntimeJsonMappingException("该客户暂无正在使用的合同");
 		}
 		return directReturn;
+	}
+
+	@Override
+	public LineTakeout linetakeoutIncomeMath(LineTakeout takeout) throws Exception {
+		//出库装卸费
+		String opId = "4c089061ca5243fd97f02213015d44e7";
+		Integer income_from_linetakeout =  CacheUtils.keyDict.get("income_from_linetakeout").getValue();
+		//找到客户对应在使用的合同
+		String usingContractId = contractMainService.getUsingContractId(takeout.getClientId());
+		
+		
+		if (StringUtils.isNotBlank(usingContractId)) {
+			ContractMain contractMain = contractMainService.getById(usingContractId);
+			BigDecimal money = new BigDecimal(0.0);
+			BigDecimal handingTakeoutMoney = contractMain.getHandingTakeoutMoney();
+			//有合同看他装卸类型是怎算的
+			switch (contractMain.getHandingType()) {
+			case 1:// 按件
+				money = handingTakeoutMoney.multiply(new BigDecimal(takeout.getTotal()));
+				break;
+			case 2:// 按体积
+				money = handingTakeoutMoney.multiply(takeout.getVolume());
+				break;
+			case 3:// 按重量
+				money = handingTakeoutMoney.multiply(takeout.getWeight());
+				break;	
+			default:
+				break;
+			}
+			Income income = new Income();
+			income.setCode(generateNoService.nextCode("SR"));
+			income.setBasis(contractMain.getContractCode());
+			income.setClientId(contractMain.getClientId());
+			income.setBasicId(contractMain.getId());
+			income.setOptionId(opId);
+			income.setMoeny(money);
+			income.setTableFrom(income_from_linetakeout);
+			income.setTableId(takeout.getId());
+			income.setTableCode(takeout.getCode());
+			save(income);
+			takeout.setIncomeId(income.getId());
+		}else{
+			throw new RuntimeJsonMappingException("该客户暂无正在使用的合同");
+		}
+		return takeout;
 	}
 
 }

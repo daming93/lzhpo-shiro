@@ -35,5 +35,6 @@ public interface IVehicleContractMainService extends IService<VehicleContractMai
 	//复制合同 改变合同的名字 变成副本 合同编号 主表子表同步复制
 	void copyContract(String contractId);
 	
-
+	//根据车辆id去找他得主合同
+	VehicleContractMain getByVehicleId(String vehicleId);
 }

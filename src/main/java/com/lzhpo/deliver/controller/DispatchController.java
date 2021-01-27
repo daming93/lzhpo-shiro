@@ -21,6 +21,7 @@ import org.springframework.web.util.WebUtils;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.fasterxml.jackson.databind.RuntimeJsonMappingException;
 import com.lzhpo.admin.service.UserService;
 import com.lzhpo.common.annotation.SysLog;
 import com.lzhpo.common.base.PageData;
@@ -216,7 +217,11 @@ public class DispatchController {
 		if (StringUtils.isBlank(dispatch.getId())) {
 			return ResponseEntity.failure("数据Id（不能为空)");
 		}
-		dispatchService.updateDispatch(dispatch);
+		try {
+			dispatchService.updateDispatch(dispatch);
+		} catch (RuntimeJsonMappingException e) {
+			return ResponseEntity.failure(e.getMessage());
+		}
 		return ResponseEntity.success("操作成功");
 	}
 	

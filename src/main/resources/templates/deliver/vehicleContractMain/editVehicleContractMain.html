@@ -59,6 +59,26 @@
                      <input type="text" required name="name" th:value="${vehicleContractMain.name}" lay-verify="required" placeholder="请输入名称" autocomplete="off" class="layui-input">
             </div>  
     </div>
+     <div class="layui-form-item">
+        <div class="layui-inline">
+              <label class="layui-form-label">最小计费点数</label>
+                     <div class="layui-input-block">
+                        <input type="text" class="layui-input " th:value="${vehicleContractMain.minPoint}" lay-filter="number|int" id="minPoint"    name="minPoint" >
+                    </div> 
+        </div>
+        <div class="layui-inline">
+              <label class="layui-form-label">点费单价</label>
+                     <div class="layui-input-block">
+                        <input type="text" class="layui-input " th:value="${vehicleContractMain.pointPrice}"  lay-filter="number" id="piontPrice"  name="piontPrice"   >
+                    </div> 
+        </div>
+        <div class="layui-inline">
+              <label class="layui-form-label">难点费用</label>
+                     <div class="layui-input-block">
+                        <input type="text" class="layui-input " th:value="${vehicleContractMain.difficultPointPrice}"  lay-filter="number" id="difficultPointPrice" name="difficultPointPrice" >
+                    </div> 
+        </div>
+    </div>
     <div class="layui-form-item">
         <fieldset class="layui-elem-field layui-field-title" style="margin-top: 30px;margin-left: 10px;">
             <legend>明细</legend>

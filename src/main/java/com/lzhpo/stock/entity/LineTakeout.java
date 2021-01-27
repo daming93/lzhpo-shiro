@@ -1,32 +1,28 @@
 package com.lzhpo.stock.entity;
 
-import java.io.Serializable;
 import java.math.BigDecimal;
+import com.baomidou.mybatisplus.annotation.TableName;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Set;
-
 import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.lzhpo.common.base.DataEntity;
-
+import java.io.Serializable;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+import com.lzhpo.common.base.DataEntity;
 /**
  * <p>
- * 出库表
+ * 线路发单（无关库存的发单) 表单形式和库存发单接近，但是没有子表
  * </p>
  *
  * @author xdm
- * @since 2020-05-15
+ * @since 2021-01-25
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@TableName("stock_takeout")
-public class Takeout extends DataEntity<Takeout> implements Serializable {
+@TableName("stock_line_takeout")
+public class LineTakeout extends DataEntity<LineTakeout> implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -35,14 +31,6 @@ public class Takeout extends DataEntity<Takeout> implements Serializable {
      */
     @TableField("client_id")
     private String clientId;
-    
-
-    /**
-     * 客户Id
-     */
-    @TableField("excption_id")
-    private String excptionId;
-
 
     /**
      * 送达方ID
@@ -83,24 +71,12 @@ public class Takeout extends DataEntity<Takeout> implements Serializable {
      * 发货总数(整)
      */
     private Integer total;
-    /**
-     * 散数量
-     */
-    @TableField("scattered_num")
-    private Integer scatteredNum;
 
     /**
      * 发货总数(零)
      */
     private Integer number;
 
-    /**
-     * 配送类型 //0市内 1 外阜 2自提
-     */
-    @TableField("deliver_type")
-    private Integer deliverType;
-
-    
     /**
      * 实际数量
      */
@@ -135,7 +111,7 @@ public class Takeout extends DataEntity<Takeout> implements Serializable {
     private Integer towStatus;
 
     /**
-     * 运输方式（1正常2加急3节假日）
+     * 收入类型（1正常2加急3节假日）
      */
     @TableField("transportation_type")
     private Integer transportationType;
@@ -194,15 +170,38 @@ public class Takeout extends DataEntity<Takeout> implements Serializable {
      */
     @TableField("picking_time")
     private LocalDateTime pickingTime;
-    
+
+
+    /**
+     * 调账 0是正常 1是调账
+     */
+    private Integer adjustment;
+
+    /**
+     * 散数量
+     */
+    @TableField("scattered_num")
+    private Integer scatteredNum;
+
+    @TableField("excption_id")
+    private String excptionId;
+
+    /**
+     * 1 是拆分 null是不拆分 得单子 用于调度拆单使用
+     */
+    private Integer split;
+
+    /**
+     * 配送类型（0市内 1 外阜 2自提）
+     */
+    @TableField("deliver_type")
+    private Integer deliverType;
+
+    /**
+     * 收入表id
+     */
     @TableField("income_id")
     private String incomeId;
-    
-    /**
-     * 拣货单打印次数
-     */
-    @TableField("adjustment")
-    private Integer adjustment;
     
     @TableField(exist = false)
     private String statusStr;
@@ -215,101 +214,6 @@ public class Takeout extends DataEntity<Takeout> implements Serializable {
     
     @TableField(exist = false)
     private String transportationTypeStr;
-    @TableField(exist = false)
-    private List<TakeoutDetail> detailSet;
-    
-    /**
-     * 1 是拆分 null是不拆分 得单子 用于调度拆单使用
-     */
-    private Integer split;
-    
-	public String getIncomeId() {
-		return incomeId;
-	}
-
-	public void setIncomeId(String incomeId) {
-		this.incomeId = incomeId;
-	}
-
-	public Integer getDeliverType() {
-		return deliverType;
-	}
-
-	public void setDeliverType(Integer deliverType) {
-		this.deliverType = deliverType;
-	}
-
-	public String getTransportationTypeStr() {
-		return transportationTypeStr;
-	}
-
-	public void setTransportationTypeStr(String transportationTypeStr) {
-		this.transportationTypeStr = transportationTypeStr;
-	}
-
-	public String getAddressName() {
-		return addressName;
-	}
-
-	public void setAddressName(String addressName) {
-		this.addressName = addressName;
-	}
-
-	public Integer getSplit() {
-		return split;
-	}
-
-	public void setSplit(Integer split) {
-		this.split = split;
-	}
-
-	public String getExcptionId() {
-		return excptionId;
-	}
-
-	public void setExcptionId(String excptionId) {
-		this.excptionId = excptionId;
-	}
-
-	public Integer getScatteredNum() {
-		return scatteredNum;
-	}
-
-	public void setScatteredNum(Integer scatteredNum) {
-		this.scatteredNum = scatteredNum;
-	}
-
-	public String getPickStatusStr() {
-		return pickStatusStr;
-	}
-
-	public void setPickStatusStr(String pickStatusStr) {
-		this.pickStatusStr = pickStatusStr;
-	}
-
-	public Integer getAdjustment() {
-		return adjustment;
-	}
-
-	public void setAdjustment(Integer adjustment) {
-		this.adjustment = adjustment;
-	}
-
-	public String getStatusStr() {
-		return statusStr;
-	}
-
-	public void setStatusStr(String statusStr) {
-		this.statusStr = statusStr;
-	}
-
-	public List<TakeoutDetail> getDetailSet() {
-		return detailSet;
-	}
-
-	public void setDetailSet(List<TakeoutDetail> detailSet) {
-		this.detailSet = detailSet;
-	}
 
 	public String getClientId() {
 		return clientId;
@@ -519,7 +423,84 @@ public class Takeout extends DataEntity<Takeout> implements Serializable {
 		this.pickingTime = pickingTime;
 	}
 
+	public Integer getAdjustment() {
+		return adjustment;
+	}
 
+	public void setAdjustment(Integer adjustment) {
+		this.adjustment = adjustment;
+	}
 
+	public Integer getScatteredNum() {
+		return scatteredNum;
+	}
+
+	public void setScatteredNum(Integer scatteredNum) {
+		this.scatteredNum = scatteredNum;
+	}
+
+	public String getExcptionId() {
+		return excptionId;
+	}
+
+	public void setExcptionId(String excptionId) {
+		this.excptionId = excptionId;
+	}
+
+	public Integer getSplit() {
+		return split;
+	}
+
+	public void setSplit(Integer split) {
+		this.split = split;
+	}
+
+	public Integer getDeliverType() {
+		return deliverType;
+	}
+
+	public void setDeliverType(Integer deliverType) {
+		this.deliverType = deliverType;
+	}
+
+	public String getIncomeId() {
+		return incomeId;
+	}
+
+	public void setIncomeId(String incomeId) {
+		this.incomeId = incomeId;
+	}
+
+	public String getStatusStr() {
+		return statusStr;
+	}
+
+	public void setStatusStr(String statusStr) {
+		this.statusStr = statusStr;
+	}
+
+	public String getPickStatusStr() {
+		return pickStatusStr;
+	}
+
+	public void setPickStatusStr(String pickStatusStr) {
+		this.pickStatusStr = pickStatusStr;
+	}
+
+	public String getAddressName() {
+		return addressName;
+	}
+
+	public void setAddressName(String addressName) {
+		this.addressName = addressName;
+	}
+
+	public String getTransportationTypeStr() {
+		return transportationTypeStr;
+	}
+
+	public void setTransportationTypeStr(String transportationTypeStr) {
+		this.transportationTypeStr = transportationTypeStr;
+	}
 
 }

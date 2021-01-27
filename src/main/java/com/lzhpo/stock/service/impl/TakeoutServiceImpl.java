@@ -283,8 +283,8 @@ public class TakeoutServiceImpl extends ServiceImpl<TakeoutMapper, Takeout> impl
 		operationService.save(operations);
 		takeout.setStatus(modify_status_await);
 		// 还有计算入库装卸费  撤销该费用
-		if(incomeService.getById(takeout)!=null){
-			incomeService.deleteIncome(incomeService.getById(takeout));//有输入就删除没有就不用管
+		if(incomeService.getById(takeout.getIncomeId())!=null){
+			incomeService.deleteIncome(incomeService.getById(takeout.getIncomeId()));//有输入就删除没有就不用管
 		}
 		takeout.setIncomeId("无");
 		baseMapper.updateById(takeout);

@@ -1,5 +1,8 @@
 package com.lzhpo.deliver.service.impl;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -12,14 +15,21 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.fasterxml.jackson.databind.RuntimeJsonMappingException;
 import com.lzhpo.common.init.CacheUtils;
 import com.lzhpo.deliver.entity.DispactAddress;
 import com.lzhpo.deliver.entity.Dispatch;
+import com.lzhpo.deliver.entity.DispatchCost;
 import com.lzhpo.deliver.entity.ExpressBill;
+import com.lzhpo.deliver.entity.VehicleContractMain;
+import com.lzhpo.deliver.entity.VehicleContractMainDetail;
 import com.lzhpo.deliver.mapper.DispatchMapper;
 import com.lzhpo.deliver.service.IDispactAddressService;
+import com.lzhpo.deliver.service.IDispatchCostService;
 import com.lzhpo.deliver.service.IDispatchService;
 import com.lzhpo.deliver.service.IExpressBillService;
+import com.lzhpo.deliver.service.IVehicleContractMainDetailService;
+import com.lzhpo.deliver.service.IVehicleContractMainService;
 import com.lzhpo.stock.entity.Takeout;
 import com.lzhpo.stock.service.ITakeoutService;
 import com.lzhpo.sys.service.IGenerateNoService;
@@ -46,6 +56,14 @@ public class DispatchServiceImpl extends ServiceImpl<DispatchMapper, Dispatch> i
 	@Autowired
 	private ITakeoutService takeoutService;
 
+	@Autowired
+	private IVehicleContractMainService vehicleContractMainService;
+	
+	@Autowired
+	private IVehicleContractMainDetailService vehicleContractMainDetailService ;
+	
+	@Autowired
+	private IDispatchCostService dispatchCostService;
 	@Override
 	public long getDispatchCount(String name) {
 		QueryWrapper<Dispatch> wrapper = new QueryWrapper<>();
@@ -156,6 +174,44 @@ public class DispatchServiceImpl extends ServiceImpl<DispatchMapper, Dispatch> i
 		// 可撤销
 		Integer modify_status_revocation = CacheUtils.keyDict.get("modify_status_revocation").getValue();
 		dispatch.setStatus(modify_status_revocation);
+		
+		//获得他的子表，去生成单车的运费 支出费用
+		List<DispactAddress> list = dispactAddressService.countNumDetailSendAreaByDispatchId(dispatch.getId());
+		//找到他的点数
+		int pointNum =(int) dispactAddressService.countNumDetailSendPlaceByDispatchId(dispatch.getId());
+		List<BigDecimal> moneyList = new ArrayList<BigDecimal>();
+		DispatchCost cost = new DispatchCost();
+		//找到这个车辆得合同
+		VehicleContractMain main = vehicleContractMainService.getByVehicleId(dispatch.getVehicleId());
+		if(main==null){
+			throw new RuntimeJsonMappingException("该车辆未找到对应合同");
+		}
+		cost.setPointNum(pointNum);
+		//难点费暂且不算
+		cost.setMinPoint(main.getMinPoint());
+		cost.setPointPrice(main.getPointPrice());
+		
+		for (DispactAddress dispactAddress : list) {
+			VehicleContractMainDetail detail = vehicleContractMainDetailService.selectDetailMoneyByInfoNoRange(main.getId(), dispactAddress.getProvinceId(), dispactAddress.getCityId(), dispactAddress.getCountiesId());
+			if(detail!=null){
+				moneyList.add(detail.getMoney());
+			}
+		}
+		//从List中找到最大值
+		BigDecimal money = Collections.max(moneyList);
+		//区域收费 然后看点数到没有
+		if(money==null){
+			money = new BigDecimal(0);
+		}
+		if(pointNum>=main.getMinPoint()){
+			//大于等于起送量 也就是从这个开始计费
+			Integer num = pointNum-main.getMinPoint()+1;
+			//支出等于基础运费加上额外点数*点费
+			cost.setMoeny(money.add(main.getPointPrice().multiply(new BigDecimal(num))));
+		}else{
+			cost.setMoeny(money);
+		}
+		dispatchCostService.save(cost);
 		baseMapper.updateById(dispatch);
 	}
 
@@ -164,6 +220,7 @@ public class DispatchServiceImpl extends ServiceImpl<DispatchMapper, Dispatch> i
 	@CacheEvict(value = "Dispatchs", allEntries = true)
 	public void deleteDispatch(Dispatch dispatch) {
 		dispatch.setDelFlag(true);
+		dispatchCostService.deleteByDispatchId(dispatch.getId());
 		baseMapper.updateById(dispatch);
 	}
 

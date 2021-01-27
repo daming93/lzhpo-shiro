@@ -329,4 +329,18 @@ public class DispactAddressServiceImpl extends ServiceImpl<DispactAddressMapper,
 		wrapper.eq("table_id",tableId);
 		return baseMapper.selectCount(wrapper);
 	}
+
+	@Override
+	public long countNumDetailSendPlaceByDispatchId(String dispatchId) {
+		QueryWrapper<DispactAddress> wrapper = new QueryWrapper<>();
+		wrapper.eq("dispacth_id", dispatchId).groupBy("counties_id","area_name");
+		return baseMapper.selectCount(wrapper);
+	}
+
+	@Override
+	public List<DispactAddress> countNumDetailSendAreaByDispatchId(String dispatchId) {
+		QueryWrapper<DispactAddress> wrapper = new QueryWrapper<>();
+		wrapper.eq("dispacth_id", dispatchId).groupBy("counties_id");
+		return baseMapper.selectList(wrapper);
+	}
 }

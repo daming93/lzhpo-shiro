@@ -5,6 +5,7 @@ import java.util.List;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.lzhpo.finance.entity.Income;
 import com.lzhpo.stock.entity.DirectReturn;
+import com.lzhpo.stock.entity.LineTakeout;
 import com.lzhpo.stock.entity.SaleReturn;
 import com.lzhpo.stock.entity.Storage;
 import com.lzhpo.stock.entity.Takeout;
@@ -39,6 +40,9 @@ public interface IIncomeService extends IService<Income> {
 
 	//出库装卸费计算
 	Takeout takeoutIncomeMath(Takeout takeout) throws Exception;
+	
+	//出库装卸费计算 线路得出库装卸费 在出库单得时候直接生成
+	LineTakeout linetakeoutIncomeMath(LineTakeout takeout) throws Exception;
 	
 	Storage storageIncomeMath(Storage storage)throws Exception;
 	

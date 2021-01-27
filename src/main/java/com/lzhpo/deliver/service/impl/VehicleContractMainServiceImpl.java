@@ -11,11 +11,15 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.lzhpo.deliver.entity.Vehicle;
 import com.lzhpo.deliver.entity.VehicleContractMain;
 import com.lzhpo.deliver.entity.VehicleContractMainDetail;
+import com.lzhpo.deliver.entity.VehicleType;
 import com.lzhpo.deliver.mapper.VehicleContractMainMapper;
 import com.lzhpo.deliver.service.IVehicleContractMainDetailService;
 import com.lzhpo.deliver.service.IVehicleContractMainService;
+import com.lzhpo.deliver.service.IVehicleService;
+import com.lzhpo.deliver.service.IVehicleTypeService;
 import com.lzhpo.sys.service.IGenerateNoService;
 /**
  * <p>
@@ -32,6 +36,12 @@ public class VehicleContractMainServiceImpl extends ServiceImpl<VehicleContractM
 	private IGenerateNoService generateNoService;
 	@Autowired
 	private IVehicleContractMainDetailService vehicleContractMainDetailService ;
+	@Autowired
+	private IVehicleService vehicleService;
+	@Autowired
+	private IVehicleTypeService vehicleTypeService ;
+	
+	
 	@Override
     public long getVehicleContractMainCount(String name) {
         QueryWrapper<VehicleContractMain> wrapper = new QueryWrapper<>();
@@ -115,6 +125,20 @@ public class VehicleContractMainServiceImpl extends ServiceImpl<VehicleContractM
 			detail.setContractId(main.getId());
         	vehicleContractMainDetailService.save(detail);
 		}
+	}
+
+	@Override
+	public VehicleContractMain getByVehicleId(String vehicleId) {
+		if(vehicleId!=null){
+			Vehicle vehicle = vehicleService.getById(vehicleId);
+			if(vehicle!=null){
+				VehicleType type = vehicleTypeService.getById(vehicle.getVehicleTypeId());
+				if(type!=null){
+					return getById(type.getContractId());
+				}
+			}
+		}
+		return null;
 	}
 
 

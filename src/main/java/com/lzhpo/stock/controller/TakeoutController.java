@@ -309,7 +309,7 @@ public class TakeoutController {
 	@SysLog("保存编辑数据")
 	public ResponseEntity edit(@RequestBody Takeout takeout) {
 		if (StringUtils.isBlank(takeout.getId())) {
-			return ResponseEntity.failure("修改提示信息（不能为空)");
+			return ResponseEntity.failure("id（不能为空)");
 		}
 		takeoutService.updateTakeout(takeout);
 		return ResponseEntity.success("操作成功");

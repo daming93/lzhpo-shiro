@@ -25,7 +25,13 @@ window.viewObj = {
 
         var $ = layui.$, table = layui.table, form = layui.form, layer = layui.layer,upload = layui.upload;
       //回车操作
-   
+        form.verify({
+            int:function(value, item){
+                if(!(/(^[0-9]\d*$)/.test(num))){
+                    return "只能输入自然数！";
+                }
+            }
+        })
         form.on('select(provinceId)', function(data){
             $("#cityId").empty();
             $("#countiesId").empty();
@@ -43,6 +49,7 @@ window.viewObj = {
              });
          
         });
+        
         form.on('select(cityId)', function(data){
             $("#countiesId").empty();
              var url = '/sys/territory/selectAreaByCityCode?id=' + data.value;
