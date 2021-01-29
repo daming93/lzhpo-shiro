@@ -23,9 +23,14 @@ public interface DispactAddressMapper extends BaseMapper<DispactAddress> {
 	//库存单据得待排单据
 	public List<DispactAddress> getDispactWaitForTakoutBill(Map<String, Object> map);
 	
+	//线路单据得待排单据
+	public List<DispactAddress>  getDispactWaitForLineBill(Map<String, Object> map);
+	
 	public DispactAddress getDispactAddressByBillId(@Param("id") String id);
 	
 	public DispactAddress getDispactAddressByTakoutId(@Param("id") String id);
 	
 	public DispactAddress getDispactAddressByBillCode(@Param("code") String code);
+	
+	public DispactAddress getDispactAddressByLineTakoutId(@Param("id") String id);
 }

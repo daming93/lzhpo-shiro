@@ -34,13 +34,16 @@ public interface IDispactAddressService extends IService<DispactAddress> {
 	//分页查询数据在父类
 	public List<DispactAddress> getDispactWaitForDeliverBill(Map<String, Object> map);
 	
-	
+	//分页查询数据在父类
+	public List<DispactAddress> getDispactWaitForLineTakeoutBill(Map<String, Object> map);
 	//分页查询数据在父类
 	public List<DispactAddress> getDispactWaitForTakeoutBill(Map<String, Object> map);
 	//根据实例Id获取实例 排单管理中得
 	DispactAddress getDispactAddressByBillId(String id);
 	//根据实例Id获取实例 排单管理中得库存出单
 	DispactAddress getDispactAddressByTakoutId(String id);
+	//根据实例Id获取实例 排单管理中得线路出单
+	DispactAddress getDispactAddressByLineTakoutId(String id);
 	//拆单
 	public String splitBill(DispactAddress dispactAddress);
 	

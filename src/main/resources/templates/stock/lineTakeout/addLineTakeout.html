@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <meta charset="utf-8">
+    <title>线路单据发货</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <link rel="stylesheet" th:href="@{/static/layui/css/layui.css}" media="all" />
+    <style type="text/css">
+        .layui-form-item .layui-inline{ min-width:15%; float:left; margin-right:0 }
+        .layui-form-item .lineTakeout-box {
+            position: relative;
+        }
+         html, body
+        {
+            width: 100%;
+            height: 70%;
+        }
+    </style>
+</head>
+<body class="childrenBody">
+<form class="layui-form">
+    <div class="layui-form-item">
+       <div class="layui-form-item">
+        <div class="layui-inline">
+            <label class="layui-form-label">客户</label>
+            <div class="layui-input-block">
+                <select name="clientId" id="clientId" class="form-control1" lay-verify="" lay-filter="clientId" lay-search>
+                    <option value="">请选择客户</option>
+                    <option th:each="basic:${basicDatas}" th:value="${basic.id}" lay-verify="required" th:text="${basic.clientShortName}"></option>
+                </select>
+            </div>  
+        </div>
+        <div class="layui-inline">
+             <label class="layui-form-label">出库时间</label>
+            <div class="layui-input-block">
+                <input type="text" class="layui-input layTime" id="takeoutTime" name="takeoutTime" lay-verify="required" placeholder="请输入出库时间">
+            </div>
+        </div>
+         <div class="layui-inline">
+             <label class="layui-form-label">配送时间</label>
+            <div class="layui-input-block">
+                <input type="text" class="layui-input layTime" id="deliveryTime" name="deliveryTime" lay-verify="required" placeholder="请输入配送时间">
+            </div>
+        </div>
+        <div  class="layui-inline">
+            <label class="layui-form-label">客户单号</label>
+            <div class="layui-input-block">
+                <input type="text" class="layui-input" id="clientCode" name="clientCode" lay-verify="required" placeholder="请输入客户单号"  >
+            </div>
+        </div>
+      
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-inline">
+            <label class="layui-form-label">出库类型</label>
+            <div class="layui-input-block">
+                <select name="adjustment" id="adjustment" class="form-control1" lay-filter="adjustment" lay-verify="required" >
+                    <option value="0">正常</option>
+                    <option value="1">调账</option>
+                </select>
+            </div>  
+        </div>
+        <div class="layui-inline">
+            <label class="layui-form-label">收入类型</label>
+            <div class="layui-input-block">
+                <select name="transportationType" id="transportationType" class="form-control1" lay-verify="" lay-filter="transportationType" lay-search>
+                    <option value="">请选择收入类型</option>
+                    <option th:each="basic:${transportationTypeList}" th:value="${basic.value}" lay-verify="required" th:text="${basic.name}"></option>
+                </select>
+            </div>  
+        </div>
+        <div class="layui-inline">
+            <label class="layui-form-label">配送类型</label>
+            <div class="layui-input-block">
+                <select name="deliverType" id="deliverType" class="form-control1" lay-verify="" lay-filter="deliverType" lay-search>
+                    <option value="">请选择配送类型</option>
+                    <option th:each="basic:${deliverTypeList}" th:value="${basic.value}" lay-verify="required" th:text="${basic.name}"></option>
+                </select>
+            </div>  
+        </div>
+         <div class="layui-inline">
+            <label class="layui-form-label">配送地址</label>
+            <div class="layui-input-block">
+                <select name="addressId" id="addressId" class="form-control1" lay-verify="" lay-filter="addressId" lay-search>
+                    <option value="">请选择配送地址</option>
+                    <option th:each="basic:${addressList}" th:value="${basic.id}" lay-verify="required" th:text="${basic.addressName}"></option>
+                </select>
+            </div>  
+        </div>
+    </div>
+    <div class="layui-form-item">
+      
+        <div class="layui-inline">
+            <label class="layui-form-label">体积(m³)</label>
+              <div class="layui-input-block">
+                <input type="text" class="layui-input" value="0.0" lay-verify="required|number" name="volume" >
+            </div>  
+        </div>
+        <div class="layui-inline">
+            <label class="layui-form-label">体积(kg)</label>
+            <div class="layui-input-block">
+                 <input type="text" class="layui-input" value="0.0" lay-verify="required|number" name="weight" >
+            </div>   
+         </div>
+         <div class="layui-inline">
+            <div class="layui-inline">
+            <label class="layui-form-label">整数量</label>
+                     <div class="layui-input-block">
+                        <input type="text" class="layui-input" name="total" value="0"  lay-verify="required|number">
+                    </div> 
+         </div>
+         <div class="layui-inline">
+            <label class="layui-form-label">零数量</label>
+                     <div class="layui-input-block">
+                      <input type="text" class="layui-input" name="number" value="0"   lay-verify="required|number">
+                    </div> 
+         </div>
+    </div>
+    <div class="layui-form-item">
+      <label class="layui-form-label">备注</label>
+        <div class="layui-input-block" >
+            <textarea placeholder="备注(不超过200字)" name="remarks" class="layui-textarea"></textarea>
+        </div>
+    </div>
+    <div class="layui-form-item" >
+
+        <div class="layui-input-block">
+            <button class="layui-btn" lay-submit="" lay-filter="addlineTakeout">确认修改</button>
+            <button class="layui-btn layui-btn-primary">放弃修改</button>
+        </div>
+    </div>
+</form>
+<script type="text/javascript" th:src="@{/static/layui/layui.js}"></script>
+<script type="text/javascript" th:src="@{/static/stock/js/lineTakeout/lineTakeoutAdd.js}"></script>
+</body>
+</html>

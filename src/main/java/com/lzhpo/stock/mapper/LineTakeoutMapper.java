@@ -1,7 +1,12 @@
 package com.lzhpo.stock.mapper;
 
-import com.lzhpo.stock.entity.LineTakeout;
+import java.util.List;
+import java.util.Set;
+
+import org.apache.ibatis.annotations.Param;
+
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.lzhpo.stock.entity.LineTakeout;
 
 /**
  * <p>
@@ -12,5 +17,5 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  * @since 2021-01-25
  */
 public interface LineTakeoutMapper extends BaseMapper<LineTakeout> {
-
+	List<LineTakeout> selectAllByDispatchIds(@Param("takeoutIds") Set<String> takeoutIds);
 }

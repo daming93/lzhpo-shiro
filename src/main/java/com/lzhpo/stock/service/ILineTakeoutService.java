@@ -1,8 +1,10 @@
 package com.lzhpo.stock.service;
 
-import com.lzhpo.stock.entity.LineTakeout;
-import com.baomidou.mybatisplus.extension.service.IService;
 import java.util.List;
+import java.util.Set;
+
+import com.baomidou.mybatisplus.extension.service.IService;
+import com.lzhpo.stock.entity.LineTakeout;
 /**
  * <p>
  * 线路发单（无关库存的发单) 表单形式和库存发单接近，但是没有子表 服务类
@@ -33,4 +35,6 @@ public interface ILineTakeoutService extends IService<LineTakeout> {
 	//分页查询数据在父类
 
 	void backTakeout(String id);
+	
+	List<LineTakeout> selectAllByDispatchIds(Set<String> dispatchIds);
 }

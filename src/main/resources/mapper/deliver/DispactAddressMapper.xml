@@ -223,7 +223,122 @@
 	               and  client_code like CONCAT('%','${clientCode}','%' )  
 	            </if> 
 	</select>
-	
+	<!-- 线路发单得待选列表 -->
+	<select id="getDispactWaitForLineBill" resultType="com.lzhpo.deliver.entity.DispactAddress" parameterType="map">
+	SELECT
+	*
+		FROM
+			(
+				SELECT
+					*
+				FROM
+					deliver_dispact_address
+				WHERE
+					(
+						dispacth_id IS NULL
+						OR dispacth_id = ''
+					)
+				AND table_id IN (
+					SELECT
+						id
+					FROM
+						stock_line_takeout
+					WHERE
+						(
+							(
+								split = 1
+								AND scheduling_status = 0
+								AND STATUS = 2 /* 正常单据*/
+							)
+							OR (
+								split = 1
+								AND scheduling_status = 1
+								AND STATUS = 3 /* 排过单据得余下单据*/
+							)
+						)
+					AND del_flag = 0
+					AND deliver_type!=2 /* 不是自提 */
+					AND adjustment!=1  /* 不是调账 */
+				)
+				UNION ALL
+					SELECT
+						t.id,
+						cb.client_short_name,
+						t.CODE,
+						t.client_code,
+						
+						NULL,
+						ad.province_id,
+						ad.city_id,
+						ad.counties_id,
+						ad.address_name,
+						t.delivery_time,
+						5,/*线路发单 5 拆单6 */
+						t.id,
+						NULL,
+						NULL,
+						number,
+						t.volume,
+						t.weight,
+						t.create_date,
+						t.create_by,
+						t.update_date,
+						t.update_by,
+						t.remarks,
+						t.del_flag
+					FROM
+						stock_line_takeout t
+					LEFT JOIN deliver_address ad ON t.address_id = ad.id
+					LEFT JOIN client_basicdata cb ON t.client_id = cb.id
+					WHERE
+						t.split IS NULL
+					AND t.scheduling_status = 0
+					AND (t. STATUS = 2 or (t.picking_status!=0 and t.STATUS=3))
+					AND t.del_flag = 0
+					AND deliver_type!=2 /* 不是自提 */
+					AND adjustment!=1  /* 不是调账 */
+					<if test="deliverType != null and deliverType != ''">  
+	               		and deliver_type = ${deliverType}
+	            	</if>
+	            	<if test="provinceId != null and provinceId != ''">  
+	               		and ad.province_id = '${provinceId}'
+	            	</if>
+	            	<if test="cityId != null and cityId != ''">  
+	               		and ad.city_id = '${cityId}'
+	            	</if>
+	            	<if test="countiesId != null and countiesId != ''">  
+	               		and ad.counties_id = '${countiesId}'
+	            	</if>
+					ORDER BY
+						client_code DESC,
+						CODE ASC
+			) a
+			where 
+			1=1
+				<if test="waitedList!=null">
+					and 
+			            a.id not in
+			            <foreach close=")" collection="waitedList" item="wait" open="(" separator=",">
+			                #{wait}
+			            </foreach>
+			       
+				</if>
+			<if test="code != null and code != ''">  
+	               and code like CONCAT('%','${code}','%' )  
+	            </if>
+	            <if test="clientName != null and clientName != '' ">  
+	               and client_name like CONCAT('%','${clientName}','%' )  
+	            </if> 
+	            <if test="startTime != null and startTime != '' ">  
+	                <![CDATA[  and dispatch_time >= '${startTime}' ]]>
+	            </if>
+	             <if test="overTime != null and overTime != '' ">  
+	                <![CDATA[  and dispatch_time <= '${overTime}' ]]>
+	            </if>
+	            <if test="clientCode != null and clientCode != '' ">  
+	               and  client_code like CONCAT('%','${clientCode}','%' )  
+	            </if> 
+	</select>
 	<select id="getDispactAddressByBillId" resultType="com.lzhpo.deliver.entity.DispactAddress"  parameterType="java.lang.String">
 		SELECT
 			*
@@ -372,6 +487,82 @@
 			where id = #{id}
 	</select>
 	
+	<!-- 线路发单 -->
+	<select id="getDispactAddressByLineTakoutId" resultType="com.lzhpo.deliver.entity.DispactAddress"  parameterType="java.lang.String">
+		SELECT
+	*
+		FROM
+			(
+				SELECT
+					*
+				FROM
+					deliver_dispact_address
+				WHERE
+					(
+						dispacth_id IS NULL
+						OR dispacth_id = ''
+					)
+				AND table_id IN (
+					SELECT
+						id
+					FROM
+						stock_line_takeout
+					WHERE
+						(
+							(
+								split = 1
+								AND scheduling_status = 0
+								AND STATUS = 2 /* 正常单据*/
+							)
+							OR (
+								split = 1
+								AND scheduling_status = 1
+								AND STATUS = 3 /* 排过单据得余下单据*/
+							)
+						)
+					AND del_flag = 0
+				)
+				UNION ALL
+					SELECT
+						t.id,
+						cb.client_short_name,
+						t.CODE,
+						t.client_code,
+						
+						NULL,
+						ad.province_id,
+						ad.city_id,
+						ad.counties_id,
+						ad.address_name,
+						t.delivery_time,
+						5,/*线路发单 5 拆单6 */
+						t.id,
+						NULL,
+						NULL,
+						number,
+						t.volume,
+						t.weight,
+						t.create_date,
+						t.create_by,
+						t.update_date,
+						t.update_by,
+						t.remarks,
+						t.del_flag
+					FROM
+						stock_line_takeout t
+					LEFT JOIN deliver_address ad ON t.address_id = ad.id
+					LEFT JOIN client_basicdata cb ON t.client_id = cb.id
+					WHERE
+						t.split IS NULL
+					AND t.scheduling_status = 0
+					AND t. STATUS = 2
+					AND t.del_flag = 0
+					ORDER BY
+						client_code DESC,
+						CODE ASC
+			) a
+			where id = #{id}
+	</select>
 	
 	
 	<select id="getDispactAddressByBillCode" resultType="com.lzhpo.deliver.entity.DispactAddress"  parameterType="java.lang.String">

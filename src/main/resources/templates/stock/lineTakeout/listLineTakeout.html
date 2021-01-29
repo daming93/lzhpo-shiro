@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+
+    <meta charset="utf-8">
+    <title>单据列表--线路出单</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <link rel = "shortcut icon" href="${site.logo}">
+    <link rel="stylesheet" th:href="@{/static/layui/css/layui.css}" media="all" />
+    <link rel="stylesheet" th:href="@{/static/admin/css/list.css}" media="all" />
+</head>
+<body class="childrenBody">
+<fieldset class="layui-elem-field">
+    <legend>用户检索</legend>
+    <div class="layui-field-box">
+        <form class="layui-form">
+            <div class="layui-inline">
+                <select name="s_clientId" id="clientId" class="form-control1" lay-verify="" lay-filter="clientId" lay-search>
+                    <option value="">请选择客户</option>
+                    <option th:each="basic:${basicDatas}" th:value="${basic.id}" lay-verify="required" th:text="${basic.clientShortName}"></option>
+                </select>
+            </div> 
+            <div class="layui-inline">
+                <input type="text" value="" name="s_clientCode" placeholder="客户单号" class="layui-input search_input">
+            </div>
+            <div class="layui-inline">
+                <input type="text" value="" name="s_code" placeholder="系统单号" class="layui-input search_input">
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">时间范围</label>
+            </div>
+           <div class="layui-inline">
+                <input type="text" value="" id="startTime" name="s_startTime" placeholder="开始时间" class="layui-input layTime">
+            </div>
+            <div class="layui-inline">
+                <input type="text" value="" id="overTime" name="s_overTime"  placeholder="结束时间" class="layui-input layTime">
+            </div>
+            <div class="layui-input-inline">
+                <a class="layui-btn" lay-submit="" lay-filter="searchForm">查询</a>
+            </div>
+        <!--   <shiro:hasPermission name="stock:takeout:delete">
+                <div class="layui-inline">
+                <a class="layui-btn layui-btn-danger" data-type="deleteSome">批量删除</a>
+            </div>
+            </shiro:hasPermission> -->
+            <shiro:hasPermission name="stock:takeout:add">
+            <div class="layui-inline">
+                <a class="layui-btn layui-btn-normal" id="addlineTakeout" data-type="addUser">添加出库</a>
+
+            </div>
+             <div class="layui-input-inline">
+                  <div class="layui-form-mid layui-word-aux">提示:双击行查看详情,ctrl+enter新建出库</div>
+              </div>
+            <div class="layui-inline">
+                <a class="layui-btn" lay-submit="" lay-filter="searchForm">查询</a>
+            </div>
+        </form>
+    </div>
+</fieldset>
+<script type="text/html" id="toolbarDemo">
+       <div class="layui-col-md2 layui-col-sm3 layui-col-xs6" style="text-align: left;padding-left: 10px;">
+            <div class="layui-input-inline yutons-btn-margin-right">
+               <span class="layui-btn yutons layui-btn-sm yutons-color-detail" lay-event="table_export">导出全部</span>
+            </div>
+        </div>
+</script>
+<div class="layui-form lineTakeouts_list">
+    <table class="layui-table" id="lineTakeoutTable" lay-filter="lineTakeoutList"></table>
+    <script type="text/html" id="lineTakeoutBar">
+                         {{# if (d.statusStr=='可撤销'){ }}
+                        <shiro:hasPermission name="stock:lineTakeout:back">
+                            <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="back">撤销</a>
+                        </shiro:hasPermission>
+                          {{#  } }}
+                         {{# if (d.status==1){ }}
+                        <shiro:hasPermission name="stock:lineTakeout:edit">
+                            <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+                        </shiro:hasPermission>
+                           <shiro:hasPermission name="stock:lineTakeout:delete">
+                            <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+                        </shiro:hasPermission>
+                        {{#  } }}
+                        </script>
+</div>
+<div id="page"></div>
+<script type="text/javascript" th:src="@{/static/layui/layui.js}"></script>
+<script type="text/javascript" th:src="@{/static/admin/js/tools.js}"></script>
+<script type="text/javascript" th:src="@{/static/stock/js/lineTakeout/lineTakeoutList.js}"></script>
+</body>
+</html>

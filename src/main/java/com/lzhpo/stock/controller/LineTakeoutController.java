@@ -9,6 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.WebUtils;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -44,7 +44,7 @@ import com.lzhpo.sys.entity.Dictionary;
  * @author xdm
  * @since 2021-01-25
  */
-@RestController
+@Controller
 @RequestMapping("/stock/lineTakeout")
 public class LineTakeoutController {
  	@Autowired
@@ -61,7 +61,9 @@ public class LineTakeoutController {
 	@Autowired
 	private IAddressService addressService;
     @GetMapping(value = "list")
-    public String list(){
+    public String list(ModelMap modelMap){
+    	List<Basicdata> basicDatas = basicdateService.selectAll();
+		modelMap.put("basicDatas", basicDatas);
         return "stock/lineTakeout/listLineTakeout";
     }
 	
@@ -189,7 +191,6 @@ public class LineTakeoutController {
 			e.printStackTrace();
 			return ResponseEntity.failure("系统异常,请联系管理员处理");
 		}
-        lineTakeoutService.saveLineTakeout(lineTakeout);
         return ResponseEntity.success("操作成功");
     }
  
@@ -243,7 +244,13 @@ public class LineTakeoutController {
         if(StringUtils.isBlank(lineTakeout.getId())){
             return ResponseEntity.failure("id（不能为空)");
         }
-        lineTakeoutService.updateLineTakeout(lineTakeout);
+        try {
+        	lineTakeoutService.updateLineTakeout(lineTakeout);
+		} catch (RuntimeJsonMappingException e) {
+			 return ResponseEntity.failure(e.getMessage());
+		} catch (Exception e) {
+			 return ResponseEntity.failure("系统异常请联系管理员");
+		}
         return ResponseEntity.success("操作成功");
     }
 	@RequiresPermissions("stock:lineTakeout:back")

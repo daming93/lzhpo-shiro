@@ -35,7 +35,9 @@ import com.lzhpo.deliver.service.IDispatchService;
 import com.lzhpo.deliver.service.IWayBillService;
 import com.lzhpo.finance.entity.Income;
 import com.lzhpo.finance.service.IIncomeService;
+import com.lzhpo.stock.entity.LineTakeout;
 import com.lzhpo.stock.entity.Takeout;
+import com.lzhpo.stock.service.ILineTakeoutService;
 import com.lzhpo.stock.service.IReceiptBillService;
 import com.lzhpo.stock.service.ITakeoutService;
 import com.lzhpo.sys.service.IGenerateNoService;
@@ -79,6 +81,8 @@ public class WayBillServiceImpl extends ServiceImpl<WayBillMapper, WayBill> impl
 	@Autowired
 	private IReceiptBillService receiptBillService;
 	
+	@Autowired
+	private ILineTakeoutService lineTakeoutService; 
 	
 	@Override
     public long getWayBillCount(String name) {
@@ -110,6 +114,7 @@ public class WayBillServiceImpl extends ServiceImpl<WayBillMapper, WayBill> impl
     	BigDecimal lodaRate = new BigDecimal(0);
     	BigDecimal weightRate = new BigDecimal(0);
     	Set<String> tableIds = new 	HashSet<>();//所有出库单的id
+    	Set<String> linetableIds = new 	HashSet<>();//所有线路发货出库单的id
     	for (Dispatch dispatch : dispatchs) {
     		dispatch = dispatchService.getById(dispatch.getId());
     		//从数据库取出得最新数据
@@ -125,6 +130,10 @@ public class WayBillServiceImpl extends ServiceImpl<WayBillMapper, WayBill> impl
     				//对应的tableid
     				tableIds.add(dispactAddress.getTableId());//找出对应的出库单的id
     			}
+    			if(dispactAddress.getType()==5||dispactAddress.getType()==6){
+    				//对应的tableid
+    				linetableIds.add(dispactAddress.getTableId());//找出对应的出库单的id
+    			}
 			}
 		}
     	wayBill.setCode(generateNoService.nextCode("LD"));
@@ -134,7 +143,6 @@ public class WayBillServiceImpl extends ServiceImpl<WayBillMapper, WayBill> impl
     	wayBill.setLodaRate(lodaRate.divide(new BigDecimal(vehicleNum)));
     	wayBill.setWeightRate(weightRate.divide(new BigDecimal(vehicleNum)));
     	//插入路单前，需要在这里计算费用
-    	//计算过程现在不清楚
     	//按客户收费 同一个路单 从合同里找他的计费方式  无论如何可以统计出来一个客户的体积，重量，货值，运输方式也要算进去
     	//（在某个路单）某个客户  配送时间 配送方式  送什么区域 送了 多少（方，中，货值）
     	//以上信息可以分类出来
@@ -143,6 +151,7 @@ public class WayBillServiceImpl extends ServiceImpl<WayBillMapper, WayBill> impl
     	//预设收入
     	List<Income> incomeList = new ArrayList<Income>();
     	List<Takeout> takeoutList = takeoutService.selectAllByDispatchIds(tableIds);
+    	
     	for (Takeout takeout : takeoutList) {//这里 总数和零数可能之前计算有问题 
 			//这里就是按五个同一原则分配出来的金额
     		String clientId = takeout.getClientId();//有客户之后//找客户的合同
@@ -247,6 +256,114 @@ public class WayBillServiceImpl extends ServiceImpl<WayBillMapper, WayBill> impl
     		}
     		
 		}
+    	//然后进行线路发单的收费
+    	List<LineTakeout> linetakeoutList = lineTakeoutService.selectAllByDispatchIds(tableIds);
+    	//逻辑基本一样只是从不同表中进行选出
+    	for (LineTakeout takeout : linetakeoutList) {//这里 总数和零数可能之前计算有问题 
+			//这里就是按五个同一原则分配出来的金额
+    		String clientId = takeout.getClientId();//有客户之后//找客户的合同
+    		Basicdata client = basicdataService.getBasicdataById(clientId);
+    		//找到客户正在使用的配送合同 其中有地址信息 地址信息去找省市区
+    		String addressId = takeout.getAddressId();
+    		Address address = addressService.getById(addressId);
+    		String main = deliverContractMainService.getUsingContractId(clientId);//正在使用的合同id
+    		DeliverContractMain mainContract = deliverContractMainService.getById(main);
+    		//由于不知道采取的是什么类型的计费方式，所以我们要把重件方货值都拿出来去找，找到为止，找不到提醒用户无改范围的报价
+    		//件数
+    	
+    		DeliverContractMainDetail detail = deliverContractMainDetailService//这个range 是要求类型的 type //件数先按总数来
+    				.selectDetailMoneyByInfo(main, address.getProvinceId(), address.getCityId(), address.getCountiesId(), takeout.getTotal(),freight_type_number);
+    		
+    		if(detail==null){//没找到件数 找体积
+    			detail = deliverContractMainDetailService
+        				.selectDetailMoneyByInfo(main, address.getProvinceId(), address.getCityId(), address.getCountiesId(), takeout.getVolume(),freight_type_volume);
+    		}
+    		if(detail==null){//没找到体积 找重量
+    			detail = deliverContractMainDetailService
+        				.selectDetailMoneyByInfo(main, address.getProvinceId(), address.getCityId(), address.getCountiesId(), takeout.getWeight(),freight_type_weight);
+    		}
+    		if(detail==null){//没找到重量 找销售额
+    			detail = deliverContractMainDetailService
+        				.selectDetailMoneyByInfo(main, address.getProvinceId(), address.getCityId(), address.getCountiesId(), takeout.getMoney(),freight_type_salesvolume);
+    		}
+    		if(detail==null){
+    			throw new RuntimeJsonMappingException("未在"+client.getClientShortName()+"的合同找到该范围的报价");
+    		}else{
+    			//此时我们得到了他的报价 //要把计费过程记录下来吗
+    			Income income = new Income();
+    			//什么客户在什么范围内 单价多少 * 单位 == 收费金额 （合同编号） 出库单号 计费方式（重方件钱）
+    			Integer type = detail.getType();
+    			String tmep = "按";
+    			BigDecimal sum = new BigDecimal(1);
+    			//还要乘以系数 //就是看配送方式
+    			Integer tranType = takeout.getTransportationType();
+    			BigDecimal coefficient = new BigDecimal(1);//系数
+    			switch (tranType) {
+				case 2://加急
+					coefficient = mainContract.getTransportationTypeUrgent();
+					break;
+				case 3://节日
+					coefficient = mainContract.getTransportationTypeHoliday();
+					break;
+				case 6://托运
+					coefficient = mainContract.getTransportationTypeConsign();
+					break;
+				default:
+					break;
+				}
+    			switch (type) {
+				case 1://件数
+					if(money_type_unit.equals(detail.getMoneyType())){
+						sum = detail.getMoney().multiply(new BigDecimal(takeout.getTotal())).multiply(coefficient);
+						tmep=tmep+"件数"+"计算过程("+takeout.getTotal()+"*"+detail.getMoney()+"[单价]"+"*"+coefficient+"[系数]="+sum+")收取 "+sum+"(元)" ;
+					}else{
+						sum = detail.getMoney().multiply(coefficient);;
+						tmep=tmep+"件数"+"计算过程("+detail.getMoney()+"[固收]"+"*"+coefficient+"[系数]="+sum+")收取 "+sum+"(元)" ;
+					}
+					break;
+				case 2://方数
+					if(money_type_unit.equals(detail.getMoneyType())){
+						sum = detail.getMoney().multiply(takeout.getVolume()).multiply(coefficient);
+						tmep=tmep+"方数"+"计算过程("+takeout.getVolume()+"*"+detail.getMoney()+"[单价]"+"*"+coefficient+"[系数]="+sum+")收取 "+sum+"(元)";
+					}else{
+						sum = detail.getMoney().multiply(coefficient);;
+						tmep=tmep+"方数"+"计算过程("+detail.getMoney()+"[固收]"+"*"+coefficient+"[系数]="+sum+")收取 "+sum+"(元)" ;
+					}
+					break;
+				case 3://重量
+					if(money_type_unit.equals(detail.getMoneyType())){
+						sum = detail.getMoney().multiply(takeout.getWeight()).multiply(coefficient);
+						tmep=tmep+"重量"+"计算过程("+takeout.getWeight()+"*"+detail.getMoney()+"[单价]"+"*"+coefficient+"[系数]="+sum+")收取 "+sum+"(元)";
+					}else{
+						sum = detail.getMoney().multiply(coefficient);;
+						tmep=tmep+"重量"+"计算过程("+detail.getMoney()+"[固收]"+"*"+coefficient+"[系数]="+sum+")收取 "+sum+"(元)" ;
+					}
+					break;
+				default://销售额
+					if(money_type_unit.equals(detail.getMoneyType())){
+						sum = detail.getMoney().multiply(takeout.getMoney()).multiply(coefficient);
+						tmep=tmep+"销售额"+"计算过程("+takeout.getMoney()+"*"+detail.getMoney()+"[百分比]"+"*"+coefficient+"[系数]="+sum+")收取 "+sum+"(元)";
+					}else{
+						sum = detail.getMoney().multiply(coefficient);;
+						tmep=tmep+"销售额"+"计算过程("+detail.getMoney()+"[固收]"+"*"+coefficient+"[系数]="+sum+")收取 "+sum+"(元)" ;
+					}
+					break;
+				}
+    			//如果要记下来以什么形式记下来
+    			//所有的都通过才去设置Income
+    			income.setTableCode(wayBill.getCode());
+    			income.setClientId(clientId);
+    			income.setBasis(mainContract.getContractCode());
+    			income.setOptionId(clientDeliverIncome);
+    			income.setMoeny(sum);
+    			income.setBasicId(mainContract.getId());
+    			String remark = client.getClientShortName()+"在"+income.getTableCode()+"中"+tmep+"合同编号为"+income.getBasis()+"计算范围为"+detail.getTypeName()+detail.getMinNumber()+"到"+detail.getMaxNumber();
+    			income.setRemarks(remark);
+    			incomeList.add(income);
+    		}
+    		
+		}
+    	
     	baseMapper.insert(wayBill);
     	//算收入 只有全部通过才会计算收入
     	for (Income income : incomeList) {
@@ -295,6 +412,8 @@ public class WayBillServiceImpl extends ServiceImpl<WayBillMapper, WayBill> impl
     @CacheEvict(value = "WayBills", allEntries = true)
     public void deleteWayBill(WayBill wayBill) {
         wayBill.setDelFlag(true);
+        //有关的计费也要删除
+        incomeService.deleteByWaybillId(wayBill.getId());
         baseMapper.updateById(wayBill);
         //然后将子表得关联关系删除
         dispatchService.backDispatchByWaybillId(wayBill.getId());

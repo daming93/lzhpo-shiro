@@ -1,27 +1,27 @@
 package com.lzhpo.deliver.service.impl;
 
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.lzhpo.common.init.CacheUtils;
 import com.lzhpo.deliver.entity.DispactAddress;
 import com.lzhpo.deliver.entity.ExpressBill;
 import com.lzhpo.deliver.mapper.DispactAddressMapper;
 import com.lzhpo.deliver.service.IDispactAddressService;
 import com.lzhpo.deliver.service.IExpressBillService;
+import com.lzhpo.stock.entity.LineTakeout;
 import com.lzhpo.stock.entity.Takeout;
+import com.lzhpo.stock.service.ILineTakeoutService;
 import com.lzhpo.stock.service.ITakeoutService;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import org.springframework.stereotype.Service;
-
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
-
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * <p>
@@ -41,6 +41,8 @@ public class DispactAddressServiceImpl extends ServiceImpl<DispactAddressMapper,
 	@Autowired
 	private ITakeoutService takeoutService;
 
+	@Autowired
+	private ILineTakeoutService linetakeoutService;
 	@Override
 	public long getDispactAddressCount(String code) {
 		QueryWrapper<DispactAddress> wrapper = new QueryWrapper<>();
@@ -109,6 +111,8 @@ public class DispactAddressServiceImpl extends ServiceImpl<DispactAddressMapper,
 		if(dispactAddress.getType()!=null){
     		if(dispactAddress.getType()==1){//库存发单
     			dispactAddress = getDispactAddressByTakoutId(dispactAddress.getId());// 补全信息
+        	}else if(dispactAddress.getType()==3){
+        		dispactAddress = getDispactAddressByLineTakoutId(dispactAddress.getId());// 补全信息
         	}else{//快速发单
         		dispactAddress = getDispactAddressByBillId(dispactAddress.getId());// 补全信息
         	}
@@ -157,7 +161,28 @@ public class DispactAddressServiceImpl extends ServiceImpl<DispactAddressMapper,
 			dispactAddress.setWeight(weight);
 			baseMapper.insert(dispactAddress);
 			break;
-		default: // 其他3，4 是需要update得 更新一条＋一条
+		case 5: // 线路发单
+
+			LineTakeout linetakeout = linetakeoutService.getById(dispactAddress.getTableId());
+			linetakeout.setSplit(1);// 拆单状态
+			linetakeoutService.updateById(linetakeout);
+			// 需要拆成两条记录
+			// 要改变得就只有 数量体积 重量
+			dispactAddress.setType(6);//线路发单的拆单
+			dispactAddress.setTotal(dispactAddress.getTotal() - total);
+			dispactAddress.setVolume(dispactAddress.getVolume().subtract(volume));
+			dispactAddress.setWeight(dispactAddress.getWeight().subtract(weight));
+			dispactAddress.setId(null);
+			dispactAddress.setCode(splitCode(dispactAddress.getClientCode(),dispactAddress.getCode()));
+			baseMapper.insert(dispactAddress);
+			dispactAddress.setCode(splitCode(dispactAddress.getClientCode(),dispactAddress.getCode()));
+			dispactAddress.setId(null);
+			dispactAddress.setTotal(total);
+			dispactAddress.setVolume(volume);
+			dispactAddress.setWeight(weight);
+			baseMapper.insert(dispactAddress);
+			break;	
+		default: // 其他3，4 ,6是需要update得 更新一条＋一条
 			dispactAddress.setTotal(dispactAddress.getTotal() - total);
 			dispactAddress.setVolume(dispactAddress.getVolume().subtract(volume));
 			dispactAddress.setWeight(dispactAddress.getWeight().subtract(weight));
@@ -342,5 +367,15 @@ public class DispactAddressServiceImpl extends ServiceImpl<DispactAddressMapper,
 		QueryWrapper<DispactAddress> wrapper = new QueryWrapper<>();
 		wrapper.eq("dispacth_id", dispatchId).groupBy("counties_id");
 		return baseMapper.selectList(wrapper);
+	}
+
+	@Override
+	public List<DispactAddress> getDispactWaitForLineTakeoutBill(Map<String, Object> map) {
+		return baseMapper.getDispactWaitForLineBill(map);
+	}
+
+	@Override
+	public DispactAddress getDispactAddressByLineTakoutId(String id) {
+		return baseMapper.getDispactAddressByLineTakoutId(id);
 	}
 }

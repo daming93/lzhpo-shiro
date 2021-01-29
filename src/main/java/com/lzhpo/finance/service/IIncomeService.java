@@ -49,4 +49,6 @@ public interface IIncomeService extends IService<Income> {
 	SaleReturn saleReturnIncomeMath(SaleReturn saleReturn)throws Exception;
 	
 	DirectReturn directReturnIncomeMath(DirectReturn directReturn)throws Exception;
+	
+	void deleteByWaybillId(String wayBillId);
 }

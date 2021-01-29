@@ -33,6 +33,7 @@ import com.lzhpo.common.annotation.SysLog;
 import com.lzhpo.common.base.PageData;
 import com.lzhpo.common.init.CacheUtils;
 import com.lzhpo.common.util.ResponseEntity;
+import com.lzhpo.stock.service.ILineTakeoutService;
 import com.lzhpo.stock.service.ITakeoutService;
 import com.lzhpo.sys.entity.Territory;
 import com.lzhpo.sys.service.ITerritoryService;
@@ -65,6 +66,8 @@ public class DeliverContractMainController {
 
 	@Autowired
 	private ITakeoutService takeoutService ;
+	@Autowired
+	private ILineTakeoutService lineTakeoutService ;
 	@GetMapping(value = "list")
 	public String list(ModelMap modelMap) {
 		modelMap.put("clientList", basicdataService.selectAll());
@@ -309,12 +312,22 @@ public class DeliverContractMainController {
 	
 	@PostMapping("searchAreaCanDeliver")
 	@ResponseBody
-	public ResponseEntity searchAreaCanDeliver(@RequestParam String tableId,@RequestParam String proviceId,@RequestParam String cityId,@RequestParam String areaId) {
+	public ResponseEntity searchAreaCanDeliver(@RequestParam String tableId,@RequestParam String proviceId,@RequestParam String cityId,@RequestParam String areaId,@RequestParam Integer type) {
 		if (StringUtils.isBlank(tableId)) {
 			return ResponseEntity.failure("客户id不能为空");
 		}else{
 			//根据出库单号找到客户id
-			String clientId = takeoutService.getById(tableId).getClientId();
+			String clientId = "";
+			switch (type) {//1是库存发单 2 是线路发单
+			case 1:
+				clientId = takeoutService.getById(tableId).getClientId();
+				break;
+
+			default:
+				clientId = lineTakeoutService.getById(tableId).getClientId();
+				break;
+			}
+					
 			String usingContractId = deliverContractMainService.getUsingContractId(clientId);
 			if(usingContractId!=null){
 				DeliverContractMainDetail detail = deliverContractMainDetailService.selectDetailMoneyByInfoNoRange(usingContractId, proviceId, cityId, areaId);

@@ -44,6 +44,7 @@ layui.use('laydate', function(){
                 var position = '#order_dispatch'
                 switch (status) {
                     case '1': position = '#order_bill';    getExpressBillList(position, '') ; break;
+                    case '2': position = '#order_line';    getLineList(position, '') ; break;
                     default: position = '#order_dispatch';getList(position, ''); break;
                 }
               
@@ -238,6 +239,60 @@ layui.use('laydate', function(){
                 });
 
         }
+        function getLineList(position, status = '',field) {
+                var tableData=new Array();  
+                //数据表格实例化           
+                var tbWidth = $("#tableRes").width();
+                var oldData = table.cache['dispatchTable'];  
+                var waitList = [];
+
+                for(var i=0, row; i < oldData.length; i++){
+                    row = oldData[i];
+                    waitList.push(row.id);
+                }
+                if(field){
+                    field.s_waitList = waitList.toLocaleString();
+                }else{
+                    field = {};
+                    field.s_waitList = waitList.toLocaleString();
+                }
+                tableIns = table.render({
+                    url:'/deliver/dispactAddress/listLineTakout',
+                    where: field,
+                    elem: position,
+                    id: layTableId,
+                    method: 'post',
+                    height:312,
+                   // width: tbWidth,
+                    cellMinWidth:100,
+                    page: false,
+                    loading: true,
+                    even: false, //不开启隔行背景
+                    limit: 1000, // 数据表格默认全部显示
+                    cols: [[
+                              {title: '序号', type: 'numbers'},
+                            { field:'clientName',title:'客户名称',align:'center'},
+                            { field:'dispatchTime',title:'配送时间',align:'center'},
+                            { field:'clientCode',title:'客户单号',align:'center'},
+                            { field:'code',title:'系统单号',align:'center'},
+                            { field:'volume',title:'体积',align:'center',width:100},
+                            { field:'weight',title:'重量',align:'center',width:100},
+                            { field:'countiesName',title:'区域',align:'center',width:100},
+                            { field:'areaName',title:'送达地点',align:'center'},
+                            { field:'provinceId',title:'省id',align:'center',hide:true,width:100},
+                            { field:'cityId',title:'市id',align:'center',hide:true,width:100},
+                            { field:'countiesId',title:'区id',align:'center',hide:true,width:100},
+                            { field:'tableId',title:'原表Id',align:'center',hide:true,width:100},
+                            { field:'type',title:'类型id',align:'center',hide:true,width:100},
+                            { field:'id',title:'id',align:'center',hide:true,width:100},
+                             {title: '操作',fixed: 'right',  width:'15%',    align: 'center',toolbar: '#dispatchBillBar'}
+                    ]],
+                    done: function(res, curr, count){
+                  
+                    }
+                });
+
+        }
         function getExpressBillList(position, status = '',field) {
                 var tableData=new Array();  
                 //数据表格实例化           
@@ -331,6 +386,26 @@ layui.use('laydate', function(){
                 }
             });
         }
+    });
+    table.on('tool(order_line)', function(obj){
+        var data = obj.data;
+        if(obj.event === 'spilt'){
+            var editIndex = layer.open({
+                title : "拆单",
+                type : 2,
+                offset: 'rt',
+                area: ['410px','800px'],
+                content : "/deliver/dispactAddress/spilt?type=3&id="+data.id,
+                success : function(layero, index){
+                  
+                    setTimeout(function(){
+                        layer.tips('点击此处返回排单列表', '.layui-layer-setwin .layui-layer-close', {
+                            tips: 3
+                        });
+                    },500);
+                }
+            });
+        }
     });       
    table.on('rowDouble(order_dispatch)', function(obj){
         var data = obj.data;
@@ -360,7 +435,8 @@ layui.use('laydate', function(){
                             tableId:data.tableId,//上面方法名是一样的类不同，其次在这里使用的是出库表的id
                             proviceId:data.provinceId,
                             cityId:data.cityId,
-                            areaId:data.countiesId
+                            areaId:data.countiesId,
+                            type:1
                         },
                         success:function(res){
                             if(res.success){
@@ -437,7 +513,77 @@ layui.use('laydate', function(){
             }
         });
           
-    });    
+    });
+    table.on('rowDouble(order_line)', function(obj){
+        var data = obj.data;
+        //对应增加预载单据得行
+        var newRow =data;
+        //在这里检测是否能添加
+        var vehicleId = $("#vehicleId").val();
+        if(!vehicleId){
+             layer.msg("请选择车辆");
+             return false;
+        }
+        $.ajax({
+            type:"POST",
+            url:"/deliver/vehicle/searchAreaCanDeliver",
+            data:{
+                vehicleId:vehicleId,
+                proviceId:data.provinceId,
+                cityId:data.cityId,
+                areaId:data.countiesId
+            },
+            success:function(res){
+                if(res.success){
+                   $.ajax({
+                        type:"POST",
+                        url:"/client/deliverContractMain/searchAreaCanDeliver",
+                        data:{
+                            tableId:data.tableId,//上面方法名是一样的类不同，其次在这里使用的是出库表的id
+                            proviceId:data.provinceId,
+                            cityId:data.cityId,
+                            areaId:data.countiesId,
+                            type:2
+                        },
+                        success:function(res){
+                            if(res.success){
+                               newRow.typeStr = "线路发单";
+                               active.addRow(newRow,'dispatchTable');
+                               obj.del(); //删除对应行（tr）的DOM结构，并更新缓存
+                               //合计数改下
+                               $("#dispatchVolume").val(mathV());
+                               $("#lodaRate").val(Percentage( $("#dispatchVolume").val(),vehicleV));
+                               $("#dispatchWeight").val(mathW());
+                               $("#weightRate").val(Percentage( $("#dispatchWeight").val(),vehicleW));
+                            }else{
+                                layer.msg(res.message);
+                                return false;
+                            }
+                        }
+                    });
+                }else{
+                    layer.msg(res.message);
+                    return false;
+                }
+            }
+        });
+      
+//        newRow.id = data.id;
+        // newRow.type = 1;
+  
+        // newRow.code = data.code;
+        // newRow.clientCode = data.code;
+        // newRow.clientName = data.receiveName;
+        // newRow.dispatchTime =data.deliverBillTime;
+        // newRow.volume = data.volume;
+        // newRow.weight = data.weight;
+        // newRow.countiesName = data.receiveDetail;
+        // newRow.areaName = data.receiveDetailArea;
+        // newRow.provinceId = data.receiveProvinceId;
+        // newRow.cityId = data.receiveCityId;
+        // newRow.countiesId = data.receiveAreaId;
+       
+    });     
     table.on('rowDouble(dispatchTable)', function(obj){
         var data = obj.data;
         //对应增加预载单据得行
@@ -445,8 +591,10 @@ layui.use('laydate', function(){
         obj.del(); //删除对应行（tr）的DOM结构，并更新缓存
         if(data.type==1||data.type==3){
           getExpressBillList('#order_bill', '')  
-        }else{
+        }else if(data.type==2||data.type==4) {
           getList('#order_dispatch', '')
+        }else{
+          getLineList('#order_line', '')
         }
         
 

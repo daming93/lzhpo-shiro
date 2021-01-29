@@ -118,7 +118,33 @@ public class DispactAddressController {
         dispactAddressPageData.setCount(1000l);
         return dispactAddressPageData ;
     }
-    
+    /**
+     * 查询分页数据（待选择表中的库存出单）
+     */
+    @PostMapping("listLineTakout")
+    @ResponseBody
+    public PageData<DispactAddress> listLineTakout(@RequestParam(value = "page",defaultValue = "1")Integer page,
+                               @RequestParam(value = "limit",defaultValue = "10")Integer limit,
+                               ServletRequest request){
+        Map map = WebUtils.getParametersStartingWith(request, "s_");
+        if(!map.isEmpty()){
+            String waitList = (String) map.get("waitList");
+            if(StringUtils.isNotBlank(waitList)) {
+                String[] arr = waitList.split(",");
+                List<String> list = new ArrayList<>();
+                for (String string : arr) {
+                	list.add(string);
+				}
+                if(!list.isEmpty()){
+                	map.put("waitedList", list);
+                }
+            }
+        }
+        PageData<DispactAddress> dispactAddressPageData = new PageData<>();
+        dispactAddressPageData.setData(setUserToDispactAddress(dispactAddressService.getDispactWaitForLineTakeoutBill(map)));
+        dispactAddressPageData.setCount(1000l);
+        return dispactAddressPageData ;
+    }
     /**
      * 查询分页数据（配送计划得明细）
      */
@@ -276,8 +302,10 @@ public class DispactAddressController {
     	if(type!=null){
     		if(type==1){//库存发单
         		modelMap.put("dispactAddress", dispactAddressService.getDispactAddressByTakoutId(id));
-        	}else{//快速发单
+        	}else if(type==2){//快速发单
         		modelMap.put("dispactAddress", dispactAddressService.getDispactAddressByBillId(id));
+        	}else{//线路发单
+        		modelMap.put("dispactAddress", dispactAddressService.getDispactAddressByLineTakoutId(id));
         	}
     		modelMap.put("type",type);
     	}

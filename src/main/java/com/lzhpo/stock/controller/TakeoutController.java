@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.util.WebUtils;
-import org.thymeleaf.templateparser.markup.decoupled.IDecoupledTemplateLogicResolver;
 
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -112,6 +111,7 @@ public class TakeoutController {
 	@ResponseBody
 	public PageData<Takeout> list(@RequestParam(value = "page", defaultValue = "1") Integer page,
 			@RequestParam(value = "limit", defaultValue = "10") Integer limit, ServletRequest request) {
+		@SuppressWarnings("rawtypes")
 		Map map = WebUtils.getParametersStartingWith(request, "s_");
 		PageData<Takeout> takeoutPageData = new PageData<>();
 		QueryWrapper<Takeout> takeoutWrapper = new QueryWrapper<>();
@@ -456,6 +456,7 @@ public class TakeoutController {
 			@RequestParam(value = "limit", defaultValue = "10") Integer limit, ServletRequest request) {
 		// 可撤销
 		Integer modify_status_revocation = CacheUtils.keyDict.get("modify_status_revocation").getValue();
+		@SuppressWarnings("rawtypes")
 		Map map = WebUtils.getParametersStartingWith(request, "s_");
 		PageData<Takeout> takeoutPageData = new PageData<>();
 		QueryWrapper<Takeout> takeoutWrapper = new QueryWrapper<>();

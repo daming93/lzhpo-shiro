@@ -30,7 +30,9 @@ import com.lzhpo.deliver.service.IDispatchService;
 import com.lzhpo.deliver.service.IExpressBillService;
 import com.lzhpo.deliver.service.IVehicleContractMainDetailService;
 import com.lzhpo.deliver.service.IVehicleContractMainService;
+import com.lzhpo.stock.entity.LineTakeout;
 import com.lzhpo.stock.entity.Takeout;
+import com.lzhpo.stock.service.ILineTakeoutService;
 import com.lzhpo.stock.service.ITakeoutService;
 import com.lzhpo.sys.service.IGenerateNoService;
 
@@ -56,6 +58,9 @@ public class DispatchServiceImpl extends ServiceImpl<DispatchMapper, Dispatch> i
 	@Autowired
 	private ITakeoutService takeoutService;
 
+	@Autowired
+	private ILineTakeoutService lineTakeoutService;
+	
 	@Autowired
 	private IVehicleContractMainService vehicleContractMainService;
 	
@@ -154,6 +159,22 @@ public class DispatchServiceImpl extends ServiceImpl<DispatchMapper, Dispatch> i
 					// 锁定单据
 					takeoutService.updateById(takeoutSpilt);
 					dispactAddressService.updateById(dispactAddress); // 拆单后已经有该条记录，分配给dispactId便可
+				case 5:// 线路发单 得表 把其配送状态改为已排单
+					LineTakeout linetakeout = lineTakeoutService.getById(dispactAddress.getTableId());
+					linetakeout.setSchedulingStatus(scheduling_status_yes);
+					linetakeout.setStatus(modify_status_lock);
+					// 锁定单据
+					lineTakeoutService.updateById(linetakeout);
+					dispactAddress.setId(null);
+					dispactAddressService.save(dispactAddress);
+					break;
+				case 6: // 线路发单 得拆单
+					LineTakeout linetakeoutSplit = lineTakeoutService.getById(dispactAddress.getTableId());
+					linetakeoutSplit.setSchedulingStatus(scheduling_status_yes);
+					linetakeoutSplit.setStatus(modify_status_lock);
+					// 锁定单据
+					lineTakeoutService.updateById(linetakeoutSplit);
+					dispactAddressService.updateById(dispactAddress); // 拆单后已经有该条记录，分配给dispactId便可	
 				default:
 					break;
 				}

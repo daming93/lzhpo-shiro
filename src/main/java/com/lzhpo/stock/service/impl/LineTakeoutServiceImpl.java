@@ -1,6 +1,7 @@
 package com.lzhpo.stock.service.impl;
 
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.fasterxml.jackson.databind.RuntimeJsonMappingException;
 import com.lzhpo.client.service.IBasicdataService;
 import com.lzhpo.common.init.CacheUtils;
 import com.lzhpo.common.util.CommomUtil;
@@ -95,11 +97,13 @@ public class LineTakeoutServiceImpl extends ServiceImpl<LineTakeoutMapper, LineT
 		//调账
 		Integer transportation_type_adjustment =  CacheUtils.keyDict.get("transportation_type_adjustment").getValue();
 		//由于没有拣货单，在这里就要生成出库得装卸费用
-		if(!transportation_type_adjustment.equals(lineTakeout.getAdjustment())){//不是调账就计算费用
+		if(transportation_type_adjustment.equals(lineTakeout.getAdjustment())){//不是调账就计算费用
 			//调账就不用生成拣货单和 不拣货也不产生费用
 		}else{
 			try {
 				lineTakeout = incomeService.linetakeoutIncomeMath(lineTakeout);
+			} catch (RuntimeJsonMappingException e1){
+				throw e1;
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -136,6 +140,11 @@ public class LineTakeoutServiceImpl extends ServiceImpl<LineTakeoutMapper, LineT
 		lineTakeout.setIncomeId("无");
 		baseMapper.updateById(lineTakeout);
 
+	}
+
+	@Override
+	public List<LineTakeout> selectAllByDispatchIds(Set<String> dispatchIds) {
+		return baseMapper.selectAllByDispatchIds(dispatchIds);
 	}
 
 }

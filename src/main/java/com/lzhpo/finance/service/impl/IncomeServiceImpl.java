@@ -330,9 +330,17 @@ public class IncomeServiceImpl extends ServiceImpl<IncomeMapper, Income> impleme
 			save(income);
 			takeout.setIncomeId(income.getId());
 		}else{
-			throw new RuntimeJsonMappingException("该客户暂无正在使用的合同");
+			throw new RuntimeJsonMappingException("该客户暂无正在使用的仓储合同");
 		}
 		return takeout;
+	}
+
+	@Override
+	public void deleteByWaybillId(String wayBillId) {
+		//根据路单id删除有关收费
+        QueryWrapper<Income> wrapper = new QueryWrapper<>();
+        wrapper.eq("table_id", wayBillId);
+        baseMapper.delete(wrapper);
 	}
 
 }
