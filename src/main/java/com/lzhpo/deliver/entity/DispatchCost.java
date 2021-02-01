@@ -66,8 +66,33 @@ public class DispatchCost extends DataEntity<DispatchCost> implements Serializab
      */
     private BigDecimal moeny;
 
+    /**
+     * 核算费用
+     */
+    @TableField("audit_moeny")
+    private BigDecimal auditMoeny;
+    
+    @TableField(exist=false)
+    private Dispatch dispatch;
     
     
+    
+	public BigDecimal getAuditMoeny() {
+		return auditMoeny;
+	}
+
+	public void setAuditMoeny(BigDecimal auditMoeny) {
+		this.auditMoeny = auditMoeny;
+	}
+
+	public Dispatch getDispatch() {
+		return dispatch;
+	}
+
+	public void setDispatch(Dispatch dispatch) {
+		this.dispatch = dispatch;
+	}
+
 	public String getDispatchId() {
 		return dispatchId;
 	}

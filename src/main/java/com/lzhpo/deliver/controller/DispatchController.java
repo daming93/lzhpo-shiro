@@ -30,8 +30,10 @@ import com.lzhpo.common.init.CacheUtils;
 import com.lzhpo.common.util.CommomUtil;
 import com.lzhpo.common.util.ResponseEntity;
 import com.lzhpo.deliver.entity.Dispatch;
+import com.lzhpo.deliver.entity.DispatchCost;
 import com.lzhpo.deliver.entity.Driver;
 import com.lzhpo.deliver.entity.Vehicle;
+import com.lzhpo.deliver.service.IDispatchCostService;
 import com.lzhpo.deliver.service.IDispatchService;
 import com.lzhpo.deliver.service.IDriverService;
 import com.lzhpo.deliver.service.IVehicleService;
@@ -43,7 +45,7 @@ import com.lzhpo.sys.service.IUserSettingService;
 
 /**
  * <p>
- * 前端控制器
+ * 前端控制器  配送计划得花费也在这个类中，修改费用
  * </p>
  *
  * @author xdm
@@ -63,6 +65,8 @@ public class DispatchController {
 	@Autowired
 	private IVehicleService vehicleService;
 
+	@Autowired
+	private IDispatchCostService dispatchCostService;
 
 	@Autowired
 	private IUserSettingService userSettingService; 
@@ -246,5 +250,67 @@ public class DispatchController {
 		}
 		dispatchService.backDispatch(id);
 		return ResponseEntity.success("操作成功");
+	}
+	
+	/**
+	 * 配送计划支出费用(以下)
+	 */
+	@RequiresPermissions("deliver:dispatchCost:list")
+	@GetMapping(value = "costList")
+	public String costList(ModelMap modelMap){
+		return "deliver/dispatch/listDispatchCost";
+	}
+	/**
+	 * 查询分页数据
+	 */
+	@RequiresPermissions("deliver:dispatchCost:list")
+	@PostMapping("costList")
+	@ResponseBody
+	public PageData<DispatchCost> costList(@RequestParam(value = "page", defaultValue = "1") Integer page,
+			@RequestParam(value = "limit", defaultValue = "10") Integer limit, ServletRequest request) {
+		Map map = WebUtils.getParametersStartingWith(request, "s_");
+		PageData<DispatchCost> dispatchPageData = new PageData<>();
+		QueryWrapper<DispatchCost> dispatchWrapper = new QueryWrapper<>();
+		// 相当于del_flag = 0;
+		dispatchWrapper.eq("del_flag", false);
+		if (!map.isEmpty()) {
+			String keys = (String) map.get("name");
+			if (StringUtils.isNotBlank(keys)) {
+				dispatchWrapper.like("name", keys);
+			}
+			String wayBillId = (String) map.get("wayBillId");
+			if (StringUtils.isNotBlank(wayBillId)) {
+				dispatchWrapper.like("way_bill_id", wayBillId);
+			}
+		}
+		//排序
+		dispatchWrapper.orderByDesc("create_date");
+		IPage<DispatchCost> dispatchPage = dispatchCostService.page(new Page<>(page, limit), dispatchWrapper);
+		dispatchPageData.setCount(dispatchPage.getTotal());
+		dispatchPageData.setData(setUserToDispatchCost(dispatchPage.getRecords()));
+		return dispatchPageData;
+	}
+	// 创建者，和修改人
+	private List<DispatchCost> setUserToDispatchCost(List<DispatchCost> dispatchs) {
+		dispatchs.forEach(r -> {
+			if(StringUtils.isNotBlank(r.getDispatchId())){
+				Dispatch dispatch = dispatchService.getById(r.getDispatchId());
+				if(StringUtils.isNotBlank(dispatch.getVehicleId())){
+					dispatch.setVehicleCode(vehicleService.getById(dispatch.getVehicleId()).getLicencePlate());
+				}
+				if(StringUtils.isNotBlank(dispatch.getDriverId())){
+					dispatch.setDriverName(driverService.getById(dispatch.getDriverId()).getDriverName());
+				}
+				if (dispatch.getStatus() != null) {
+					dispatch.setStatusStr(CommomUtil.valueToNameInDict(dispatch.getStatus(), "modify_status"));
+				}
+				if (dispatch.getDispatchStatus() != null) {
+					dispatch.setDispactStatusStr(CommomUtil.valueToNameInDict(dispatch.getDispatchStatus(), "scheduling_status"));
+				}
+				r.setDispatch(dispatch);
+			}
+		});
+
+		return dispatchs;
 	}
 }
