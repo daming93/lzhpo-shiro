@@ -211,7 +211,7 @@ public class DispatchServiceImpl extends ServiceImpl<DispatchMapper, Dispatch> i
 		//难点费暂且不算
 		cost.setMinPoint(main.getMinPoint());
 		cost.setPointPrice(main.getPointPrice());
-		
+		cost.setDispatchId(dispatch.getId());
 		for (DispactAddress dispactAddress : list) {
 			VehicleContractMainDetail detail = vehicleContractMainDetailService.selectDetailMoneyByInfoNoRange(main.getId(), dispactAddress.getProvinceId(), dispactAddress.getCityId(), dispactAddress.getCountiesId());
 			if(detail!=null){
@@ -232,6 +232,7 @@ public class DispatchServiceImpl extends ServiceImpl<DispatchMapper, Dispatch> i
 		}else{
 			cost.setMoeny(money);
 		}
+	
 		dispatchCostService.save(cost);
 		baseMapper.updateById(dispatch);
 	}

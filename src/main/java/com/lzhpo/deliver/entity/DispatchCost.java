@@ -66,6 +66,16 @@ public class DispatchCost extends DataEntity<DispatchCost> implements Serializab
      */
     private BigDecimal moeny;
 
+    
+    
+	public String getDispatchId() {
+		return dispatchId;
+	}
+
+	public void setDispatchId(String dispatchId) {
+		this.dispatchId = dispatchId;
+	}
+
 	public BigDecimal getPointPrice() {
 		return pointPrice;
 	}
