@@ -94,10 +94,10 @@ public class VehicleController {
     //创建者，和修改人
    private List<Vehicle> setUserToVehicle(List<Vehicle> vehicles){
         vehicles.forEach(r -> {
-        	if(r.getVehicleTypeId()!=null){
+        	if(r.getVehicleTypeId()!=null&&StringUtils.isNotBlank(r.getVehicleTypeId())){
         		r.setTypeName(vehicleTypeService.getById(r.getVehicleTypeId()).getName());
         	}
-        	if(r.getDriverId()!=null){
+        	if(r.getDriverId()!=null&&StringUtils.isNotBlank(r.getDriverId())){
         		r.setDriverName(driverService.getById(r.getDriverId()).getDriverName());
         	}
         	if(r.getVehicleStatus()!=null){
@@ -131,10 +131,10 @@ public class VehicleController {
     @SysLog("保存新增数据")
     public ResponseEntity add(@RequestBody Vehicle vehicle){
         if(StringUtils.isBlank(vehicle.getLicencePlate())){
-            return ResponseEntity.failure("修改提示信息（不能为空)");
+            return ResponseEntity.failure("车牌号（不能为空)");
         }
         if(vehicleService.getVehicleCount(vehicle.getLicencePlate())>0){
-             return ResponseEntity.failure("修改提示信息（不能重复)");
+             return ResponseEntity.failure("车牌号（不能重复)");
         }
         
         vehicleService.saveVehicle(vehicle);

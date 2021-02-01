@@ -307,7 +307,7 @@ layui.config({
                 //验证运输计划得状态
                 for (var i = 0; i < data.length; i++) {
                     if(data[i].status==1){
-                        layer.msg("有带确认得单据在选中列表中");
+                        layer.msg("有待确认得单据在选中列表中");
                         return false;
                     }
                 }

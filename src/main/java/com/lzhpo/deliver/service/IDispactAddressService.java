@@ -62,7 +62,7 @@ public interface IDispactAddressService extends IService<DispactAddress> {
 	long countDetailByTableId(String tableId);
 	
 	//根据dispatchid去查询具体送往地址的分组
-	long countNumDetailSendPlaceByDispatchId(String dispatchId);
+	int countNumDetailSendPlaceByDispatchId(String dispatchId);
 	
 	//根据dispatchid去查询具体送往区域的分组 
 	List<DispactAddress> countNumDetailSendAreaByDispatchId(String dispatchId);

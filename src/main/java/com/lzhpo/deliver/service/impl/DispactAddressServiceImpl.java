@@ -356,10 +356,10 @@ public class DispactAddressServiceImpl extends ServiceImpl<DispactAddressMapper,
 	}
 
 	@Override
-	public long countNumDetailSendPlaceByDispatchId(String dispatchId) {
+	public int countNumDetailSendPlaceByDispatchId(String dispatchId) {
 		QueryWrapper<DispactAddress> wrapper = new QueryWrapper<>();
 		wrapper.eq("dispacth_id", dispatchId).groupBy("counties_id","area_name");
-		return baseMapper.selectCount(wrapper);
+		return baseMapper.selectList(wrapper).size();
 	}
 
 	@Override
