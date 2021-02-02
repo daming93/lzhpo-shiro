@@ -96,6 +96,25 @@ layui.config({
             });
             layer.full(editIndex);
         }
+        if(obj.event === 'dispatchId'){
+            var editIndex = layer.open({
+                title : "运输计划",
+                type : 2,
+                content : "/deliver/dispatch/edit?id="+data.dispatch.id.toString(),
+                success : function(layero, index){
+                    setTimeout(function(){
+                        layer.tips('点击此处返回单据列表', '.layui-layer-setwin .layui-layer-close', {
+                            tips: 3
+                        });
+                    },500);
+                }
+            });
+            //改变窗口大小时，重置弹窗的高度，防止超出可视区域（如F12调出debug的操作）
+            $(window).resize(function(){
+                layer.full(editIndex);
+            });
+            layer.full(editIndex);
+        }
     });
     table.on('rowDouble(dispatchCostList)', function(obj){
         var data = obj.data;
@@ -144,7 +163,7 @@ layui.config({
                     }
                 }
             },
-            { field:'dispatchId' ,event:"dispatchId",title:'司机姓名',templet: function(d){   
+            { field:'dispatchId' ,title:'司机姓名',templet: function(d){   
                     if(d.dispatch.driverName!=null){
                         return  '<div>'+ d.dispatch.driverName+'</div>'
                     }else{
@@ -152,7 +171,7 @@ layui.config({
                     }
                 }
             },
-            { field:'dispatchId' ,event:"dispatchId",title:'车牌号',templet: function(d){   
+            { field:'dispatchId' ,title:'车牌号',templet: function(d){   
                     if(d.dispatch.vehicleCode!=null){
                         return  '<div>'+ d.dispatch.vehicleCode+'</div>'
                     }else{

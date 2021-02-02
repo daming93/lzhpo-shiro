@@ -313,4 +313,42 @@ public class DispatchController {
 
 		return dispatchs;
 	}
+	@GetMapping("costEdit")
+	public String costEdit(String id, ModelMap modelMap) {
+		DispatchCost dispatchCost = dispatchCostService.getById(id);
+		if(StringUtils.isNotBlank(dispatchCost.getDispatchId())){
+			Dispatch dispatch = dispatchService.getById(dispatchCost.getDispatchId());
+			if(StringUtils.isNotBlank(dispatch.getVehicleId())){
+				dispatch.setVehicleCode(vehicleService.getById(dispatch.getVehicleId()).getLicencePlate());
+			}
+			if(StringUtils.isNotBlank(dispatch.getDriverId())){
+				dispatch.setDriverName(driverService.getById(dispatch.getDriverId()).getDriverName());
+			}
+			if (dispatch.getStatus() != null) {
+				dispatch.setStatusStr(CommomUtil.valueToNameInDict(dispatch.getStatus(), "modify_status"));
+			}
+			if (dispatch.getDispatchStatus() != null) {
+				dispatch.setDispactStatusStr(CommomUtil.valueToNameInDict(dispatch.getDispatchStatus(), "scheduling_status"));
+			}
+			dispatchCost.setDispatch(dispatch);
+		}
+		modelMap.put("dispatchCost", dispatchCost);
+		return "deliver/dispatch/editDispatchCost";
+	}
+
+	@RequiresPermissions("deliver:dispatchCost:edit")
+	@PostMapping("costEdit")
+	@ResponseBody
+	@SysLog("保存编辑数据(支出编辑)")
+	public ResponseEntity costEdit(@RequestBody DispatchCost dispatchCost) {
+		if (StringUtils.isBlank(dispatchCost.getId())) {
+			return ResponseEntity.failure("数据Id（不能为空)");
+		}
+		try {
+			dispatchCostService.updateDispatchCost(dispatchCost);
+		} catch (RuntimeJsonMappingException e) {
+			return ResponseEntity.failure(e.getMessage());
+		}
+		return ResponseEntity.success("操作成功");
+	}
 }
