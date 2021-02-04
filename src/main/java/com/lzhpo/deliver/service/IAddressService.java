@@ -37,5 +37,7 @@ public interface IAddressService extends IService<Address> {
 	
 	//上传
 	String upload(MultipartFile file);
+	
+	public Address getByName(String addressName);
 
 }

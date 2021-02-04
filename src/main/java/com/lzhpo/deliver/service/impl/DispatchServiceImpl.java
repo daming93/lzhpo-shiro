@@ -285,6 +285,14 @@ public class DispatchServiceImpl extends ServiceImpl<DispatchMapper, Dispatch> i
 		wrapper.eq("way_bill_id", wayBillId);
 		return baseMapper.selectList(wrapper);
 	}
+
+	@Override
+	public List<Dispatch> selectByCode(String code) {
+		QueryWrapper<Dispatch> wrapper = new QueryWrapper<>();
+		wrapper.eq("del_flag", false);
+		wrapper.like("code", code);
+		return baseMapper.selectList(wrapper);
+	}
 	
 
 }

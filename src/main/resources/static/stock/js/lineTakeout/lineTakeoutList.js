@@ -83,7 +83,28 @@ layui.config({
                             }
                     });
                 }
-            
+        upload.render({
+            elem: '#upload',
+            url: '/stock/lineTakeout/upload',
+            field: 'file',
+            before: function(obj){ //obj参数包含的信息，跟 choose回调完全一致，可参见上文。
+                layer.load(); //上传loading
+            },
+            done: function (res) {
+                //如果上传失败
+                if (res.success === false) {
+                     layer.closeAll('loading');
+                    return layer.msg(res.message);
+                }else{
+                     layer.closeAll('loading');
+                     layer.open({
+                        title: '提示消息'
+                        ,content: res.message
+                     });     
+                }
+                table.reload('lineTakeoutTable', t);
+            }
+        });       
 
     t = {
         elem: '#lineTakeoutTable',
@@ -101,11 +122,12 @@ layui.config({
         },
         width: $(parent.window).width()-223,
         cols: [[
+            {type:'checkbox'},
             {field:'takeoutTime',  title: '出库时间',    width:'10%'}, 
             {field:'clientName',        title: '客户名称'   },
             {field:'clientCode',        title: '客户单号' ,    width:'12%'  },
             {field:'code',        title: '系统单号' ,    width:'13%'   },
-            {field:'transportationTypeStr',        title: '运输方式'   },
+            {field:'transportationTypeStr',        title: '收入类型'   },
             {field:'addressName',        title: '送达地址'   },
             {field:'total',  title: '整'}, 
             {field:'number',  title: '零'}, 
@@ -218,25 +240,53 @@ layui.config({
             });
             layer.full(addIndex);
         },
+         down : function(){
+            addIndex = layer.open({
+                title : "添加出库单",
+                type : 2,
+                content : "/stock/lineTakeout/add",
+                success : function(layero, addIndex){
+                    setTimeout(function(){
+                        layer.tips('点击此处返回出库单列表', '.layui-layer-setwin .layui-layer-close', {
+                            tips: 3
+                        });
+                    },500);
+                }, 
+                end: function () {
+                    //重新加载当前页面
+                    location.reload();
+                }
+            });
+            //改变窗口大小时，重置弹窗的高度，防止超出可视区域（如F12调出debug的操作）
+            $(window).resize(function(){
+                layer.full(addIndex);
+            });
+            layer.full(addIndex);
+        },
         //批量删除
         deleteSome : function(){
             var checkStatus = table.checkStatus('lineTakeoutTable'),
                 data = checkStatus.data;
             if(data.length > 0){
-                console.log(JSON.stringify(data));
-                layer.confirm("你确定要删除这些出库么？",{btn:['是的,我确定','我再想想']},
+                for (var i = 0; i < data.length; i++) {
+                    if(data[i].status!=1){
+                         layer.msg("列表中有非待确认的单据，请重新勾选");
+                         return false;
+                    }
+                }
+                layer.confirm("你确定要确认这些出库单据么？",{btn:['是的,我确定','我再想想']},
                     function(){
-                        var deleteindex = layer.msg('删除中，请稍候',{icon: 16,time:false,shade:0.8});
+                        var deleteindex = layer.msg('确认中，请稍候',{icon: 16,time:false,shade:0.8});
                         $.ajax({
                             type:"POST",
-                            url:"/stock/lineTakeout/deleteSome",
+                            url:"/stock/lineTakeout/editSome",
                             dataType:"json",
                             contentType:"application/json",
                             data:JSON.stringify(data),
                             success:function(res){
                                 layer.close(deleteindex);
                                 if(res.success){
-                                    layer.msg("删除成功",{time: 1000},function(){
+                                    layer.msg("确认成功",{time: 1000},function(){
                                         table.reload('lineTakeoutTable', t);
                                     });
                                 }else{

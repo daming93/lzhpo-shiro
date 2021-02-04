@@ -1,9 +1,14 @@
 package com.lzhpo.stock.controller;
 
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.ServletOutputStream;
 import javax.servlet.ServletRequest;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.SecurityUtils;
@@ -17,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.WebUtils;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -36,6 +42,12 @@ import com.lzhpo.deliver.service.IAddressService;
 import com.lzhpo.stock.entity.LineTakeout;
 import com.lzhpo.stock.service.ILineTakeoutService;
 import com.lzhpo.sys.entity.Dictionary;
+import com.lzhpo.warehouse.entity.Depot;
+
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.io.IoUtil;
+import cn.hutool.poi.excel.ExcelUtil;
+import cn.hutool.poi.excel.ExcelWriter;
 /**
  * <p>
  * 线路发单（无关库存的发单) 表单形式和库存发单接近，但是没有子表 前端控制器
@@ -207,16 +219,22 @@ public class LineTakeoutController {
         return ResponseEntity.success("操作成功");
     }
  
-  @RequiresPermissions("stock:lineTakeout:delete")
-    @PostMapping("deleteSome")
+  @RequiresPermissions("stock:lineTakeout:edit")
+    @PostMapping("editSome")
     @ResponseBody
-    @SysLog("多选删除数据")
-    public ResponseEntity deleteSome(@RequestBody List<LineTakeout> lineTakeouts){
+    @SysLog("多选确认数据")
+    public ResponseEntity editSome(@RequestBody List<LineTakeout> lineTakeouts){
         if(lineTakeouts == null || lineTakeouts.size()==0){
-            return ResponseEntity.failure("请选择需要删除的角色");
+            return ResponseEntity.failure("请选择需要编辑的单据");
         }
         for (LineTakeout r : lineTakeouts){
-            lineTakeoutService.deleteLineTakeout(r);
+            try {
+            	lineTakeoutService.updateLineTakeout(r);
+    		} catch (RuntimeJsonMappingException e) {
+    			 return ResponseEntity.failure(e.getMessage());
+    		} catch (Exception e) {
+    			 return ResponseEntity.failure("系统异常请联系管理员");
+    		}
         }
         return ResponseEntity.success("操作成功");
     }
@@ -253,6 +271,7 @@ public class LineTakeoutController {
 		}
         return ResponseEntity.success("操作成功");
     }
+    
 	@RequiresPermissions("stock:lineTakeout:back")
 	@PostMapping("back")
 	@ResponseBody
@@ -263,5 +282,48 @@ public class LineTakeoutController {
 		}
 		lineTakeoutService.backTakeout(id);
 		return ResponseEntity.success("操作成功");
+	}
+	
+	@SysLog("上传文件")
+	@PostMapping("upload")
+	@ResponseBody
+	public ResponseEntity uploadFile(@RequestParam("file") MultipartFile file, HttpServletRequest httpServletRequest) {
+		if (file == null) {
+			return ResponseEntity.failure("上传文件为空 ");
+		}
+		Map map = new HashMap();
+		List<Basicdata> basicDatas = basicdateService.selectAll();
+		String message = lineTakeoutService.upload(file, basicDatas);
+		return ResponseEntity.success(message).setAny("data", map);
+	}
+	
+	@SysLog("下载模板")
+	@GetMapping("down")
+	@ResponseBody
+	public void down(HttpServletRequest httpServletRequest,HttpServletResponse response) {
+		// 通过工具类创建writer，默认创建xls格式
+		ExcelWriter writer = ExcelUtil.getWriter();
+		// 一次性写出内容，使用默认样式，强制输出标题
+		List<String> row1 = CollUtil.newArrayList("客户名称", "出库时间", "客户单号", "出库类型"
+				,"收入类型", "配送类型", "配送地址", "配送时间","体积(m³)", "重量(kg)", "整数量", "零数量", "备注");
+		//弄个实例
+		List<List<String>> rows = CollUtil.newArrayList(row1);
+		writer.write(rows,false);
+		//out为OutputStream，需要写出到的目标流
+		//response为HttpServletResponse对象
+		response.setContentType("application/vnd.ms-excel;charset=utf-8"); 
+		//test.xls是弹出下载对话框的文件名，不能为中文，中文请自行编码
+		response.setHeader("Content-Disposition","attachment;filename=lineTakeout.xls"); 
+		ServletOutputStream out;
+		try {
+			out = response.getOutputStream();
+			writer.flush(out, true);
+			// 关闭writer，释放内存
+			writer.close();
+			//此处记得关闭输出Servlet流
+			IoUtil.close(out);
+		} catch (IOException e) {
+			e.printStackTrace();
+		} 
 	}
 }

@@ -40,4 +40,6 @@ public interface IDispatchService extends IService<Dispatch> {
 	
 	//选取所有记录
 	List<Dispatch> selectByWayBillId(String wayBillId);
+	
+	List<Dispatch> selectByCode(String code);
 }

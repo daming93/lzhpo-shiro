@@ -232,7 +232,7 @@ layui.config({
             {field:'clientName',        title: '客户名称'   },
             {field:'clientCode',        title: '客户单号' ,    width:'12%'  },
             {field:'code',        title: '系统单号' ,    width:'13%'   },
-            {field:'transportationTypeStr',        title: '运输方式'   },
+            {field:'transportationTypeStr',        title: '收入类型'   },
             {field:'addressName',        title: '送达地址'   },
             {field:'total',  title: '整'}, 
             {field:'scatteredNum',  title: '零'}, 

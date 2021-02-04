@@ -215,6 +215,30 @@ public class LineTakeout extends DataEntity<LineTakeout> implements Serializable
     @TableField(exist = false)
     private String transportationTypeStr;
 
+    @TableField(exist = false)
+    private String adjustmentStr;
+    
+    @TableField(exist = false)
+    private String deliverTypeStr;
+    
+    
+    
+	public String getAdjustmentStr() {
+		return adjustmentStr;
+	}
+
+	public void setAdjustmentStr(String adjustmentStr) {
+		this.adjustmentStr = adjustmentStr;
+	}
+
+	public String getDeliverTypeStr() {
+		return deliverTypeStr;
+	}
+
+	public void setDeliverTypeStr(String deliverTypeStr) {
+		this.deliverTypeStr = deliverTypeStr;
+	}
+
 	public String getClientId() {
 		return clientId;
 	}

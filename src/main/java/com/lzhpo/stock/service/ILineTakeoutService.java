@@ -3,7 +3,10 @@ package com.lzhpo.stock.service;
 import java.util.List;
 import java.util.Set;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.lzhpo.client.entity.Basicdata;
 import com.lzhpo.stock.entity.LineTakeout;
 /**
  * <p>
@@ -15,7 +18,7 @@ import com.lzhpo.stock.entity.LineTakeout;
  */
 public interface ILineTakeoutService extends IService<LineTakeout> {
 	//获取满足某个条件的记录 以便不插入重复记录
-	long getLineTakeoutCount(String name);
+	long getLineTakeoutCount(String clientCode,String clientId);
 	
 	//保存实例 返回该实例
 	LineTakeout saveLineTakeout(LineTakeout lineTakeout);
@@ -37,4 +40,6 @@ public interface ILineTakeoutService extends IService<LineTakeout> {
 	void backTakeout(String id);
 	
 	List<LineTakeout> selectAllByDispatchIds(Set<String> dispatchIds);
+	
+	String upload(MultipartFile file,List<Basicdata> basicList);
 }

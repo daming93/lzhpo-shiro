@@ -43,21 +43,23 @@
             <div class="layui-input-inline">
                 <a class="layui-btn" lay-submit="" lay-filter="searchForm">查询</a>
             </div>
-        <!--   <shiro:hasPermission name="stock:takeout:delete">
-                <div class="layui-inline">
-                <a class="layui-btn layui-btn-danger" data-type="deleteSome">批量删除</a>
-            </div>
-            </shiro:hasPermission> -->
-            <shiro:hasPermission name="stock:takeout:add">
+
+            <shiro:hasPermission name="stock:lineTakeout:add">
             <div class="layui-inline">
                 <a class="layui-btn layui-btn-normal" id="addlineTakeout" data-type="addUser">添加出库</a>
-
+                
             </div>
              <div class="layui-input-inline">
-                  <div class="layui-form-mid layui-word-aux">提示:双击行查看详情,ctrl+enter新建出库</div>
+                  <div class="layui-form-mid layui-word-aux">提示:双击行查看详情</div>
               </div>
+            <shiro:hasPermission name="stock:lineTakeout:delete">
             <div class="layui-inline">
-                <a class="layui-btn" lay-submit="" lay-filter="searchForm">查询</a>
+                <a class="layui-btn layui-btn-danger" data-type="deleteSome">批量确认</a>
+            </div>
+            </shiro:hasPermission>
+            <div class="layui-inline">
+                <button class="layui-btn" id="upload" type="button" lay-data="{ accept: 'file',exts:'xlsx|xls'}">批量上传</button><span id="uploadText"></span>
+               <button class="layui-btn search" style="margin-left: 50px;" ><a href="/stock/lineTakeout/down" download="linelist.xls" style="color: #fff;">导出模板</a></button>
             </div>
         </form>
     </div>

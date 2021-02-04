@@ -47,18 +47,10 @@
                 <a class="layui-btn layui-btn-danger" data-type="deleteSome">批量删除</a>
             </div>
             </shiro:hasPermission> -->
-            <shiro:hasPermission name="stock:directReturn:add">
-            <div class="layui-inline">
-                <a class="layui-btn layui-btn-normal" id="adddirectReturn" data-type="addUser">添加直退</a>
-
-            </div>
+         
              <div class="layui-input-inline">
-                  <div class="layui-form-mid layui-word-aux">双击行查看详情,ctrl+enter新建直退</div>
+                  <div class="layui-form-mid layui-word-aux">双击行查看详情</div>
               </div>
-             </shiro:hasPermission>
-             <div class="layui-input-inline">
-                <input type="checkbox" name="continuity" id="continuity" lay-skin="switch" lay-text="连续录入|关闭" >
-            </div>
         </form>
     </div>
 </fieldset>

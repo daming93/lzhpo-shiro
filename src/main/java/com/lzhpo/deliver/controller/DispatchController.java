@@ -1,5 +1,6 @@
 package com.lzhpo.deliver.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -274,13 +275,19 @@ public class DispatchController {
 		// 相当于del_flag = 0;
 		dispatchWrapper.eq("del_flag", false);
 		if (!map.isEmpty()) {
-			String keys = (String) map.get("name");
-			if (StringUtils.isNotBlank(keys)) {
-				dispatchWrapper.like("name", keys);
-			}
-			String wayBillId = (String) map.get("wayBillId");
-			if (StringUtils.isNotBlank(wayBillId)) {
-				dispatchWrapper.like("way_bill_id", wayBillId);
+			String code = (String) map.get("code");
+			if (StringUtils.isNotBlank(code)) {
+				//这里是运输计划的单号
+				List<Dispatch> dispatchList = dispatchService.selectByCode(code);
+				List<String> ids = new ArrayList<String>();
+				for (Dispatch dispatch : dispatchList) {
+					ids.add(dispatch.getId());
+				}
+				if(ids.isEmpty()){
+					dispatchWrapper.eq("id", 1);
+				}else{
+					dispatchWrapper.in("dispatch_id", ids);
+				}
 			}
 		}
 		//排序
