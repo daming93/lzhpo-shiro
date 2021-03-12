@@ -181,6 +181,7 @@ layui.use('laydate', function(){
         form.on("submit(searchForm)",function(data){
             getExpressBillList('#order_bill', '',data.field) ;
             getList('#order_dispatch', '',data.field);
+            getLineList('#order_line', '',data.field);
             return false;
         });
 

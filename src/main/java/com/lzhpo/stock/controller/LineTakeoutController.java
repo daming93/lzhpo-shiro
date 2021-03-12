@@ -227,6 +227,7 @@ public class LineTakeoutController {
         if(lineTakeouts == null || lineTakeouts.size()==0){
             return ResponseEntity.failure("请选择需要编辑的单据");
         }
+        
         for (LineTakeout r : lineTakeouts){
             try {
             	lineTakeoutService.updateLineTakeout(r);

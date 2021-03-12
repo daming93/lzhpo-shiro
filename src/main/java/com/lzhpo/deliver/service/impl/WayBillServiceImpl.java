@@ -150,7 +150,10 @@ public class WayBillServiceImpl extends ServiceImpl<WayBillMapper, WayBill> impl
     	//有所有单据之后按时间之类的分
     	//预设收入
     	List<Income> incomeList = new ArrayList<Income>();
-    	List<Takeout> takeoutList = takeoutService.selectAllByDispatchIds(tableIds);
+    	List<Takeout> takeoutList  =  new ArrayList<>();
+    	if(!tableIds.isEmpty()){
+    		takeoutList = takeoutService.selectAllByDispatchIds(tableIds);
+    	}
     	
     	for (Takeout takeout : takeoutList) {//这里 总数和零数可能之前计算有问题 
 			//这里就是按五个同一原则分配出来的金额
@@ -234,8 +237,8 @@ public class WayBillServiceImpl extends ServiceImpl<WayBillMapper, WayBill> impl
 					break;
 				default://销售额
 					if(money_type_unit.equals(detail.getMoneyType())){
-						sum = detail.getMoney().multiply(takeout.getMoney()).multiply(coefficient);
-						tmep=tmep+"销售额"+"计算过程("+takeout.getMoney()+"*"+detail.getMoney()+"[百分比]"+"*"+coefficient+"[系数]="+sum+")收取 "+sum+"(元)";
+						sum = detail.getMoney().multiply(takeout.getMoney()).multiply(coefficient).divide(new BigDecimal(100));;
+						tmep=tmep+"销售额"+"计算过程("+takeout.getMoney()+"*"+detail.getMoney()+"%[百分比]"+"*"+coefficient+"[系数]="+sum+")收取 "+sum+"(元)";
 					}else{
 						sum = detail.getMoney().multiply(coefficient);;
 						tmep=tmep+"销售额"+"计算过程("+detail.getMoney()+"[固收]"+"*"+coefficient+"[系数]="+sum+")收取 "+sum+"(元)" ;
@@ -257,7 +260,10 @@ public class WayBillServiceImpl extends ServiceImpl<WayBillMapper, WayBill> impl
     		
 		}
     	//然后进行线路发单的收费
-    	List<LineTakeout> linetakeoutList = lineTakeoutService.selectAllByDispatchIds(tableIds);
+    	List<LineTakeout> linetakeoutList = new ArrayList<>();
+    	if(!linetableIds.isEmpty()){
+    		linetakeoutList = lineTakeoutService.selectAllByDispatchIds(linetableIds);
+    	}
     	//逻辑基本一样只是从不同表中进行选出
     	for (LineTakeout takeout : linetakeoutList) {//这里 总数和零数可能之前计算有问题 
 			//这里就是按五个同一原则分配出来的金额
@@ -341,8 +347,8 @@ public class WayBillServiceImpl extends ServiceImpl<WayBillMapper, WayBill> impl
 					break;
 				default://销售额
 					if(money_type_unit.equals(detail.getMoneyType())){
-						sum = detail.getMoney().multiply(takeout.getMoney()).multiply(coefficient);
-						tmep=tmep+"销售额"+"计算过程("+takeout.getMoney()+"*"+detail.getMoney()+"[百分比]"+"*"+coefficient+"[系数]="+sum+")收取 "+sum+"(元)";
+						sum = detail.getMoney().multiply(takeout.getMoney()).multiply(coefficient).divide(new BigDecimal(100));
+						tmep=tmep+"销售额"+"计算过程("+takeout.getMoney()+"*"+detail.getMoney()+"%[百分比]"+"*"+coefficient+"[系数]="+sum+")收取 "+sum+"(元)";
 					}else{
 						sum = detail.getMoney().multiply(coefficient);;
 						tmep=tmep+"销售额"+"计算过程("+detail.getMoney()+"[固收]"+"*"+coefficient+"[系数]="+sum+")收取 "+sum+"(元)" ;
